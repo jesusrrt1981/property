@@ -1,0 +1,1538 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+	<!-- My Portal -->
+    
+	<template id="portal_my_contracts" inherit_id="portal.portal_my_home" name="My Portal">
+		<xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+			<t t-call="portal.portal_docs_entry">
+				<t t-set="title">Maintenance Requests</t>
+				<t t-set="url" t-value="'/my/maintenance-request/'" />
+				<t t-set="placeholder_count" t-value="'maintenance_count'" />
+				<t t-set="text">View your property maintenance requests</t>
+				<t t-set="icon" t-value="'/cjg_finance_property/static/src/img/maintence_icon.png'" />
+			</t>
+		</xpath>
+	</template>
+	<!-- Sell Contract Tree -->
+	<template id="rental_user_sell_contract_info" name="Sell Contracts">
+		<t t-call="portal.portal_layout">
+			<t t-if="not contract">
+				<p>
+					There are currently no sell contract
+				</p>
+			</t>
+			<t t-if="contract" t-call="portal.portal_table">
+				<thead>
+					<tr class="active">
+						<th>
+							Ref #
+						</th>
+						<th>
+							Property
+						</th>
+						<th>
+							Landlord
+						</th>
+						<th class="text-center">
+							Status
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<t t-foreach="contract" t-as="b">
+						<tr>
+							<td>
+								<a t-attf-href="/my/sell-contract/information/{{ slug(b) }}">
+									<span t-field="b.sold_seq" />
+								</a>
+							</td>
+							<td>
+								<span t-field="b.property_id.name" />
+							</td>
+                            <!-- landlord column removed -->
+							<td class="text-center">
+								<t t-if="b.stage in ['booked']">
+									<span class="badge rounded-pill text-bg-info">
+										<span t-field="b.stage" />
+									</span>
+								</t>
+								<t t-if="b.stage=='sold'">
+									<span class="badge rounded-pill text-bg-success">
+										<span t-field="b.stage" />
+									</span>
+								</t>
+								<t t-if="b.stage=='refund'">
+									<span class="badge rounded-pill text-bg-warning">
+										<span t-field="b.stage" />
+									</span>
+								</t>
+							</td>
+						</tr>
+					</t>
+				</tbody>
+			</t>
+		</t>
+	</template>
+	<!-- Sell Contract Form -->
+	<template id="rental_user_sell_contract_details" name="Sell Contract">
+		<t t-call="website.layout">
+			<div class="container py-4">
+				<div class="card">
+					<div class="card-header row">
+						<div class="col-md-6 col-sm-12"> Contract Ref. <strong>
+								<span t-field="sell_contract.sold_seq" />
+							</strong>
+						</div>
+						<div class="col-md-6 col-sm-12 text-end">
+							<t t-if="sell_contract.stage in ['booked']">
+								<span class="badge rounded-pill text-bg-info">
+									<span t-field="sell_contract.stage" />
+								</span>
+							</t>
+							<t t-if="sell_contract.stage=='sold'">
+								<span class="badge rounded-pill text-bg-success">
+									<span t-field="sell_contract.stage" />
+								</span>
+							</t>
+							<t t-if="sell_contract.stage=='refund'">
+								<span class="badge rounded-pill text-bg-warning">
+									<span t-field="sell_contract.stage" />
+								</span>
+							</t>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="row p-2">
+							<div class="col-md-6 col-sm-12"> Date : <strong>
+									<span t-field="sell_contract.date" />
+								</strong>
+							</div>
+							<t t-if="sell_contract.sold_document">
+								<div class="col-md-6 col-sm-12"> Contract : <strong>
+										<a
+											t-attf-href="/web/content?model=property.vendor&amp;id=#{sell_contract.id}&amp;field=sold_document&amp;filename_field=file_name"
+											target="_blank">
+											<span class="svg-icon svg-icon-muted svg-icon-2hx">
+												<svg width="24" height="24" viewBox="0 0 24 24"
+													fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path opacity="0.3"
+														d="M19 15C20.7 15 22 13.7 22 12C22 10.3 20.7 9 19 9C18.9 9 18.9 9 18.8 9C18.9 8.7 19 8.3 19 8C19 6.3 17.7 5 16 5C15.4 5 14.8 5.2 14.3 5.5C13.4 4 11.8 3 10 3C7.2 3 5 5.2 5 8C5 8.3 5 8.7 5.1 9H5C3.3 9 2 10.3 2 12C2 13.7 3.3 15 5 15H19Z"
+														fill="currentColor" />
+													<path
+														d="M13 17.4V12C13 11.4 12.6 11 12 11C11.4 11 11 11.4 11 12V17.4H13Z"
+														fill="currentColor" />
+													<path opacity="0.3"
+														d="M8 17.4H16L12.7 20.7C12.3 21.1 11.7 21.1 11.3 20.7L8 17.4Z"
+														fill="currentColor" />
+												</svg>
+											</span>
+											<span t-field="sell_contract.file_name" />
+										</a>
+									</strong>
+								</div>
+							</t>
+						</div>
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-home" aria-hidden="true">
+							</i> Property Details </div>
+						<div class="row p-2">
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-md-4 col-4 col-sm-6">
+										Property Name
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-md-7 col-7 col-sm-6">
+										<span t-field="sell_contract.property_id.name"
+											class="fw-bold" />
+									</div>
+									<div class="col-md-4 col-4 col-sm-6">
+										Property Type
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-md-7 col-7 col-sm-6">
+										<span t-field="sell_contract.type" class="fw-bold" /> / <span
+											t-field="sell_contract.property_subtype_id"
+											class="fw-bold" />
+									</div>
+									<div class="col-md-4 col-4 col-sm-6">
+										Address
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-md-7 col-7 col-sm-6">
+										<span t-esc="sell_contract.street" class="fw-bold" />
+										<br />
+										<span
+											t-esc="sell_contract.street2" class="fw-bold" />
+										<br />
+										<span
+											t-esc="sell_contract.city_id.name" class="fw-bold" />
+										<span
+											t-esc="sell_contract.zip" class="fw-bold" />
+										<br />
+										<span
+											t-esc="sell_contract.state_id.name" class="fw-bold" /> , <span
+											t-esc="sell_contract.country_id.name" class="fw-bold" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-12">
+							</div>
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-md-4 col-4 col-sm-6">
+										Price
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-md-7 col-7 col-sm-6">
+										<span t-field="sell_contract.price" class="fw-bold" />
+									</div>
+									<div class="col-md-4 col-4 col-sm-6">
+										Region
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-md-7 col-7 col-sm-6">
+										<span t-field="sell_contract.region_id.name" class="fw-bold" />
+									</div>
+									<t t-if="sell_contract.property_project_id">
+										<div class="col-md-4 col-4 col-sm-6">
+											Project
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-md-7 col-7 col-sm-6">
+											<span t-field="sell_contract.property_project_id.name"
+												class="fw-bold" />
+										</div>
+									</t>
+									<t t-if="sell_contract.subproject_id">
+										<div class="col-md-4 col-4 col-sm-6">
+											Sub Project
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-md-7 col-7 col-sm-6">
+											<span t-field="sell_contract.subproject_id.name"
+												class="fw-bold" />
+										</div>
+									</t>
+								</div>
+							</div>
+						</div>
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-cube" aria-hidden="true">
+							</i> Property Area </div>
+						<div class="row p-2">
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Total Area
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.total_area" class="fw-bold" />
+										<span t-field="sell_contract.measure_unit" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-12">
+							</div>
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Usable Area
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.usable_area" class="fw-bold" />
+										<span t-field="sell_contract.measure_unit" />
+									</div>
+								</div>
+							</div>
+						</div>
+                        <!-- Landlord Details removed from sell contract -->
+						<t t-if="sell_contract.is_any_broker">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-user-circle" aria-hidden="true">
+								</i> Broker Details </div>
+							<div class="row p-2">
+								<div class="col-md-5 col-sm-12">
+									<div class="row">
+										<div class="col-4 col-md-4 col-sm-6">
+											Broker
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="sell_contract.broker_id.name"
+												class="fw-bold" />
+										</div>
+										<div class="col-4 col-md-4 col-sm-6">
+											Commission Type
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="sell_contract.commission_type"
+												class="fw-bold" />
+										</div>
+										<div class="col-4 col-sm-6 col-md-4">
+											Commission From
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="sell_contract.commission_from"
+												class="fw-bold" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-12">
+								</div>
+								<div class="col-md-5 col-sm-12">
+									<div class="row">
+										<div class="col-4 col-md-4 col-sm-6">
+											Commission
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<t t-if="sell_contract.commission_type == 'f'">
+												<span
+													t-field="sell_contract.broker_final_commission"
+													class="fw-bold" />
+											</t>
+											<t t-if="sell_contract.commission_type == 'p'">
+												<span
+													t-field="sell_contract.broker_commission_percentage"
+													class="fw-bold" /> % - <span
+													t-field="sell_contract.broker_final_commission"
+													class="fw-bold" />
+											</t>
+										</div>
+										<div class="col-4 col-md-4 col-sm-6">
+											Broker Bill
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<t t-if="sell_contract.broker_bill_id">
+												<a
+													t-att-href="sell_contract.broker_bill_id.get_portal_url()"
+													t-att-title="sell_contract.broker_bill_id.name">
+													<t t-esc="sell_contract.broker_bill_id.name"
+														t-if="sell_contract.broker_bill_id.name != '/'" />
+													<em t-else="">
+														Draft Bill
+													</em>
+												</a>
+											</t>
+										</div>
+										<div class="col-4 col-md-4 col-sm-6">
+											Brokerage
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<t t-if="sell_contract.broker_invoice_id">
+												<a
+													t-att-href="sell_contract.broker_invoice_id.get_portal_url()"
+													t-att-title="sell_contract.broker_invoice_id.name">
+													<t t-esc="sell_contract.broker_invoice_id.name"
+														t-if="sell_contract.broker_invoice_id.name != '/'" />
+													<em t-else="">
+														Draft Invoice
+													</em>
+												</a>
+											</t>
+										</div>
+									</div>
+								</div>
+							</div>
+						</t>
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-money" aria-hidden="true">
+							</i> Payment Details </div>
+						<div class="row p-2">
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Payment Term
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.payment_term" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Customer Ask Price
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.ask_price" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Customer Sell Price
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.sale_price" class="fw-bold" />
+									</div>
+									<t t-if="sell_contract.is_any_maintenance">
+										<div class="col-4 col-md-4 col-sm-6">
+											Maintenance
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="sell_contract.total_maintenance"
+												class="fw-bold" />
+										</div>
+									</t>
+									<t t-if="sell_contract.is_utility_service">
+										<div class="col-4 col-md-4 col-sm-6">
+											Utility Cost
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="sell_contract.total_service"
+												class="fw-bold" />
+										</div>
+									</t>
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-12">
+							</div>
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Total Amount
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.total_sell_amount"
+											class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Book Price
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.book_price" class="fw-bold" />
+										<br />
+										<t t-if="sell_contract.book_invoice_id"> Invoice : <a
+												t-att-href="sell_contract.book_invoice_id.get_portal_url()"
+												t-att-title="sell_contract.book_invoice_id.name">
+												<t t-esc="sell_contract.book_invoice_id.name"
+													t-if="sell_contract.book_invoice_id.name != '/'" />
+												<em t-else="">
+													Draft Invoice
+												</em>
+											</a>
+										</t>
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Total Payable
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="sell_contract.payable_amount" class="fw-bold" />
+									</div>
+								</div>
+							</div>
+						</div>
+						<t t-if="sell_contract.sale_invoice_ids">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-list-alt" aria-hidden="true">
+								</i> Invoices </div>
+							<div class="table-responsive">
+
+								<table class="table table-hover table-sm">
+									<thead>
+										<tr>
+											<th scope="col">
+												Title
+											</th>
+											<th scope="col">
+												Date
+											</th>
+											<th scope="col">
+												Taxes
+											</th>
+											<th scope="col" class="text-end">
+												Amount
+											</th>
+											<th scope="col" class="text-end">
+												Tax Amount
+											</th>
+											<th scope="col" class="text-center">
+												# Invoice
+											</th>
+											<th scope="col" class="text-center">
+												Status
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<t t-foreach="sell_contract.sale_invoice_ids" t-as="ins">
+											<tr>
+												<td>
+													<span t-field="ins.name" />
+												</td>
+												<td>
+													<span t-field="ins.invoice_date" />
+												</td>
+												<td>
+													<span t-field="ins.tax_ids" />
+												</td>
+												<td class="text-end">
+													<span t-field="ins.amount" />
+												</td>
+												<td class="text-end">
+													<span t-field="ins.tax_amount" />
+												</td>
+												<td class="text-center">
+													<t t-if="ins.invoice_id">
+														<a
+															t-att-href="ins.invoice_id.get_portal_url()"
+															t-att-title="ins.invoice_id.name">
+															<t t-esc="ins.invoice_id.name"
+																t-if="ins.invoice_id.name != '/'" />
+															<em t-else="">
+																Draft Invoice
+															</em>
+														</a>
+													</t>
+												</td>
+												<td class="text-center">
+													<t
+														t-if="ins.invoice_id.state == 'posted' and ins.payment_state not in ('in_payment', 'paid', 'reversed')">
+														<span
+															class="badge rounded-pill text-bg-info">
+															<i class="fa fa-fw fa-clock-o"
+																aria-label="Opened" title="Opened"
+																role="img">
+															</i>
+															<span class="d-none d-md-inline">
+																Waiting
+																for Payment
+															</span>
+														</span>
+													</t>
+													<t
+														t-if="ins.invoice_id.state == 'posted' and ins.payment_state in ('paid', 'in_payment')">
+														<span
+															class="badge rounded-pill text-bg-success">
+															<i class="fa fa-fw fa-check"
+																aria-label="Paid" title="Paid"
+																role="img">
+															</i>
+															<span class="d-none d-md-inline">
+																Paid
+															</span>
+														</span>
+													</t>
+													<t
+														t-if="ins.invoice_id.state == 'posted' and ins.payment_state == 'reversed'">
+														<span
+															class="badge rounded-pill text-bg-success">
+															<i class="fa fa-fw fa-check"
+																aria-label="Reversed"
+																title="Reversed"
+																role="img">
+															</i>
+															<span class="d-none d-md-inline">
+																Reversed
+															</span>
+														</span>
+													</t>
+													<t t-if="ins.invoice_id.state == 'cancel'">
+														<span
+															class="badge rounded-pill text-bg-warning">
+															<i class="fa fa-fw fa-remove"
+																aria-label="Cancelled"
+																title="Cancelled"
+																role="img">
+															</i>
+															<span class="d-none d-md-inline">
+																Cancelled
+															</span>
+														</span>
+													</t>
+												</td>
+											</tr>
+										</t>
+									</tbody>
+								</table>
+							</div>
+							<div class="row">
+								<div class="col-md-10 col-6 col-sm-6 text-end">
+									Untaxed Amount
+								</div>
+								<div class="col-md-2 col-6 col-sm-6 text-end">
+									<span t-field="sell_contract.total_untaxed_amount" />
+								</div>
+								<div class="col-md-10 col-6 col-sm-6 text-end">
+									Tax Amount
+								</div>
+								<div class="col-md-2 col-6 col-sm-6 text-end">
+									<span t-field="sell_contract.tax_amount" />
+								</div>
+								<div class="col-md-10 col-6 col-sm-6 text-end fw-bold">
+									Total Amount
+								</div>
+								<div class="col-md-2 col-6 col-sm-6 text-end fw-bold">
+									<span t-field="sell_contract.total_amount" />
+								</div>
+								<div class="col-md-10 col-6 col-sm-6 text-end">
+									Paid
+								</div>
+								<div class="col-md-2 col-6 col-sm-6 text-end">
+									<span t-field="sell_contract.paid_amount" />
+								</div>
+								<div class="col-md-10 col-6 col-sm-6 text-end fw-bold">
+									Remaining Amount
+								</div>
+								<div class="col-md-2 col-6 col-sm-6 text-end fw-bold">
+									<span t-field="sell_contract.remaining_amount" />
+								</div>
+							</div>
+						</t>
+					</div>
+				</div>
+				<div id="bid_details_content" class="col-12 col-lg">
+					<div id="sell_contract_communication" class="mt-4">
+						<h2>
+							History
+						</h2>
+						<t t-call="portal.message_thread">
+							<t t-set="object" t-value="sell_contract" />
+						</t>
+					</div>
+				</div>
+			</div>
+		</t>
+	</template>
+	<!-- Rent Contract Tree -->
+	<template id="rental_user_rent_contract_info" name="Rent Contracts">
+		<t t-call="portal.portal_layout">
+			<t t-if="not contract">
+				<p>
+					There are currently no rent contract
+				</p>
+			</t>
+			<t t-if="contract" t-call="portal.portal_table">
+				<thead>
+					<tr class="active">
+						<th>
+							Ref #
+						</th>
+						<th>
+							Property
+						</th>
+                        <!-- landlord header removed -->
+						<th>
+							Duration
+						</th>
+						<th class="text-center">
+							Status
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<t t-foreach="contract" t-as="rc">
+						<tr>
+							<td>
+								<span t-field="rc.property_id.name" />
+							</td>
+                            <!-- landlord cell removed -->
+							<td>
+								<span class="badge rounded-pill text-bg-primary">
+									<i class="fa fa-fw fa-clock-o" aria-label="Duration"
+										title="Duration" role="img">
+									</i>
+									<span class="d-none d-md-inline">
+										<span t-field="rc.start_date" /> to <span
+											t-field="rc.end_date" />
+									</span>
+								</span>
+							</td>
+							<td class="text-center">
+								<t t-if="rc.contract_type in ['new_contract']">
+									<span class="badge rounded-pill text-bg-info">
+										<span t-field="rc.contract_type" />
+									</span>
+								</t>
+								<t t-if="rc.contract_type=='running_contract'">
+									<span class="badge rounded-pill text-bg-success">
+										<span t-field="rc.contract_type" />
+									</span>
+								</t>
+								<t t-if="rc.contract_type in ['cancel_contract','close_contract']">
+									<span class="badge rounded-pill text-bg-danger">
+										<span t-field="rc.contract_type" />
+									</span>
+								</t>
+								<t t-if="rc.contract_type in ['expire_contract']">
+									<span class="badge rounded-pill text-bg-warning">
+										<span t-field="rc.contract_type" />
+									</span>
+								</t>
+							</td>
+						</tr>
+					</t>
+				</tbody>
+			</t>
+		</t>
+	</template>
+	<!-- Rent Contract Form -->
+	<template id="rental_user_rent_contract_details" name="Rent Contract">
+		<t t-call="website.layout">
+			<div class="container py-4">
+				<div class="card">
+					<div class="card-header row">
+									<div class="col-6 col-md-5 col-sm-6 text-end">
+							<t t-if="rent.contract_type == 'running_contract'">
+								<span class="badge text-bg-primary">Days Left : <span
+										t-field="rent.days_left" /> Days</span>
+							</t>
+						</div>
+						<div class="col-12 col-md-1 col-sm-6 text-end">
+							<t t-if="rent.contract_type in ['new_contract']">
+								<span class="badge rounded-pill text-bg-info">
+									<span t-field="rent.contract_type" />
+								</span>
+							</t>
+							<t t-if="rent.contract_type=='running_contract'">
+								<span class="badge rounded-pill text-bg-success">
+									<span t-field="rent.contract_type" />
+								</span>
+							</t>
+							<t t-if="rent.contract_type in ['cancel_contract','close_contract']">
+								<span class="badge rounded-pill text-bg-danger">
+									<span t-field="rent.contract_type" />
+								</span>
+							</t>
+							<t t-if="rent.contract_type in ['expire_contract']">
+								<span class="badge rounded-pill text-bg-warning">
+									<span t-field="rent.contract_type" />
+								</span>
+							</t>
+						</div>
+					</div>
+					<div class="card-body">
+						<t t-if="rent.contract_type=='running_contract'">
+							<button type="button" class="btn btn-primary mb-2"
+								data-bs-toggle="modal"
+								data-bs-target="#maintenanceToggle">
+								Maintenance Request
+							</button>
+							<div class="modal fade" id="maintenanceToggle" tabindex="-1"
+								role="dialog"
+								aria-labelledby="maintenanceModalLabel" aria-hidden="true">
+								<div class="modal-dialog" role="maintenance">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title">Maintenance Request</h5>
+											<button type="button" class="close btn btn-danger"
+												data-bs-dismiss="modal"
+												aria-label="Close">
+												<span aria-hidden="true">x</span>
+											</button>
+										</div>
+										<div class="modal-body">
+											<form class="row g-3"
+												action="/my/rent-contract/information/maintenance-request"
+												method="POST"
+												enctype="multipart/form-data">
+												<input type="hidden" name="csrf_token"
+													t-att-value="request.csrf_token()" />
+												<input type="hidden" name="rent"
+													t-att-value="rent.id" />
+												<div class="input-group">
+													<span class="input-group-text">Request</span>
+													<input type="text" class="form-control"
+														id="name" required="required"
+														name="request" />
+												</div>
+												<div class="input-group mb-3">
+													<label class="input-group-text"
+														for="type">Maintenance Type
+													</label>
+													<select class="form-select"
+														id="maintenance_type_id"
+														name="maintenance_type_id"
+														required="required">
+														<t t-foreach="maintenance_type" t-as="d">
+															<option t-esc="d.name"
+																t-att-value="d.id" />
+														</t>
+													</select>
+												</div>
+												<div class="input-group">
+													<span class="input-group-text">Description</span>
+													<textarea class="form-control" name="desc"
+														aria-label="With textarea" />
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary"
+														data-bs-dismiss="modal">
+														Close
+													</button>
+													<button type="submit" class="btn btn-primary">
+														Create Request</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</t>
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-envelope" aria-hidden="true">
+							</i> Contract Information </div>
+						<div class="row p-2">
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Start Date
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.start_date" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Payment Term
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.payment_term" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Type
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.type" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Invoice Start From
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.invoice_start_date" class="fw-bold" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-12">
+							</div>
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										End Date
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.end_date" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Rent
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<t t-if="rent.is_any_deposit">
+										<div class="col-4 col-md-4 col-sm-6">
+											Deposit
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.deposit_amount" class="fw-bold" />
+										</div>
+									</t>
+									<t t-if="rent.new_contract_id">
+										<div class="col-4 col-md-4 col-sm-6">
+											Extended Contract Ref.
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span
+												t-field="rent.new_contract_id" class="fw-bold" />
+										</div>
+									</t>
+								</div>
+							</div>
+						</div>
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-cube" aria-hidden="true">
+							</i> Property Area </div>
+						<div class="row p-2">
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-md-4 col-4 col-sm-6">
+										Total Area
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-md-7 col-7 col-sm-6">
+										<span t-field="rent.total_area" class="fw-bold" />
+										<span t-field="rent.measure_unit" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-12">
+							</div>
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-md-4 col-sm-6 col-4">
+										Usable Area
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.usable_area" class="fw-bold" />
+										<span t-field="rent.measure_unit" />
+									</div>
+								</div>
+							</div>
+						</div>
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-building-o" aria-hidden="true">
+							</i> Property Details </div>
+						<div class="row p-2">
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Property
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.property_id.name" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Type
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.property_type" class="fw-bold" /> / <span
+											t-field="rent.property_subtype_id" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Address
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-esc="rent.street" class="fw-bold" />
+										<br />
+										<span
+											t-esc="rent.street2" class="fw-bold" />
+										<br />
+										<span
+											t-esc="rent.city_id.name" class="fw-bold" />
+										<span
+											t-esc="rent.zip" class="fw-bold" />
+										<br />
+										<span
+											t-esc="rent.state_id.name" class="fw-bold" /> , <span
+											t-esc="rent.country_id.name" class="fw-bold" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-12">
+							</div>
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Region
+									</div>
+									<div class="col-md-1 remove_colon">
+										:
+									</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="rent.region_id.name" class="fw-bold" />
+									</div>
+									<t t-if="rent.property_project_id">
+										<div class="col-4 col-md-4 col-sm-6">
+											Project
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.property_project_id.name"
+												class="fw-bold" />
+										</div>
+									</t>
+									<t t-if="rent.subproject_id">
+										<div class="col-4 col-md-4 col-sm-6">
+											Sub Project
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.subproject_id.name" class="fw-bold" />
+										</div>
+									</t>
+								</div>
+							</div>
+						</div>
+                        <!-- Landlord Details removed from portal rent contract -->
+						<t t-if="rent.is_maintenance_service">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-wrench" aria-hidden="true">
+								</i> Maintenance Details </div>
+							<div class="row p-2">
+								<div class="col-md-5 col-sm-12">
+									<div class="row">
+										<div class="col-4 col-md-4 col-sm-6">
+											Maintenance Type
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.maintenance_rent_type"
+												class="fw-bold" />
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-4 col-md-4 col-sm-6">
+											Charges Type
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.maintenance_type" class="fw-bold" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-12">
+								</div>
+								<div class="col-md-5 col-sm-12">
+									<div class="row">
+										<t t-if="rent.maintenance_type == 'area_wise'">
+											<div class="col-4 col-md-4 col-sm-6">
+												Maintenance
+											</div>
+											<div class="col-md-1 remove_colon">
+												:
+											</div>
+											<div class="col-7 col-md-7 col-sm-6">
+												<span t-field="rent.per_area_maintenance"
+													class="fw-bold" /> / <span
+													t-field="rent.measure_unit" class="fw-bold" />
+											</div>
+										</t>
+										<div class="col-4 col-md-4 col-sm-6">
+											Total Maintenance
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.total_maintenance" class="fw-bold" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</t>
+						<t t-if="rent.is_any_broker">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-user-circle" aria-hidden="true">
+								</i> Broker Details </div>
+							<div class="row p-2">
+								<div class="col-md-5 col-sm-12">
+									<div class="row">
+										<div class="col-4 col-md-4 col-sm-6">
+											Broker
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.broker_id.name" class="fw-bold" />
+										</div>
+										<div class="col-4 col-md-4 col-sm-6">
+											Commission From
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.commission_from" class="fw-bold" />
+										</div>
+										<div class="col-4 col-md-4 col-sm-6">
+											Brokerage Type
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.rent_type" class="fw-bold" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2 col-sm-12">
+								</div>
+								<div class="col-md-5 col-sm-12">
+									<div class="row">
+										<div class="col-4 col-md-4 col-sm-6">
+											Commission Type
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<span t-field="rent.commission_type" class="fw-bold" />
+										</div>
+										<div class="col-4 col-md-4 col-sm-6">
+											Payable Commission
+										</div>
+										<div class="col-md-1 remove_colon">
+											:
+										</div>
+										<div class="col-7 col-md-7 col-sm-6">
+											<t t-if="rent.commission_type == 'f'">
+												<span t-field="rent.commission" class="fw-bold" />
+											</t>
+											<t t-if="rent.commission_type == 'p'">
+												<span t-field="rent.broker_commission_percentage"
+													class="fw-bold" /> % - <span
+													t-field="rent.commission" class="fw-bold" />
+											</t>
+										</div>
+									</div>
+								</div>
+							</div>
+						</t>
+						<t t-if="rent.is_extra_service">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-bars" aria-hidden="true">
+								</i> Utility Services </div>
+							<div class="table-responsive">
+								<table class="table table-hover table-sm">
+									<thead>
+										<tr>
+											<th scope="col">
+												Service
+											</th>
+											<th scope="col">
+												Type
+											</th>
+											<th scope="col" class="text-end">
+												Cost
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<t t-foreach="rent.extra_services_ids" t-as="s">
+											<tr>
+												<td>
+													<span t-field="s.service_id.name" />
+												</td>
+												<td>
+													<span t-field="s.service_type" />
+												</td>
+												<td class="text-end">
+													<span t-field="s.price" />
+												</td>
+											</tr>
+										</t>
+									</tbody>
+								</table>
+							</div>
+						</t>
+						<t t-if="rent.is_added_services">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-bars" aria-hidden="true">
+								</i> Extra Services </div>
+							<div class="table-responsive">
+								<table class="table table-hover table-sm">
+									<thead>
+										<tr>
+											<th scope="col">
+												Service
+											</th>
+											<th scope="col" class="text-end">
+												Cost
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<t t-foreach="rent.added_service_ids" t-as="es">
+											<tr>
+												<td>
+													<span t-field="es.service_id.name" />
+												</td>
+
+												<td class="text-end">
+													<span t-field="es.price" />
+												</td>
+											</tr>
+										</t>
+									</tbody>
+								</table>
+							</div>
+						</t>
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-credit-card" aria-hidden="true">
+							</i> Rent Installments </div>
+						<div class="table-responsive">
+							<table class="table table-hover table-sm">
+								<thead>
+									<tr>
+										<th scope="col">
+											Invoice Date
+										</th>
+										<th scope="col">
+											Payment
+										</th>
+										<th scope="col">
+											Description
+										</th>
+										<th scope="col" class="text-end">
+											Amount
+										</th>
+										<th scope="col" class="text-center">
+											Invoice
+										</th>
+										<th scope="col" class="text-center">
+											Status
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<t t-foreach="rent.rent_invoice_ids" t-as="ins">
+										<tr>
+											<td>
+												<span t-field="ins.invoice_date" />
+											</td>
+											<td>
+												<span t-field="ins.type" />
+											</td>
+											<td>
+												<span t-field="ins.description" />
+											</td>
+											<td class="text-end">
+												<span t-field="ins.amount" />
+											</td>
+											<td class="text-center">
+												<t t-if="ins.rent_invoice_id">
+													<a
+														t-att-href="ins.rent_invoice_id.get_portal_url()"
+														t-att-title="ins.rent_invoice_id.name">
+														<t t-esc="ins.rent_invoice_id.name"
+															t-if="ins.rent_invoice_id.name != '/'" />
+														<em t-else="">
+															Draft Invoice
+														</em>
+													</a>
+												</t>
+											</td>
+											<td class="text-center">
+												<t
+													t-if="ins.rent_invoice_id.state == 'posted' and ins.payment_state not in ('in_payment', 'paid', 'reversed')">
+													<span class="badge rounded-pill text-bg-info">
+														<i class="fa fa-fw fa-clock-o"
+															aria-label="Opened" title="Opened"
+															role="img">
+														</i>
+														<span class="d-none d-md-inline">
+															Waiting
+															for Payment
+														</span>
+													</span>
+												</t>
+												<t
+													t-if="ins.rent_invoice_id.state == 'posted' and ins.payment_state in ('paid', 'in_payment')">
+													<span class="badge rounded-pill text-bg-success">
+														<i class="fa fa-fw fa-check"
+															aria-label="Paid" title="Paid"
+															role="img">
+														</i>
+														<span class="d-none d-md-inline">
+															Paid
+														</span>
+													</span>
+												</t>
+												<t
+													t-if="ins.rent_invoice_id.state == 'posted' and ins.payment_state == 'reversed'">
+													<span class="badge rounded-pill text-bg-success">
+														<i class="fa fa-fw fa-check"
+															aria-label="Reversed" title="Reversed"
+															role="img">
+														</i>
+														<span class="d-none d-md-inline">
+															Reversed
+														</span>
+													</span>
+												</t>
+												<t t-if="ins.rent_invoice_id.state == 'cancel'">
+													<span class="badge rounded-pill text-bg-warning">
+														<i class="fa fa-fw fa-remove"
+															aria-label="Cancelled" title="Cancelled"
+															role="img">
+														</i>
+														<span class="d-none d-md-inline">
+															Cancelled
+														</span>
+													</span>
+												</t>
+											</td>
+										</tr>
+									</t>
+								</tbody>
+							</table>
+						</div>
+						<t t-if="rent.agreement">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-file-pdf-o" aria-hidden="true">
+								</i> Contract Agreement </div>
+							<div class="row p-2">
+								<div class="col-12">
+									<span t-field="rent.agreement" />
+								</div>
+							</div>
+						</t>
+						<t t-if="rent.term_condition">
+							<div
+								class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+								<i class="fa fa-tasks" aria-hidden="true">
+								</i> Terms &amp; Conditions </div>
+							<div class="row p-2">
+								<div class="col-12">
+									<span t-field="rent.term_condition" />
+								</div>
+							</div>
+						</t>
+					</div>
+				</div>
+				<div id="rent_contract_history" class="col-12 col-lg">
+					<div id="rent_contract_history_log" class="mt-4">
+						<h2>
+							History
+						</h2>
+						<t t-call="portal.message_thread">
+							<t t-set="object" t-value="rent" />
+						</t>
+					</div>
+				</div>
+			</div>
+		</t>
+	</template>
+	<!-- Maintenance Request Tree View -->
+	<template id="rental_user_maintenance_info" name="Maintenance Requests">
+		<t t-call="portal.portal_layout">
+			<t t-if="not maintenance_rec">
+				<p>
+					There are currently no maintenance requests
+				</p>
+			</t>
+			<t t-if="maintenance_rec" t-call="portal.portal_table">
+				<thead>
+					<tr class="active">
+						<th>
+							Title
+						</th>
+						<th>
+							Property
+						</th>
+                        <!-- Landlord column removed -->
+						<th>
+							Type
+						</th>
+						<th class="text-center">
+							Status
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<t t-foreach="maintenance_rec" t-as="mr">
+						<tr>
+							<td>
+								<a t-attf-href="/my/maintenance-request/information/{{ slug(mr) }}">
+									<span t-field="mr.name" />
+								</a>
+							</td>
+							<td>
+								<span t-field="mr.property_id.name" />
+							</td>
+                            <!-- landlord column cell removed -->
+							<td>
+								<span t-field="mr.maintenance_type_id.name" />
+							</td>
+							<td class="text-center">
+								<span t-field="mr.stage_id.name" />
+							</td>
+						</tr>
+					</t>
+				</tbody>
+			</t>
+		</t>
+	</template>
+	<!-- Maintenance Request Form -->
+	<template id="rental_user_maintenance_details" name="Maintenance Request">
+		<t t-call="website.layout">
+			<div class="container py-4">
+				<div class="card">
+					<div class="card-header row">
+						<div class="col-6">
+							<strong>
+								<span t-field="mr.maintenance_type_id.name" />
+							</strong>
+						</div>
+						<div class="col-6 text-end">
+							<span class="badge rounded-pill text-bg-info">
+								<span t-field="mr.stage_id.name" />
+							</span>
+						</div>
+					</div>
+					<div class="card-body">
+						<div
+							class="h6 ps-1 pb-2 pt-2 text-primary border-bottom border-top border-primary">
+							<i class="fa fa-wrench" aria-hidden="true">
+							</i> Maintenance Details </div>
+						<div class="row p-2 border-bottom">
+							<div class="col-12">
+								<span t-field="mr.name"
+									class="fw-bold" />
+							</div>
+						</div>
+						<div class="row p-2">
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Request Date
+									</div>
+									<div class="col-1 remove_colon">:</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="mr.request_date" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Property
+									</div>
+									<div class="col-1 remove_colon">:</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="mr.property_id.name" class="fw-bold" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 col-sm-12">
+							</div>
+							<div class="col-md-5 col-sm-12">
+								<div class="row">
+									<div class="col-4 col-md-4 col-sm-6">
+										Schedule Date
+									</div>
+									<div class="col-md-1 remove_colon">:</div>
+									<div class="col-7 col-md-7 col-sm-6">
+										<span t-field="mr.schedule_date" class="fw-bold" />
+									</div>
+									<div class="col-4 col-md-4 col-sm-6">
+										Rent Ref #
+									</div>
+									<div class="col-md-1 remove_colon">:</div>
+								</div>
+							</div>
+						</div>
+						<t t-if="mr.description">
+							<div class="row p-2 border-top">
+								<div class="col-12"> Description <br />
+								<span
+										t-field="mr.description"
+										class="fw-bold" />
+								</div>
+							</div>
+						</t>
+					</div>
+				</div>
+				<div id="maintenance_history" class="col-12 col-lg">
+					<div id="rent_maintenance_history_log" class="mt-4">
+						<h2>
+							History
+						</h2>
+						<t t-call="portal.message_thread">
+							<t t-set="object" t-value="mr" />
+						</t>
+					</div>
+				</div>
+			</div>
+		</t>
+	</template>
+    </data>
+</odoo>

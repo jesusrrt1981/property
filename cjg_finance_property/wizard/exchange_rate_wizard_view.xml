@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_property_exchange_rate_wizard" model="ir.ui.view">
+            <field name="name">property.exchange.rate.wizard.form</field>
+            <field name="model">property.exchange.rate.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Apply Exchange Rate">
+                    <group>
+                        <field name="apply_scope"/>
+                        <field name="property_project_id"/>
+                        <field name="property_sub_project_id"/>
+                        <field name="stage"/>
+                    </group>
+                    <group string="Currency">
+                        <field name="foreign_currency_id"/>
+                        <field name="exchange_rate"/>
+                    </group>
+                    <group string="Summary">
+                        <field name="unit_count" readonly="1"/>
+                    </group>
+                    <footer>
+                        <button string="Apply" type="object" name="action_apply" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_property_exchange_rate_wizard" model="ir.actions.act_window">
+            <field name="name">Apply Exchange Rate</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">property.exchange.rate.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

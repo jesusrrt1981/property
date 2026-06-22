@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+        <!--Payment Product-->
+        <record id="product_category_property" model="product.category">
+            <field name="parent_id" ref="product.product_category_all"/>
+            <field name="name">Property</field>
+        </record>
+
+        <record id="terreno_category" model="product.category">
+            <field name="name">Terrenos</field>
+            <field name="property_valuation">real_time</field>
+            <field name="property_cost_method">average</field>
+        </record>
+        <record id="property_product_1" model="product.product">
+            <field name="name">Property Payment</field>
+            <field name="detailed_type">service</field>
+            <field name="categ_id" ref="terreno_category"/>
+        </record>
+        <record id="property_product_2" model="product.product">
+            <field name="name">Property Deposit</field>
+            <field name="detailed_type">service</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <record id="property_product_3" model="product.product">
+            <field name="name">Broker Commission</field>
+            <field name="detailed_type">service</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <record id="property_product_4" model="product.product">
+            <field name="name">Property Maintenance</field>
+            <field name="detailed_type">service</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <!--Maintenance Product-->
+        <record id="property_maintenance_product_1" model="product.product">
+            <field name="name">Electrical System Repairs</field>
+            <field name="detailed_type">service</field>
+            <field name="description">Only Stock Electrical item will be covered</field>
+            <field name="is_maintenance">True</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <record id="property_maintenance_product_2" model="product.product">
+            <field name="name">Structural Repairs</field>
+            <field name="detailed_type">service</field>
+            <field name="description">including severe damage to walls, ceiling, or floors, or Paint
+                related Work
+            </field>
+            <field name="is_maintenance">True</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <record id="property_maintenance_product_3" model="product.product">
+            <field name="name">Plumbing System Repairs</field>
+            <field name="detailed_type">service</field>
+            <field name="description">plumbing related Services will be covered</field>
+            <field name="is_maintenance">True</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <record id="property_maintenance_product_4" model="product.product">
+            <field name="name">Mold Found</field>
+            <field name="detailed_type">service</field>
+            <field name="description">Mold Related all Service</field>
+            <field name="is_maintenance">True</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <record id="property_maintenance_product_5" model="product.product">
+            <field name="name">Other</field>
+            <field name="detailed_type">service</field>
+            <field name="description">Any Other Maintenance</field>
+            <field name="is_maintenance">True</field>
+            <field name="categ_id" ref="cjg_finance_property.product_category_property"/>
+        </record>
+        <!--Maintenance Record-->
+        <record id="maintenance_team_product_1" model="maintenance.team">
+            <field name="name">Electrical team</field>
+        </record>
+        <record id="maintenance_team_product_2" model="maintenance.team">
+            <field name="name">Structural Repair team</field>
+        </record>
+        <record id="maintenance_team_product_3" model="maintenance.team">
+            <field name="name">Mold Remediation team</field>
+        </record>
+        <record id="maintenance_team_product_4" model="maintenance.team">
+            <field name="name">Plumbing team</field>
+        </record>
+        <record id="maintenance_team_product_5" model="maintenance.team">
+            <field name="name">Other team</field>
+        </record>
+        <!--Nearby Connectivity-->
+        <record id="property_connectivity_1" model="property.connectivity">
+            <field name="name">Airport</field>
+            <field name="distance">10 KM</field>
+            <field name="image" type="base64" file="cjg_finance_property/static/src/img/airport.svg"/>
+        </record>
+        <record id="property_connectivity_2" model="property.connectivity">
+            <field name="name">Hospital</field>
+            <field name="distance">3 KM</field>
+            <field name="image" type="base64"
+                   file="cjg_finance_property/static/src/img/hospital-building.svg"/>
+        </record>
+        <record id="property_connectivity_3" model="property.connectivity">
+            <field name="name">Shopping Mall</field>
+            <field name="distance">5 KM</field>
+            <field name="image" type="base64" file="cjg_finance_property/static/src/img/mall.svg"/>
+        </record>
+        <record id="property_connectivity_4" model="property.connectivity">
+            <field name="name">Park</field>
+            <field name="distance">1 KM</field>
+            <field name="image" type="base64" file="cjg_finance_property/static/src/img/park.svg"/>
+        </record>
+        <record id="property_connectivity_5" model="property.connectivity">
+            <field name="name">School</field>
+            <field name="distance">4 KM</field>
+            <field name="image" type="base64" file="cjg_finance_property/static/src/img/school.svg"/>
+        </record>
+        <record id="property_connectivity_6" model="property.connectivity">
+            <field name="name">Metro Station</field>
+            <field name="distance">7 KM</field>
+            <field name="image" type="base64"
+                   file="cjg_finance_property/static/src/img/train-station.svg"/>
+        </record>
+
+        <!-- Property Sub Type -->
+
+        <record id="property_type_7" model="property.sub.type">
+            <field name="name">Parcela</field>
+            <field name="type">land</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="booking_inquiry_form_view" model="ir.ui.view">
+            <field name="name">booking.inquiry.form.view</field>
+            <field name="model">booking.inquiry</field>
+            <field name="arch" type="xml">
+                <form string="Booking">
+                    <field name="company_id" invisible="1" />
+                    <field name="currency_id" invisible="1" />
+                    <field name="property_id" required="1" invisible="1" />
+                    <field name="customer_id" required="1" invisible="1" />
+                    <field name="sale_inquiry" required="1" invisible="1" />
+                    <group invisible="not sale_inquiry">
+                        <group>
+                            <field name="ask_price" required="sale_inquiry"
+                                invisible="not sale_inquiry" />
+                        </group>
+                        <group>
+                            <field name="sale_price" />
+                        </group>
+                    </group>
+                    <group invisible="sale_inquiry">
+                    </group>
+                    <hr />
+                    <h6>
+                        Note
+                    </h6>
+                    <field name="note" nolabel="1" place_holder="Note...." widget="html" />
+                    <footer>
+                        <button string="Create Booking" type="object"
+                            class="btn btn-outline-success"
+                            name="action_property_inquiry_booking" />
+                        <button string="Cancel" special="cancel" class="btn btn-outline-danger" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="booking_inquiry_action" model="ir.actions.act_window">
+            <field name="name">Booking Inquiry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">booking.inquiry</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

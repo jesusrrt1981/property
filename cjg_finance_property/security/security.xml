@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+        <record id="rental_company_restricted_property" model="ir.rule">
+            <field name="name">Rental Management : Company Property Only</field>
+            <field name="model_id" ref="cjg_finance_property.model_property_details"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="rental_company_restricted_parent_property" model="ir.rule">
+            <field name="name">Rental Management : Company Parent Property Only</field>
+            <field name="model_id" ref="cjg_finance_property.model_parent_property"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="rental_company_restricted_selling" model="ir.rule">
+            <field name="name">Rental Management : Company Selling Only</field>
+            <field name="model_id" ref="cjg_finance_property.model_property_vendor"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rental_company_restricted_agreement_template" model="ir.rule">
+            <field name="name">Rental Management : Company Rental Agreement Template</field>
+            <field name="model_id" ref="cjg_finance.model_agreement_template"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+        <!-- Project-->
+        <record id="rental_company_restricted_project" model="ir.rule">
+            <field name="name">Rental Management : Company Project Only</field>
+            <field name="model_id" ref="cjg_finance_property.model_property_project"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+        <!-- Sub Project-->
+        <record id="rental_company_restricted_sub_project" model="ir.rule">
+            <field name="name">Rental Management : Company Sub Project Only</field>
+            <field name="model_id" ref="cjg_finance_property.model_property_sub_project"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('property_project_id.company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

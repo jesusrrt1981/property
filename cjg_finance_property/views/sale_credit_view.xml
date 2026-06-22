@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="cjg_finance_property_sale_credit_v3_inherit" model="ir.ui.view">
+            <field name="name">sale.credit.form.property.inherit.v2</field>
+            <field name="model">sale.credit</field>
+            <field name="inherit_id" ref="cjg_finance.sale_credit_view_form" />
+            <field name="arch" type="xml">
+                <xpath position="attributes" expr="//field[@name='type_id']">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

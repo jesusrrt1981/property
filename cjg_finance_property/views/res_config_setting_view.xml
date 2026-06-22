@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_rental" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.rental</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="40" />
+            <field name="inherit_id" ref="base.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app data-string="Property Management" string="Property Management"
+                        name="cjg_finance_property">
+                        <block title="Reminder Days">
+                            <setting help="Reminder days for Creating Invoice">
+                                <field name="sale_reminder_days" />
+                            </setting>
+                        </block>
+                        <block title="Default Duration Days for Month, Quarter and Year">
+                            <setting help="Month Days">
+                                <field name="month_days" />
+                            </setting>
+                            <setting help="Quarter Days">
+                                <field name="quarter_days" />
+                            </setting>
+                            <setting help="Year Days">
+                                <field name="year_days" />
+                            </setting>
+                        </block>
+                        <block title="Invoice Post Type">
+                            <setting help="Invoice Post Type">
+                                <field name="invoice_post_type" widget="radio"
+                                    options="{'horizontal':True}"
+                                    required="1" />
+                            </setting>
+                        </block>
+                        <block title="Default Items">
+                            <setting help="Installment Default Item">
+                                <field name="installment_item_id" required="1" />
+                            </setting>
+                            <setting help="Deposit Default Item">
+                                <field name="deposit_item_id" required="1" />
+                            </setting>
+                            <setting help="Broker Default Item">
+                                <field name="broker_item_id" required="1" />
+                            </setting>
+                            <setting help="Maintenance Default Item">
+                                <field name="maintenance_item_id" required="1" />
+                            </setting>
+                        </block>
+                        <block title="Default Coordinates">
+                            <setting help="Company default latitude">
+                                <field name="company_latitude" />
+                            </setting>
+                            <setting help="Company default longitude">
+                                <field name="company_longitude" />
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

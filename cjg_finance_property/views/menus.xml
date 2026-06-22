@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Main Menu -->
+    
+    <menuitem id="main_menu_cjg_finance_property" name="Propiedades" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" web_icon="cjg_finance_property,static/description/icon.png" sequence="30" />
+
+    <!--Dashboard
+    Menu-->
+    <menuitem id="menu_rental_dashboard" name="Statistics" sequence="0" action="action_property_dashboard" parent="main_menu_cjg_finance_property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+
+
+
+    <!-- Project Menu -->
+    <menuitem name="Projects" id="menu_property_project_subproject" parent="main_menu_cjg_finance_property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="2">
+        <menuitem name="Projects" id="menu_property_project" action="action_property_project" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="2" />
+        <menuitem name="Sub Projects" id="menu_property_sub_project" action="action_property_sub_project" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="3" />
+        <menuitem name="Regions" id="menu_property_region" action="action_property_region" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="1" />
+    </menuitem>
+
+    <!-- Property Menu -->
+    <menuitem name="Properties" id="menu_property" parent="main_menu_cjg_finance_property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="3"  action="property_details_action" />
+
+    <!-- Cemetery Map (Kanban visual) -->
+    <menuitem id="menu_property_details_kanban"
+              name="Mapa del Cementerio"
+              parent="main_menu_cjg_finance_property"
+              action="action_property_details_kanban"
+              sequence="4"
+              groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer"/>
+
+
+    <!-- Leads -->
+    <menuitem name="Leads" id="menu_property_lead" parent="main_menu_cjg_finance_property" sequence="4" action="crm.crm_lead_all_leads" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+
+    <!-- Selling -->
+    <menuitem name="Selling" id="menu_property_vendor" parent="main_menu_cjg_finance_property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="6">
+        <menuitem id="menu_sell_contract" name="Contracts" action="property_vendor_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="1" />
+    </menuitem>
+
+    <!-- Customers -->
+    <menuitem name="Customers" id="menu_customer_details" parent="main_menu_cjg_finance_property" action="customer_details_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="7" />
+
+
+    <!-- Vendors -->
+    <menuitem name="Vendors" id="menu_property_broker_landlord" parent="main_menu_cjg_finance_property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="8">
+        <menuitem name="Brokers" id="menu_broker_details" action="broker_details_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="2" />
+    </menuitem>
+
+    <!-- Maintenance -->
+    <menuitem name="Maintenances" id="menu_maintenance_root" parent="main_menu_cjg_finance_property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="9">
+        <menuitem id="menu_property_maintenance" name="Request" action="property_maintenance_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="1" />
+        <menuitem id="menu_property_maintenance_invoices" name="Invoices" action="maintenace_invoice_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="2" />
+        <menuitem id="menu_property_maintenance_bills" name="Bills" action="maintenace_bill_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="3" />
+    </menuitem>
+
+    <!-- Employees -->
+    <menuitem name="Employees" id="menu_employee" parent="main_menu_cjg_finance_property" action="hr.open_view_employee_list_my" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="10" />
+
+    <!--Configuration
+    Menu-->
+        <menuitem name="Configurations" id="menu_configuration" parent="main_menu_cjg_finance_property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="12">
+        <!-- FIX R4 (2026-06-12): menu_agreement_template comentado porque agreement_template_action
+             vivía en el archivo agreement_template_view.xml (borrado al eliminar duplicación con cjg_finance).
+             Si se requiere acceso a plantillas de acuerdo, usar el menú del módulo cjg_finance. -->
+        <!--
+        <menuitem name="Agreement Templates" id="menu_agreement_template" action="agreement_template_action" sequence="2" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+        -->
+        <menuitem id="menu_configuration_property" name="Property" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="3">
+            <menuitem name="Amenities" id="menu_property_amenities" action="property_amenities_action" sequence="1" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+            <menuitem name="Tags" id="property_tag_menu" sequence="2" action="property_tag_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+            <menuitem name="Specifications" id="menu_property_specification" action="property_specification_action" sequence="3" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+            <menuitem name="Utility Services" id="property_extra_service_menu" action="product_extra_service_action" sequence="5" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+            <menuitem name="Cities" id="property_res_city_sub_menu" sequence="6" action="property_res_city_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+        </menuitem>
+        <menuitem id="menu_configuration_property_types" name="Types" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" sequence="4">
+            <menuitem name="Property Types" id="menu_property_sub_type" sequence="1" action="property_sub_type_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+            <menuitem name="Area Types" id="menu_property_area_type" sequence="2" action="property_area_type_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+            <menuitem name="Furnishing Types" id="menu_property_furnishing_type" sequence="3" action="property_furnishing_action" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+        </menuitem>
+        <menuitem name="Payment Plans" id="menu_property_payment_plan" action="cjg_finance_property.property_payment_plan_action" sequence="5" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+        <menuitem name="Subprojects!" id="menu_properties_subproject" action="action_property_sub_project" sequence="5" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+        <menuitem name="Subproject Price Config" id="menu_subproject_price_config" action="action_subproject_price_config" sequence="6" groups="cjg_finance_property.property_rental_manager,cjg_finance_property.property_rental_officer" />
+    </menuitem>
+
+
+    </data>
+</odoo>

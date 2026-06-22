@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="cjg_finance_property.property_dashboard" owl="1">
+        <section class="section tk_rental_dash">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Statistics</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewStatistic('project')">
+                        <div class="card warn-bg p-32">
+                            <div class="card-body warn-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/city.svg" />
+                                <h4 class="tk-st-1"> Projects </h4>
+                                <h6 class="tk-st-2"><t t-esc="state.propertyStats['project_count']"/> </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewStatistic('sub_project')">
+                        <div class="card purple-bg p-32">
+                            <div class="card-body purple-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/office.svg" />
+                                <h4 class="tk-st-1"> Sub Projects </h4>
+                                <h6 class="tk-st-2"> <t t-esc="state.propertyStats['subproject_count']"/></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewProperties('all')">
+                        <div class="card success-bg p-32">
+                            <div class="card-body success-bg tk-card-body">
+                                <img alt="users" width="40"  src="cjg_finance_property/static/src/img/blueprint.png" />
+                                <h4 class="tk-st-1"> Properties </h4>
+                                <h6 class="tk-st-2"> <t t-esc="state.propertyStats['total_property']"/> </h6>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPartner('customer')">
+                        <div class="card info-bg p-32">
+                            <div class="card-body info-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/audience.png" />
+                                <h4 class="tk-st-1"> Customers </h4>
+                                <h6 class="tk-st-2"> <t t-esc="state.propertyStats['customer_count']"/> </h6>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col-md-5 align-items-stretch">
+                        <div class="col-md-12 mt32">
+                            <h4 class="tk-primary">Property Statics</h4>
+                            <hr class="border-primary"/>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4 mt8 mb16" t-on-click="() => this.viewProperties('available')">
+                                <div class="card info-bg p-32">
+                                    <div class="card-body info-bg tk-card-body">
+                                        <img alt="users" width="40" src="cjg_finance_property/static/src/img/residential.svg" />
+                                        <h4 class="tk-st-1"> Available</h4>
+                                        <h6 class="tk-st-2"> <t t-esc="state.propertyStats['avail_property']"/> </h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4 mt8 mb16" t-on-click="() => this.viewProperties('sale')">
+                                <div class="card danger-bg p-32">
+                                    <div class="card-body danger-bg tk-card-body">
+                                        <img alt="users" width="40" class="rounded-circle" src="cjg_finance_property/static/src/img/sale.svg" />
+                                        <h4 class="tk-st-1"> On Sale </h4>
+                                        <h6 class="tk-st-2">  <t t-esc="state.propertyStats['sale_property']"/> </h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4 mt8 mb16" t-on-click="() => this.viewProperties('sold')">
+                                <div class="card success-bg p-32">
+                                    <div class="card-body success-bg tk-card-body">
+                                        <img alt="users" width="40" src="cjg_finance_property/static/src/img/real-estate.svg" />
+                                        <h4 class="tk-st-1"> Sold </h4>
+                                        <h6 class="tk-st-2"><t t-esc="state.propertyStats['sold_property']"/></h6>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="col-md-12 mt32">
+                            <h4 class="tk-primary">Property Type</h4>
+                            <hr class="border-primary"/>
+                        </div>
+                        <div class="tk-os-chart" t-ref="propertyType"></div>
+                    </div>   
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Sale Contract Statics</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPropertySale('booked')">
+                        <div class="card info-bg p-32">
+                            <div class="card-body info-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/online-booking.svg" />
+                                <h4 class="tk-st-1"> Reservado</h4>
+                                <h6 class="tk-st-2">  <t t-esc="state.propertyStats['booked']"/> </h6>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPropertySale('sold')">
+                        <div class="card success-bg p-32">
+                            <div class="card-body success-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/p_sold.svg" />
+                                <h4 class="tk-st-1"> Sold </h4>
+                                <h6 class="tk-st-2">  <t t-esc="state.propertyStats['sale_sold']"/> </h6>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPropertySale('refund')">
+                        <div class="card info-bg p-32">
+                            <div class="card-body info-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/refund.svg" />
+                                <h4 class="tk-st-1"> Refund</h4>
+                                <h6 class="tk-st-2">  <t t-esc="state.propertyStats['refund']"/> </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPropertySale('not_paid')">
+                        <div class="card warn-bg p-32">
+                            <div class="card-body warn-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/pending.svg" />
+                                <h4 class="tk-st-1"> Invoice Due </h4>
+                                <h6 class="tk-st-2">  <t t-esc="state.propertyStats['pending_invoice_sale']"/> </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPropertySale('sold')">
+                        <div class="card info-bg p-32">
+                            <div class="card-body info-bg tk-card-body">
+                                <img alt="users" width="40" src="cjg_finance_property/static/src/img/cash.svg" />
+                                <h4 class="tk-st-1"> Total Sold Amount </h4>
+                                <h6 class="tk-st-2">  <t t-esc="state.propertyStats['sold_total']"/> </h6>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="col-md-3 mb-4 mt8 mb16">
+                        <div class="tk-center-primary">Sale Invoice Due / Paid</div>
+                        <div class="card-graph p-16" t-ref="soldDuePaid"></div>
+                    </div> 
+                    <div class="col-md-6 mb-4 mt8 mb16">
+                        <div class="tk-center-primary">Sold Contract Top Broker</div>
+                        <div class="card-graph p-16" t-ref="soldTopBroker"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Property Locations</h4>
+                        <hr class="border-primary"/>
+                        <div class="tk-charts" t-ref="worldMap"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </t>
+</templates>

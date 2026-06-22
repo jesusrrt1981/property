@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Secuencia de número de reserva -->
+    <record id="seq_cemetery_reservation" model="ir.sequence">
+        <field name="name">Reserva de Cementerio</field>
+        <field name="code">cemetery.reservation</field>
+        <field name="active">TRUE</field>
+        <field name="prefix">RES/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <data noupdate="1">
+        <!-- Tipos de reserva (Testarossa: tabla tipos_reservas) -->
+        <record id="cemetery_reservation_type_abono" model="cemetery.reservation.type">
+            <field name="name">Abono</field>
+            <field name="code">1</field>
+            <field name="requires_deposit" eval="True"/>
+            <field name="duration_hours">48</field>
+            <field name="requires_management_approval" eval="False"/>
+        </record>
+        <record id="cemetery_reservation_type_horas" model="cemetery.reservation.type">
+            <field name="name">Horas</field>
+            <field name="code">2</field>
+            <field name="requires_deposit" eval="False"/>
+            <field name="duration_hours">720</field>
+            <field name="requires_management_approval" eval="False"/>
+        </record>
+        <record id="cemetery_reservation_type_gerencia" model="cemetery.reservation.type">
+            <field name="name">Gerencia</field>
+            <field name="code">3</field>
+            <field name="requires_deposit" eval="False"/>
+            <field name="duration_hours">0</field>
+            <field name="requires_management_approval" eval="True"/>
+        </record>
+
+        <!-- Cron: vence reservas activas cuya fecha de vencimiento ya pasó -->
+        <record id="cron_cemetery_reservation_expire" model="ir.cron">
+            <field name="name">Cementerio: Vencer Reservas</field>
+            <field name="model_id" ref="cjg_finance_property.model_cemetery_reservation"/>
+            <field name="state" eval="'code'"/>
+            <field name="code" eval="'model._cron_expire_reservations()'"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+    </data>
+</odoo>

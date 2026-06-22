@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+        <!-- Actualizar registros de subproject.price.config que no tienen company_id -->
+        <function model="subproject.price.config" name="_update_legacy_records"/>
+    </data>
+</odoo>

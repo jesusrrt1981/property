@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Extend the existing property details report template to include payment plan -->
+    
+    <template id="property_payment_plan_report_section" inherit_id="cjg_finance_property.property_details_qweb_report_template">
+        <xpath expr="//div[hasclass('page')]" position="before">
+            <!-- Payment Plan Section - Only for Sale Properties with Payment Plan -->
+            <t t-if="doc.sale_lease == 'for_sale' and doc.is_payment_plan and doc.custom_payment_plan_line_ids">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif;">
+                        <!-- Header Section -->
+                        <div class="text-center mb-4">
+                            <h1 style="color: #800020; font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">Payment Plan</h1>
+                            <hr style="border: 2px solid #800020; width: 50%; margin: 0 auto;"/>
+                        </div>
+
+                        <!-- Property Name -->
+                        <h2 class="text-center" style="color: #800020; font-size: 2rem; font-weight: bold; margin: 20px 0;">
+                            <span t-field="doc.name"/>
+                        </h2>
+
+                        <!-- Price Summary Section -->
+                        <div class="mb-4">
+                            <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                <i class="fa fa-calculator" style="margin-right: 8px;"></i>Price Summary
+                            </h3>
+                            <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="width: 50%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Sale Price</td>
+                                        <td style="width: 50%; padding: 12px; text-align: right;">
+                                            <strong style="color: #800020; font-size: 1.1rem;">
+                                                <span t-field="doc.price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">
+                                            DLD Fee (<span t-field="doc.dld_fee_percentage"/>%)
+                                        </td>
+                                        <td style="padding: 12px; text-align: right;">
+                                            <span t-field="doc.dld_fee_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Admin Fee</td>
+                                        <td style="padding: 12px; text-align: right;">
+                                            <span t-field="doc.admin_fee" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <td style="padding: 12px; font-weight: bold; font-size: 1.1rem; border-right: 1px solid #ddd;">Total Amount (incl. Fees)</td>
+                                        <td style="padding: 12px; text-align: right;">
+                                            <strong style="color: #800020; font-size: 1.2rem;">
+                                                <span t-field="doc.total_with_fees" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Payment Schedule Section -->
+                        <div class="mb-4">
+                            <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                <i class="fa fa-calendar" style="margin-right: 8px;"></i>Payment Schedule
+                            </h3>
+                            <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                <thead>
+                                    <tr style="background-color: #800020; color: white;">
+                                        <th style="padding: 12px; width: 5%; text-align: center; border-right: 1px solid white;">#</th>
+                                        <th style="padding: 12px; width: 25%; border-right: 1px solid white;">Description</th>
+                                        <th style="padding: 12px; width: 20%; border-right: 1px solid white;">Payment Type</th>
+                                        <th style="padding: 12px; width: 15%; text-align: center; border-right: 1px solid white;">Terms</th>
+                                        <th style="padding: 12px; width: 10%; text-align: center; border-right: 1px solid white;">%</th>
+                                        <th style="padding: 12px; width: 25%; text-align: right;">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="line_number" t-value="0"/>
+                                    <t t-foreach="doc.custom_payment_plan_line_ids" t-as="line">
+                                        <t t-set="line_number" t-value="line_number + 1"/>
+                                        <tr style="border-bottom: 1px solid #ddd;">
+                                            <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                                <strong><t t-esc="line_number"/></strong>
+                                            </td>
+                                            <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                <span t-field="line.payment_type"/>
+                                                <t t-if="line.payment_type == 'days_after_booking'">
+                                                    <br/><small style="color: #666;">After <span t-field="line.days_after"/> days</small>
+                                                </t>
+                                            </td>
+                                            <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                                <t t-if="line.payment_type == 'post_handover' and line.installments > 1">
+                                                    <span t-field="line.installments"/> installments
+                                                    <br/><small style="color: #666;"><span t-field="line.installment_frequency"/></small>
+                                                </t>
+                                                <t t-else="">
+                                                    One-time
+                                                </t>
+                                            </td>
+                                            <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                                <strong><span t-field="line.percentage"/>%</strong>
+                                            </td>
+                                            <td style="padding: 12px; text-align: right;">
+                                                <strong style="color: #800020;">
+                                                    <span t-field="line.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <t t-if="line.note">
+                                            <tr style="border-bottom: 1px solid #ddd; background-color: #f8f9fa;">
+                                                <td colspan="6" style="padding: 8px 12px;">
+                                                    <i class="fa fa-info-circle" style="margin-right: 5px; color: #800020;"></i>
+                                                    <em style="color: #666;"><span t-field="line.note"/></em>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <tr style="background-color: #f8f9fa; font-weight: bold; font-size: 1.1rem;">
+                                        <td colspan="4" style="padding: 12px; text-align: right; border-right: 1px solid #ddd;">Total:</td>
+                                        <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                            <strong><span t-esc="'%.2f' % doc.payment_plan_total"/>%</strong>
+                                        </td>
+                                        <td style="padding: 12px; text-align: right;">
+                                            <strong style="color: #800020; font-size: 1.2rem;">
+                                                <span t-esc="sum(doc.custom_payment_plan_line_ids.mapped('amount'))"
+                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Payment Plan Details Section -->
+                        <t t-if="doc.payment_plan_id">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                    <i class="fa fa-file-text-o" style="margin-right: 8px;"></i>Payment Plan Details
+                                </h3>
+                                <div style="border: 2px solid #800020; padding: 15px; background-color: white;">
+                                    <p style="margin: 0;">
+                                        <strong>Plan Name:</strong> <span t-field="doc.payment_plan_id.name"/>
+                                    </p>
+                                    <t t-if="doc.payment_plan_id.description">
+                                        <p style="margin: 10px 0 0 0;">
+                                            <strong>Description:</strong><br/>
+                                            <span t-field="doc.payment_plan_id.description"/>
+                                        </p>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Terms and Conditions -->
+                        <div class="mb-4">
+                            <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                <i class="fa fa-gavel" style="margin-right: 8px;"></i>Terms &amp; Conditions
+                            </h3>
+                            <div style="border: 2px solid #800020; padding: 15px; background-color: white;">
+                                <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li>All payments are to be made as per the payment schedule mentioned above.</li>
+                                    <li>DLD fee and Admin fee are additional to the sale price.</li>
+                                    <li>Payment delays may result in penalties as per the agreement.</li>
+                                    <li>Post-handover payments will be scheduled based on the installment frequency.</li>
+                                    <li>All prices are in <span t-field="doc.currency_id.name"/>.</li>
+                                    <li>This payment plan is subject to final agreement and may be modified based on mutual consent.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Footer Section -->
+                        <div style="margin-top: 40px; border-top: 2px solid #800020; padding-top: 15px; text-align: center;">
+                            <p style="color: #800020; font-weight: bold;">
+                                For more information, please contact us at:
+                            </p>
+                            <!-- landlord phone/email footer removed -->
+                            <p style="color: #666; font-size: 0.9rem; margin-top: 15px;">
+                                This payment plan was generated on <span t-esc="(doc.write_date or doc.create_date).strftime('%Y-%m-%d') if (doc.write_date or doc.create_date) else ''"/>
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+    </template>
+    </data>
+</odoo>

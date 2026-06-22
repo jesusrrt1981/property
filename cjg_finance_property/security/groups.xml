@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo><data noupdate="0">
+        <record id="module_cjg_finance_property" model="ir.module.category">
+            <field name="name">Rental Management</field>
+            <field name="description">Access rights for Rental Management</field>
+        </record>
+            <record id="property_rental_officer" model="res.groups">
+            <field name="name">Property Officer</field>
+            <field name="category_id" ref="module_cjg_finance_property"/>
+            <field name="implied_ids" eval="[(4,ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="property_rental_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="implied_ids" eval="[(4, ref('property_rental_officer'))]"/>
+            <field name="category_id" ref="module_cjg_finance_property"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+        
+        <!-- Grupo especial para modificar propiedades en contratos activos -->
+        <record id="group_property_contract_manager" model="res.groups">
+            <field name="name">Property Contract Manager</field>
+            <field name="category_id" ref="module_cjg_finance_property"/>
+            <field name="comment">Permite modificar o quitar propiedades en contratos activos</field>
+            <field name="implied_ids" eval="[(4, ref('property_rental_manager'))]"/>
+        </record>
+        <record id="base.default_user" model="res.users">
+            <field name="groups_id" eval="[(4,ref('property_rental_manager'))]"/>
+        </record>
+    </data>
+</odoo>

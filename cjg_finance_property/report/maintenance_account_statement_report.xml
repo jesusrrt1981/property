@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_maintenance_statement" model="ir.actions.report">
+            <field name="name">Estado de Cuenta Mantenimiento</field>
+            <field name="model">maintenance.request</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance_property.report_maintenance_statement_document</field>
+            <field name="report_file">cjg_finance_property.report_maintenance_statement_document</field>
+            <field name="print_report_name">'Estado_Mantenimiento_%s' % object.name</field>
+            <!-- <field name="binding_model_id" ref="model_maintenance_request"/>
+            <field name="binding_type">report</field> -->
+        </record>
+
+        <template id="report_maintenance_statement_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="text-center mb-4">
+                                <h2>ESTADO DE CUENTA DE MANTENIMIENTO</h2>
+                                <h4>
+                                    <span t-field="o.name" />
+                                </h4>
+                                <p>
+                                    Fecha de Emisión:
+                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')" />
+                                </p>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <strong>Cliente:</strong>
+                                    <span t-field="o.customer_id.name" />
+                                    <br />
+                                    <strong>Expediente:</strong>
+                                    <span t-field="o.customer_id.expediente" />
+                                    <br />
+                                    <strong>Propiedad:</strong>
+                                    <span t-field="o.property_id.name" />
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong>Compañía:</strong>
+                                    <span t-field="o.company_id.name" />
+                                </div>
+                            </div>
+                            <!-- Facturas Generadas -->
+                            <div class="mb-5">
+                                <h3>Historial de Facturas</h3>
+                                <t t-set="invoices" t-value="request.env['account.move'].search([('maintenance_request_id', '=', o.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted')])" />
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Factura</th>
+                                            <th>Fecha</th>
+                                            <th>Vencimiento</th>
+                                            <th class="text-right">Total</th>
+                                            <th class="text-right">Pagado</th>
+                                            <th class="text-right">Saldo</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="invoices" t-as="inv">
+                                            <td>
+                                                <span t-field="inv.name" />
+                                            </td>
+                                            <td>
+                                                <span t-field="inv.invoice_date" />
+                                            </td>
+                                            <td>
+                                                <span t-field="inv.invoice_date_due" />
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="inv.amount_total" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}" />
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="inv.amount_total - inv.amount_residual" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}" />
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="inv.amount_residual" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}" />
+                                            </td>
+                                            <td>
+                                                <span t-field="inv.payment_state" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-active">
+                                            <td colspan="3" class="text-right">
+                                                <strong>Totales:</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong>
+                                                    <span t-esc="sum(invoices.mapped('amount_total'))" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}" />
+                                                </strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong>
+                                                    <span t-esc="sum(invoices.mapped('amount_total')) - sum(invoices.mapped('amount_residual'))" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}" />
+                                                </strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong>
+                                                    <span t-esc="sum(invoices.mapped('amount_residual'))" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}" />
+                                                </strong>
+                                            </td>
+                                            <td />
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="row mt-5">
+                                <div class="col-12">
+                                    <p class="text-muted small">Si tiene preguntas sobre este estado de cuenta, por favor contáctenos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

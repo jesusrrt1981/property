@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit Property Details Form View to Add Payment Plan -->
+        <record id="property_details_payment_plan_form_view" model="ir.ui.view">
+            <field name="name">property.details.payment.plan.form.view</field>
+            <field name="model">property.details</field>
+            <field name="inherit_id" ref="cjg_finance_property.property_details_form_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Add Payment Plan Page in Notebook -->
+                <xpath expr="//sheet" position="inside">
+                    <field name="sale_lease" invisible="1"/>
+                </xpath>
+
+                <xpath expr="//notebook" position="inside">
+                    <page string="Payment Plan" name="payment_plan" invisible="sale_lease != 'for_sale'">
+                        <group>
+                            <group>
+                                <field name="is_payment_plan"/>
+                            </group>
+                        </group>
+
+                        <group invisible="not is_payment_plan">
+                            <group string="Payment Plan Template">
+                                <field name="payment_plan_id"
+                                       options="{'no_create': True, 'no_create_edit': True}"
+                                       placeholder="Select a payment plan template..."/>
+                            </group>
+                            <group string="Additional Fees">
+                                <label for="dld_fee_percentage"/>
+                                <div>
+                                    <field name="dld_fee_percentage" class="oe_inline"/> %
+                                    <span class="ms-2">
+                                        (Amount: <field name="dld_fee_amount" class="oe_inline" readonly="1"/>)
+                                    </span>
+                                </div>
+                                <field name="admin_fee"/>
+                            </group>
+                        </group>
+
+                        <field name="custom_payment_plan_line_ids" invisible="not is_payment_plan">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="payment_type"/>
+                                <field name="days_after"
+                                       column_invisible="parent.sale_lease != 'for_sale'"
+                                       invisible="payment_type != 'days_after_booking'"/>
+                                <field name="percentage" widget="percentage"/>
+                                <field name="amount" sum="Total Amount"/>
+                                <field name="installments" invisible="payment_type != 'post_handover'"/>
+                                <field name="installment_frequency"
+                                       invisible="payment_type != 'post_handover'"/>
+                                <field name="note"/>
+                                <field name="currency_id" column_invisible="1"/>
+                                <field name="company_id" column_invisible="1"/>
+                            </tree>
+                        </field>
+
+                        <group class="oe_subtotal_footer oe_right" invisible="not is_payment_plan">
+                            <field name="price" string="Sale Price" readonly="1"/>
+                            <field name="dld_fee_amount" string="DLD Fee" readonly="1"/>
+                            <field name="admin_fee" string="Admin Fee" readonly="1"/>
+                            <div class="oe_subtotal_footer_separator oe_inline">
+                                <label for="total_with_fees"/>
+                                <field name="total_with_fees" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" readonly="1"/>
+                            </div>
+                            <field name="payment_plan_total" string="Payment Plan Coverage" widget="percentage" readonly="1"
+                                   class="text-danger" invisible="payment_plan_total == 100.0"/>
+                        </group>
+
+                        <div class="alert alert-warning text-center" role="alert"
+                             invisible="not is_payment_plan or payment_plan_total == 100.0">
+                            <strong>Warning:</strong> Payment plan total is
+                            <field name="payment_plan_total" widget="percentage" readonly="1" class="oe_inline"/>.
+                            It should be 100%!
+                        </div>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Inherit sale.credit form view to add property_product_ids field -->
+    
+    <record id="view_sale_credit_form_property_products" model="ir.ui.view">
+        <field name="name">sale.credit.form.property.products</field>
+        <field name="model">sale.credit</field>
+        <field name="inherit_id" ref="cjg_finance.sale_credit_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Add property_product_ids field inside products_services group -->
+            <field name="contract_product_type" position="after">
+                <field name="property_product_ids" 
+                       widget="many2many_tags"
+                       string="Propiedades"
+                       invisible="contract_product_type != 'property'"
+                       domain="[('stage', '=', 'available')]"
+                       context="{'default_stage': 'available'}"
+                       options="{'no_create': True, 'no_open': True}"/>
+            </field>
+        </field>
+    </record>
+    </data>
+</odoo>

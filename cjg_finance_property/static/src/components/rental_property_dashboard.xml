@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="cjg_finance_property.RentalPropertyDashboard">
+        <div class="o_rental_property_dashboard container-fluid align-item-center py-4 border-bottom bg-view">
+                 <div class="row gap-3 gap-lg-0 mx-4 mb-4">
+                    <div class="col-12 col-lg-5 col-xl-5 col-xxl-4 flex-grow-1 flex-lg-grow-0 flex-shrink-0">
+                        <div class="grid gap-1">
+                            <div class="g-col-3 g-col-sm-4 d-flex align-items-center justify-content-end text-end justify-content-lg-start text-lg-start">
+                                All
+                            </div>
+                            <div class="g-col-9 g-col-sm-8 grid gap-1">
+                                <div class="g-col-6 p-0" title="All Available Properties">
+                                    <div class="card m-1 p-3 text-center custom-card bg-available" t-on-click="() => this.viewProperties('available', 'sale')">
+                                      <h4 class="bg-available mb-1"><t t-out="this.state.property_data.available_prop_count"/></h4>
+                                        <div class="fw-bold">Disponible</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+           
+                    </div>
+                     <div class="col-12 col-lg-5 col-xl-5 col-xxl-4 flex-grow-1 flex-lg-grow-0 flex-shrink-0">
+                        <div class="grid">
+                            <div class="g-col-12 g-col-sm-12 grid gap-1">
+                                <div class="g-col-4 p-0" title="All On Sale Properties">
+                                    <div class="card m-1 p-3 text-center bg-sale custom-card" t-on-click="() => this.viewProperties('sale', 'sale')">
+                                      <h4 class="bg-sale mb-1"><t t-out="this.state.property_data.sale_prop_count"/></h4>
+                                        <div class="fw-bold">Venta</div>
+                                    </div>
+                                </div>
+                                <div class="g-col-4 p-0" title="All Booked Properties">
+                                    <div class="card m-1 p-3 text-center custom-card bg-booked" t-on-click="() => this.viewProperties('booked', 'sale')">
+                                        <h4 class="bg-booked mb-1"><t t-out="this.state.property_data.booked_prop_count"/></h4>
+                                        <div class="fw-bold">Reservado</div>
+                                    </div>
+                                </div>
+                                <div class="g-col-4 p-0" title="All Sold Properties">
+                                    <div class="card m-1 p-3 text-center custom-card bg-sold" t-on-click="() => this.viewProperties('sold', 'sale')">
+                                        <h4 class="bg-sold mb-1"><t t-out="this.state.property_data.sold_prop_count"/></h4>
+                                        <div class="fw-bold bg-sold">Vendido</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         
+                     </div>
+                     <div class="col-12 col-lg-5 col-xl-5 col-xxl-4 flex-grow-1 flex-lg-grow-0 flex-shrink-0 mt-1">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex mb-1 gap-2">
+                                <div class="card mx-1 p-3 text-center custom-card bg-total" t-on-click="() => this.viewProperties('all', 'sale')" title="Total Properties">
+                                    <h4 class="bg-total mb-1">
+                                        <t t-out="this.state.property_data.total_prop_count"/>
+                                    </h4>
+                                    <div class="fw-bold">Total</div>
+                                </div>
+                                <div class="card p-3 mx-1 text-center custom-card bg-draft" t-on-click="() => this.viewProperties('draft', 'sale')" title="Draft Properties">
+                                    <h4 class="bg-draft mb-1"><t t-out="this.state.property_data.draft_prop_count"/></h4>
+                                    <div class="fw-bold">Draft</div>
+                                </div>
+                            </div>
+                    
+                        </div>
+                     </div>
+                 </div>
+        </div>
+    </t>
+
+</templates>

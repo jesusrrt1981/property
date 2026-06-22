@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_template_form_inherit_view_units" model="ir.ui.view">
+            <field name="name">product.template.inherit.form.view.units</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_units" type="object" class="oe_stat_button" icon="fa-home">
+                        <field name="unit_count" string="Units" widget="statinfo"/>
+                    </button>
+                </xpath>
+                <xpath expr="//group[@name='group_standard_price']" position="after">
+                    <group string="Moneda / Precio Extranjero (Unidad)" invisible="unit_count == 0" col="2">
+                        <group>
+                            <field name="foreign_currency_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="prop_exchange_rate" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="prop_price_foreign" widget="monetary" options="{'currency_field': 'foreign_currency_id', 'field_digits': True}" readonly="1"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    <record id="product_template_kanban_price_currency_view" model="ir.ui.view">
+            <field name="name">product.template.kanban.price.currency</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_kanban_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="inside">
+                    <field name="list_price"/>
+                    <field name="currency_id"/>
+                    <field name="prop_price_foreign"/>
+                    <field name="foreign_currency_id"/>
+                    <field name="unit_count"/>
+                </xpath>
+                <xpath expr="//div[@name='product_lst_price']" position="after">
+                    <t t-if="record.unit_count.raw_value">
+                        <div name="product_price_currency" class="mt-1">
+                            <span>Precio: </span>
+                            <field name="list_price" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                        </div>
+                        <t t-if="record.prop_price_foreign.raw_value and record.foreign_currency_id.raw_value">
+                            <div name="product_price_foreign" class="mt-1">
+                                <span>Precio extranjero (unidad): </span>
+                                <field name="prop_price_foreign" widget="monetary" options="{'currency_field': 'foreign_currency_id', 'field_digits': True}"/>
+                            </div>
+                        </t>
+                    </t>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="at_inherit_view_product_template" model="ir.ui.view">
+        <field name="name">at.inherit.view.product.template</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="custom_property_ok" readonly="1"/>
+                <field name="adicional_project_ok"/>
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page[@name='general_information']" position="after">
+                <page name="informacion de la propiedad" string="Informacion de la Propiedad" invisible="not custom_property_ok">
+                    <group>
+                        <group string="Información del Terreno">
+                            <field name="land_id"/>
+                        </group>
+                        <group string="Proyecto">
+                            <field name="project_property_id"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page[@name='general_information']" position="after">
+                <page name="adicional_proyecto" string="Adicional de Proyecto" invisible="not adicional_project_ok">
+                    <group>
+                        <field name="project_property_id_adicional" string="Proyecto Asociado" options="{'no_create': True}"/>
+                    </group>
+                    
+                    <field name="land_ids" invisible="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+        <record id="action_adicional_project" model="ir.actions.act_window">
+        <field name="name">Adicionales de Proyecto</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('adicional_project_ok', '=', True)]</field>
+        <field name="context">{'default_adicional_project_ok': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer adicional de proyecto
+            </p>
+            <p>
+                Los adicionales de proyecto son características o mejoras que pueden
+                aplicarse a propiedades dentro de un proyecto inmobiliario.
+            </p>
+        </field>
+    </record>
+    
+    </data>
+</odoo>

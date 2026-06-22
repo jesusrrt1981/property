@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+        <!-- Sample Payment Plan Template: 60% Post Handover - 4 Years -->
+        <record id="payment_plan_template_60_post_handover" model="property.payment.plan">
+            <field name="name">60% Post Handover - 4 Years (Standard)</field>
+            <field name="active">True</field>
+            <field name="description">Standard payment plan with 60% post-handover payment spread over 4 years with 6-month installments</field>
+        </record>
+
+        <!-- Payment Plan Lines -->
+        <record id="payment_plan_line_booking_10" model="property.payment.plan.line">
+            <field name="sequence">10</field>
+            <field name="payment_plan_id" ref="payment_plan_template_60_post_handover"/>
+            <field name="name">Booking Payment</field>
+            <field name="percentage">10.0</field>
+            <field name="payment_type">booking</field>
+            <field name="installments">1</field>
+            <field name="note">Initial booking payment to reserve the property</field>
+        </record>
+
+        <record id="payment_plan_line_30days_10" model="property.payment.plan.line">
+            <field name="sequence">20</field>
+            <field name="payment_plan_id" ref="payment_plan_template_60_post_handover"/>
+            <field name="name">Payment after 30 Days</field>
+            <field name="percentage">10.0</field>
+            <field name="payment_type">days_after_booking</field>
+            <field name="days_after">30</field>
+            <field name="installments">1</field>
+            <field name="note">Second payment due 30 days after booking</field>
+        </record>
+
+        <record id="payment_plan_line_construction_15" model="property.payment.plan.line">
+            <field name="sequence">30</field>
+            <field name="payment_plan_id" ref="payment_plan_template_60_post_handover"/>
+            <field name="name">On Construction Milestone</field>
+            <field name="percentage">15.0</field>
+            <field name="payment_type">construction</field>
+            <field name="installments">1</field>
+            <field name="note">Payment upon reaching construction milestone</field>
+        </record>
+
+        <record id="payment_plan_line_handover_5" model="property.payment.plan.line">
+            <field name="sequence">40</field>
+            <field name="payment_plan_id" ref="payment_plan_template_60_post_handover"/>
+            <field name="name">On Handover</field>
+            <field name="percentage">5.0</field>
+            <field name="payment_type">handover</field>
+            <field name="installments">1</field>
+            <field name="note">Payment upon property handover</field>
+        </record>
+
+        <record id="payment_plan_line_post_handover_60" model="property.payment.plan.line">
+            <field name="sequence">50</field>
+            <field name="payment_plan_id" ref="payment_plan_template_60_post_handover"/>
+            <field name="name">Post Handover Installments</field>
+            <field name="percentage">60.0</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">8</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">60% of the property price paid over 4 years in 8 half-yearly installments</field>
+        </record>
+
+        <!-- Alternative Payment Plan: Quick Payment - 20% Down -->
+        <record id="payment_plan_template_quick_20" model="property.payment.plan">
+            <field name="name">Quick Payment - 20% Down</field>
+            <field name="active">True</field>
+            <field name="description">Fast-track payment plan with 20% down payment and 80% on handover</field>
+        </record>
+
+        <record id="payment_plan_line_quick_booking_20" model="property.payment.plan.line">
+            <field name="sequence">10</field>
+            <field name="payment_plan_id" ref="payment_plan_template_quick_20"/>
+            <field name="name">Down Payment</field>
+            <field name="percentage">20.0</field>
+            <field name="payment_type">booking</field>
+            <field name="installments">1</field>
+            <field name="note">20% down payment at booking</field>
+        </record>
+
+        <record id="payment_plan_line_quick_handover_80" model="property.payment.plan.line">
+            <field name="sequence">20</field>
+            <field name="payment_plan_id" ref="payment_plan_template_quick_20"/>
+            <field name="name">Balance Payment on Handover</field>
+            <field name="percentage">80.0</field>
+            <field name="payment_type">handover</field>
+            <field name="installments">1</field>
+            <field name="note">Remaining 80% paid at handover</field>
+        </record>
+
+        <!-- Flexible Payment Plan: 30-70 Split -->
+        <record id="payment_plan_template_30_70" model="property.payment.plan">
+            <field name="name">Flexible 30-70 Split</field>
+            <field name="active">True</field>
+            <field name="description">30% during construction, 70% post-handover over 2 years</field>
+        </record>
+
+        <record id="payment_plan_line_flex_booking_10" model="property.payment.plan.line">
+            <field name="sequence">10</field>
+            <field name="payment_plan_id" ref="payment_plan_template_30_70"/>
+            <field name="name">Booking</field>
+            <field name="percentage">10.0</field>
+            <field name="payment_type">booking</field>
+            <field name="installments">1</field>
+        </record>
+
+        <record id="payment_plan_line_flex_construction_20" model="property.payment.plan.line">
+            <field name="sequence">20</field>
+            <field name="payment_plan_id" ref="payment_plan_template_30_70"/>
+            <field name="name">Construction Phase</field>
+            <field name="percentage">20.0</field>
+            <field name="payment_type">construction</field>
+            <field name="installments">1</field>
+        </record>
+
+        <record id="payment_plan_line_flex_post_70" model="property.payment.plan.line">
+            <field name="sequence">30</field>
+            <field name="payment_plan_id" ref="payment_plan_template_30_70"/>
+            <field name="name">Post Handover - 2 Years</field>
+            <field name="percentage">70.0</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">4</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">70% paid over 2 years in 4 half-yearly installments</field>
+        </record>
+
+        <!-- Biltmore Sufouh Payment Plan (Default) - 12 Installments -->
+        <record id="payment_plan_template_biltmore" model="property.payment.plan">
+            <field name="name">Biltmore Sufouh Plan (Default)</field>
+            <field name="sequence">1</field>
+            <field name="active">True</field>
+            <field name="description">Standard Biltmore payment plan: 10% on booking, 10% after 30 days, 5% after 3 months, 5% after 6 months, 10% on handover, then 60% over 4 years (8 installments half-yearly)</field>
+        </record>
+
+        <!-- Line 1: On Booking - 10% -->
+        <record id="payment_plan_line_biltmore_booking" model="property.payment.plan.line">
+            <field name="sequence">10</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">On Booking</field>
+            <field name="percentage">10.0</field>
+            <field name="payment_type">booking</field>
+            <field name="installments">1</field>
+            <field name="note">Initial booking payment</field>
+        </record>
+
+        <!-- Line 2: Installment after 30 days from booking - 10% -->
+        <record id="payment_plan_line_biltmore_30days" model="property.payment.plan.line">
+            <field name="sequence">20</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 30 days from booking</field>
+            <field name="percentage">10.0</field>
+            <field name="payment_type">days_after_booking</field>
+            <field name="days_after">30</field>
+            <field name="installments">1</field>
+            <field name="note">Second payment due 30 days after booking</field>
+        </record>
+
+        <!-- Line 3: Installment after 3 months from booking - 5% -->
+        <record id="payment_plan_line_biltmore_3months" model="property.payment.plan.line">
+            <field name="sequence">30</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 3 months from booking</field>
+            <field name="percentage">5.0</field>
+            <field name="payment_type">days_after_booking</field>
+            <field name="days_after">90</field>
+            <field name="installments">1</field>
+            <field name="note">Payment due 3 months after booking</field>
+        </record>
+
+        <!-- Line 4: Installment after 6 months from booking - 5% -->
+        <record id="payment_plan_line_biltmore_6months" model="property.payment.plan.line">
+            <field name="sequence">40</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 6 months from booking</field>
+            <field name="percentage">5.0</field>
+            <field name="payment_type">days_after_booking</field>
+            <field name="days_after">180</field>
+            <field name="installments">1</field>
+            <field name="note">Payment due 6 months after booking</field>
+        </record>
+
+        <!-- Line 5: On Handover - 10% -->
+        <record id="payment_plan_line_biltmore_handover" model="property.payment.plan.line">
+            <field name="sequence">50</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">On Handover</field>
+            <field name="percentage">10.0</field>
+            <field name="payment_type">handover</field>
+            <field name="installments">1</field>
+            <field name="note">Payment upon property handover</field>
+        </record>
+
+        <!-- Lines 6-13: Post Handover - 7.5% each (60% total over 4 years, half-yearly) -->
+        <record id="payment_plan_line_biltmore_post_6months" model="property.payment.plan.line">
+            <field name="sequence">60</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 6 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">First post-handover payment</field>
+        </record>
+
+        <record id="payment_plan_line_biltmore_post_12months" model="property.payment.plan.line">
+            <field name="sequence">70</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 12 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">Second post-handover payment (1 year)</field>
+        </record>
+
+        <record id="payment_plan_line_biltmore_post_18months" model="property.payment.plan.line">
+            <field name="sequence">80</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 18 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">Third post-handover payment (18 months)</field>
+        </record>
+
+        <record id="payment_plan_line_biltmore_post_24months" model="property.payment.plan.line">
+            <field name="sequence">90</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 24 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">Fourth post-handover payment (2 years)</field>
+        </record>
+
+        <record id="payment_plan_line_biltmore_post_30months" model="property.payment.plan.line">
+            <field name="sequence">100</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 30 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">Fifth post-handover payment (30 months)</field>
+        </record>
+
+        <record id="payment_plan_line_biltmore_post_36months" model="property.payment.plan.line">
+            <field name="sequence">110</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 36 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">Sixth post-handover payment (3 years)</field>
+        </record>
+
+        <record id="payment_plan_line_biltmore_post_42months" model="property.payment.plan.line">
+            <field name="sequence">120</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 42 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">Seventh post-handover payment (42 months)</field>
+        </record>
+
+        <record id="payment_plan_line_biltmore_post_48months" model="property.payment.plan.line">
+            <field name="sequence">130</field>
+            <field name="payment_plan_id" ref="payment_plan_template_biltmore"/>
+            <field name="name">Installment after 48 months of Handover</field>
+            <field name="percentage">7.5</field>
+            <field name="payment_type">post_handover</field>
+            <field name="installments">1</field>
+            <field name="installment_frequency">months_6</field>
+            <field name="note">Final payment (4 years)</field>
+        </record>
+    </data>
+</odoo>

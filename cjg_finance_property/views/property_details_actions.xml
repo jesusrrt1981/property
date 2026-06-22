@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción de servidor para aplicar configuración de precio a unidades seleccionadas -->
+        <record id="action_apply_subproject_price_config_server" model="ir.actions.server">
+            <field name="name">Aplicar Configuración de Precio</field>
+            <field name="model_id" ref="cjg_finance_property.model_property_details"/>
+            <field name="binding_model_id" ref="cjg_finance_property.model_property_details"/>
+            <field name="binding_type">action</field>
+            <field name="state">code</field>
+            <field name="code">records.action_apply_subproject_price_config()</field>
+        </record>
+    </data>
+</odoo>

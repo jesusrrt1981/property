@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cambiar_parcela_wizard_form" model="ir.ui.view">
+        <field name="name">cambiar.parcela.wizard.form</field>
+        <field name="model">cambiar.parcela.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cambiar Parcela (Mejora de Parcela)">
+                <div class="alert alert-info" role="alert">
+                    <p><strong>Procedimiento:</strong> Este wizard cambia la parcela asignada al contrato:</p>
+                    <ul>
+                        <li>Libera la parcela actual (cambia su estado a 'available')</li>
+                        <li>Asigna la nueva parcela (cambia su estado a 'sold')</li>
+                        <li>Genera un cargo (ND) en el contrato por el costo del cambio</li>
+                        <li>Registra auditoría completa en chatter</li>
+                    </ul>
+                </div>
+                <group>
+                    <group string="Contrato y Parcela Actual">
+                        <field name="contract_id"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="parcela_vieja_id"/>
+                        <field name="parcela_vieja_display" readonly="1"/>
+                    </group>
+                    <group string="Nueva Parcela">
+                        <field name="parcela_nueva_id"/>
+                        <field name="parcela_nueva_display" readonly="1"/>
+                    </group>
+                </group>
+                <group>
+                    <group string="Costo y Justificación">
+                        <field name="costo_cambio" widget="monetary"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="motivo" placeholder="Motivo del cambio de parcela..."/>
+                </group>
+                <footer>
+                    <button name="action_cambiar_parcela"
+                            string="Cambiar Parcela"
+                            type="object"
+                            class="btn-primary"
+                            confirm="¿Confirma el cambio de parcela? La parcela actual será liberada y la nueva asignada al contrato."/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cambiar_parcela_wizard" model="ir.actions.act_window">
+        <field name="name">Cambiar Parcela</field>
+        <field name="res_model">cambiar.parcela.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_property_details"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

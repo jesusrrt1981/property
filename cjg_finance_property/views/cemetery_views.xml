@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================= -->
+    <!-- CEMENTERIO: vistas limpias fieles a Testarossa.                -->
+    <!-- Jardín -> Fase -> Parcela (con cabida) + flujo de Reserva.     -->
+    <!-- ============================================================= -->
+
+    <!-- ===================== FASES ===================== -->
+    <record id="view_cemetery_phase_tree" model="ir.ui.view">
+        <field name="name">cemetery.phase.tree</field>
+        <field name="model">cemetery.phase</field>
+        <field name="arch" type="xml">
+            <tree string="Fases" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cemetery_phase" model="ir.actions.act_window">
+        <field name="name">Fases</field>
+        <field name="res_model">cemetery.phase</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- ===================== JARDINES ===================== -->
+    <record id="view_cemetery_garden_tree" model="ir.ui.view">
+        <field name="name">cemetery.garden.tree</field>
+        <field name="model">cemetery.garden</field>
+        <field name="arch" type="xml">
+            <tree string="Jardines">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="abbreviation"/>
+                <field name="space_type"/>
+                <field name="pays_fixed_maintenance" widget="boolean_toggle"/>
+                <field name="plot_count"/>
+                <field name="plot_available_count"/>
+                <field name="plot_sold_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cemetery_garden_form" model="ir.ui.view">
+        <field name="name">cemetery.garden.form</field>
+        <field name="model">cemetery.garden</field>
+        <field name="arch" type="xml">
+            <form string="Jardín">
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado" bg_color="bg-danger"
+                            invisible="active == True"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Nombre del jardín"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="abbreviation"/>
+                            <field name="space_type"/>
+                        </group>
+                        <group>
+                            <field name="pays_fixed_maintenance"/>
+                            <field name="accounting_group"/>
+                            <field name="accounting_account_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="currency_usd_id"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="pricing" string="Precios por Fase">
+                            <field name="pricing_ids">
+                                <tree editable="bottom">
+                                    <field name="phase_id"/>
+                                    <field name="cost"/>
+                                    <field name="price_need_local"/>
+                                    <field name="price_need_usd"/>
+                                    <field name="price_prev_local"/>
+                                    <field name="price_prev_usd"/>
+                                    <field name="price_ossuary_local"/>
+                                    <field name="price_ossuary_usd"/>
+                                    <field name="accounting_account_id" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="currency_usd_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="plots" string="Parcelas">
+                            <field name="plot_ids" context="{'default_garden_id': id}">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="phase_id"/>
+                                    <field name="block"/>
+                                    <field name="lot"/>
+                                    <field name="osario_code"/>
+                                    <field name="cavities_capacity"/>
+                                    <field name="ossuary_capacity"/>
+                                    <field name="stage"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cemetery_garden" model="ir.actions.act_window">
+        <field name="name">Jardines</field>
+        <field name="res_model">cemetery.garden</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Crear un jardín</p>
+            <p>Un jardín agrupa parcelas. Define el tipo de espacio (parcela, osario,
+               columbario...) y los precios por fase.</p>
+        </field>
+    </record>
+
+    <!-- ===================== PARCELAS (property.details, vista limpia) ===== -->
+    <record id="view_cemetery_plot_tree" model="ir.ui.view">
+        <field name="name">cemetery.plot.tree</field>
+        <field name="model">property.details</field>
+        <field name="arch" type="xml">
+            <tree string="Parcelas">
+                <field name="name"/>
+                <field name="garden_id"/>
+                <field name="phase_id"/>
+                <field name="block"/>
+                <field name="lot"/>
+                <field name="osario_code"/>
+                <field name="is_ossuary"/>
+                <field name="cavities_capacity"/>
+                <field name="ossuary_capacity"/>
+                <field name="burial_count"/>
+                <field name="available_capacity"/>
+                <field name="price"/>
+                <field name="stage" widget="badge"
+                       decoration-success="stage == 'available'"
+                       decoration-warning="stage == 'booked'"
+                       decoration-muted="stage in ('sold','occupied')"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cemetery_plot_form" model="ir.ui.view">
+        <field name="name">cemetery.plot.form</field>
+        <field name="model">property.details</field>
+        <field name="arch" type="xml">
+            <form string="Parcela">
+                <header>
+                    <field name="stage" widget="statusbar"
+                           statusbar_visible="available,booked,sold,occupied"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Identificación de la parcela"/></h1>
+                    </div>
+                    <group>
+                        <group string="Ubicación">
+                            <field name="garden_id"/>
+                            <field name="phase_id"/>
+                            <field name="block"/>
+                            <field name="lot"/>
+                            <field name="is_ossuary"/>
+                            <field name="osario_code" invisible="is_ossuary == False"/>
+                        </group>
+                        <group string="Cabida (Capacidad)">
+                            <field name="cavities_capacity"/>
+                            <field name="ossuary_capacity"/>
+                            <field name="burial_count"/>
+                            <field name="available_capacity"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Comercial">
+                            <field name="product_id"/>
+                            <field name="price"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cemetery_plot_search" model="ir.ui.view">
+        <field name="name">cemetery.plot.search</field>
+        <field name="model">property.details</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Parcelas">
+                <field name="name"/>
+                <field name="garden_id"/>
+                <field name="phase_id"/>
+                <field name="block"/>
+                <field name="lot"/>
+                <filter name="available" string="Disponibles" domain="[('stage','=','available')]"/>
+                <filter name="booked" string="Reservadas" domain="[('stage','=','booked')]"/>
+                <filter name="sold" string="Vendidas" domain="[('stage','in',('sold','occupied'))]"/>
+                <separator/>
+                <filter name="is_ossuary" string="Osarios" domain="[('is_ossuary','=',True)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_garden" string="Jardín" context="{'group_by':'garden_id'}"/>
+                    <filter name="group_phase" string="Fase" context="{'group_by':'phase_id'}"/>
+                    <filter name="group_stage" string="Estado" context="{'group_by':'stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cemetery_plot" model="ir.actions.act_window">
+        <field name="name">Parcelas</field>
+        <field name="res_model">property.details</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cemetery_plot_search"/>
+        <field name="context">{'form_view_ref': 'cjg_finance_property.view_cemetery_plot_form',
+                               'tree_view_ref': 'cjg_finance_property.view_cemetery_plot_tree'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Crear una parcela</p>
+            <p>Cada parcela pertenece a un jardín y tiene una cabida (cavidades + osarios).</p>
+        </field>
+    </record>
+
+    <!-- ===================== TIPOS DE RESERVA ===================== -->
+    <record id="view_cemetery_reservation_type_tree" model="ir.ui.view">
+        <field name="name">cemetery.reservation.type.tree</field>
+        <field name="model">cemetery.reservation.type</field>
+        <field name="arch" type="xml">
+            <tree string="Tipos de Reserva" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="requires_deposit" widget="boolean_toggle"/>
+                <field name="duration_hours"/>
+                <field name="requires_management_approval" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cemetery_reservation_type" model="ir.actions.act_window">
+        <field name="name">Tipos de Reserva</field>
+        <field name="res_model">cemetery.reservation.type</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- ===================== RESERVAS ===================== -->
+    <record id="view_cemetery_reservation_tree" model="ir.ui.view">
+        <field name="name">cemetery.reservation.tree</field>
+        <field name="model">cemetery.reservation</field>
+        <field name="arch" type="xml">
+            <tree string="Reservas"
+                  decoration-success="state == 'active'"
+                  decoration-muted="state in ('expired','cancelled')"
+                  decoration-info="state == 'converted'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="reservation_type_id"/>
+                <field name="plot_count"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="commercial_id"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cemetery_reservation_form" model="ir.ui.view">
+        <field name="name">cemetery.reservation.form</field>
+        <field name="model">cemetery.reservation</field>
+        <field name="arch" type="xml">
+            <form string="Reserva">
+                <header>
+                    <button name="action_activate" string="Activar Reserva" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_convert_to_sale" string="Convertir en Venta" type="object"
+                            class="btn-primary" invisible="state != 'active'"/>
+                    <button name="action_expire" string="Vencer" type="object"
+                            invisible="state != 'active'"/>
+                    <button name="action_cancel" string="Cancelar" type="object"
+                            invisible="state in ('cancelled','converted')"/>
+                    <button name="action_reset_draft" string="Volver a Borrador" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,converted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="reservation_type_id"/>
+                            <field name="commercial_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="receipt_number"/>
+                            <field name="deposit_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="plot_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="garden_id"/>
+                            <field name="phase_id"/>
+                            <field name="block"/>
+                            <field name="lot"/>
+                            <field name="stage"/>
+                        </tree>
+                    </field>
+                    <field name="note" placeholder="Notas..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cemetery_reservation" model="ir.actions.act_window">
+        <field name="name">Reservas</field>
+        <field name="res_model">cemetery.reservation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Crear una reserva</p>
+            <p>Una reserva bloquea parcelas temporalmente. Al vencer se liberan;
+               al convertirse en venta pasan a vendidas.</p>
+        </field>
+    </record>
+
+    <!-- ===================== MENÚS ===================== -->
+    <menuitem id="menu_cemetery_root" name="Cementerio" sequence="15"
+              web_icon="cjg_finance_property,static/description/icon.png"/>
+
+    <menuitem id="menu_cemetery_plots" name="Parcelas" parent="menu_cemetery_root"
+              action="action_cemetery_plot" sequence="10"/>
+    <menuitem id="menu_cemetery_reservations" name="Reservas" parent="menu_cemetery_root"
+              action="action_cemetery_reservation" sequence="20"/>
+
+    <menuitem id="menu_cemetery_config" name="Configuración" parent="menu_cemetery_root"
+              sequence="90"/>
+    <menuitem id="menu_cemetery_gardens" name="Jardines" parent="menu_cemetery_config"
+              action="action_cemetery_garden" sequence="10"/>
+    <menuitem id="menu_cemetery_phases" name="Fases" parent="menu_cemetery_config"
+              action="action_cemetery_phase" sequence="20"/>
+    <menuitem id="menu_cemetery_reservation_types" name="Tipos de Reserva" parent="menu_cemetery_config"
+              action="action_cemetery_reservation_type" sequence="30"/>
+</odoo>

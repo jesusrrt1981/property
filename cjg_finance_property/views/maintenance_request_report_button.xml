@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <record id="view_maintenance_request_form_statement_button" model="ir.ui.view">
+        <field name="name">maintenance.request.form.statement.button</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(cjg_finance_property.action_report_maintenance_statement)d"
+                        string="Imprimir Estado de Cuenta"
+                        type="action"
+                        class="btn-secondary"/>
+            </xpath>
+        </field>
+    </record>
+    </data>
+</odoo>

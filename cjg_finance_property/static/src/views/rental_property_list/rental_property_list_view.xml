@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <t t-name="cjg_finance_property.RentalPropertyListView" t-inherit="web.ListRenderer" t-inherit-mode="primary">
+         <xpath expr="//div/table" position="before">
+            <RentalPropertyDashboard />
+        </xpath>
+    </t>
+</templates>

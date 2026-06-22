@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="cjg_finance_sale_order_form_inherit" model="ir.ui.view">
+            <field name="name">astratech.credit.sale.order.view.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="cjg_finance.cjg_finance_sale_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='price_unit']" position="after">
+                    <field invisible="1" name="custom_property_ok"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">custom_property_ok == True</attribute>
+                    <attribute name="force_save">
+                        True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="readonly">custom_property_ok == True</attribute>
+                    <attribute name="force_save">
+                        True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
+                    <attribute name="readonly">custom_property_ok == True</attribute>
+                    <attribute name="force_save">
+                        True</attribute>
+                </xpath></field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="parent_property_form_view" model="ir.ui.view">
+            <field name="name">parent.property.form.view</field>
+            <field name="model">parent.property</field>
+            <field name="arch" type="xml">
+                <form string="Property">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button"
+                                type="object"
+                                name="action_properties_parent"
+                                icon="fa-home">
+                                <field name="property_count"
+                                    string='Properties'
+                                    widget="statinfo" />
+                            </button>
+                        </div>
+                        <field name="image" widget="image" class="oe_avatar" />
+                        <div class="oe_title mb24">
+                            <h1>
+                                <field class="text-break" name="name" required="1"
+                                    default_focus="1"
+                                    placeholder="e.g. Silver Height" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type" widget="radio" options="{'horizontal':True}" />
+                                <field name="company_id" />
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <span class="o_form_label o_td_label" name="address_name">
+                                    <b>Address</b>
+                                </span>
+                                <div class="o_address_format">
+                                    <field name="street" placeholder="Street..."
+                                        class="o_address_street" />
+                                    <field name="street2" placeholder="Street 2..."
+                                        class="o_address_street" />
+                                    <field name="city_id" placeholder="City" class="o_address_city" />
+                                    <field name="state_id" class="o_address_state"
+                                        placeholder="State"
+                                        options="{'no_open': True, 'no_quick_create': True}" />
+                                    <field name="zip" placeholder="ZIP" class="o_address_zip" />
+                                    <field name="country_id" placeholder="Country"
+                                        class="o_address_country"
+                                        options="{'no_open': True, 'no_quick_create': True}" />
+                                </div>
+                            </group>
+                            <group>
+                                <field name="website" />
+                            </group>
+                        </group>
+                        <group string="Residential Details" invisible="type != 'residential'">
+                            <group>
+                                <field name="residence_type" widget="radio" />
+                            </group>
+                            <group>
+                                <field name="total_floor" />
+                                <field name="towers" invisible="1" />
+                                <field name="no_of_towers" invisible="1" />
+                            </group>
+                        </group>
+                        <group string="Industrial Details" invisible="type != 'industrial'">
+                            <group>
+                                <field name="industry_location" widget="radio" />
+                            </group>
+                        </group>
+                        <group string="Commercial Details" invisible="type != 'commercial'">
+                            <group>
+                                <field name="commercial_type" widget="radio" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Amenities">
+                                <h3 style="color:#714B67;">
+                                    <strong>Amenities</strong>
+                                </h3>
+                                <field name="amenities_ids">
+                                    <kanban>
+                                        <field name="id" />
+                                        <field name="title" />
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div t-attf-class="oe_kanban_global_click border-bottom rounded #{kanban_classes}"
+                                                    style="width:130px;height:60px;">
+                                                    <div
+                                                        style="width:40%;float:left;display:inline-block;">
+                                                        <img alt="Avtar"
+                                                            t-att-src="kanban_image('property.amenities','image',record.id.raw_value)"
+                                                            style="width:50px;height:40px;" />
+                                                    </div>
+                                                    <div
+                                                        style="width:60%;float:right;display:inline-block;">
+                                                        <h5 style="color:#714B67;">
+                                                            <strong>
+                                                                <field name="title" />
+                                                            </strong>
+                                                        </h5>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+                            </page>
+                            <page string="Facilities">
+                                <h3 style="color:#714B67;">
+                                    <strong>Facilities</strong>
+                                </h3>
+                                <field name="property_specification_ids">
+                                    <kanban>
+                                        <field name="id" />
+                                        <field name="title" />
+                                        <field name="description_line1" />
+                                        <field name="description_line2" />
+                                        <field name="description_line3" />
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div t-attf-class="oe_kanban_global_click border border-info border-bottom #{kanban_classes}"
+                                                    style="width:350px;min-height:100px;height:auto;">
+                                                    <div
+                                                        style="width:40%;float:left;display:inline-block;">
+                                                        <img alt="Avtar"
+                                                            t-att-src="kanban_image('property.specification','image',record.id.raw_value)"
+                                                            style="width:100px;height:100px;"
+                                                            class="img-thumbnail-left" />
+                                                    </div>
+                                                    <div
+                                                        style="width:60%;float:right;display:inline-block;">
+                                                        <h4 style="color:#714B67;">
+                                                            <strong>
+                                                                <field name="title" />
+                                                            </strong>
+                                                        </h4>
+                                                        <h6>
+                                                            <span>➸ <field name="description_line1" />
+                                                                <br />
+                                                                ➸
+                                                                <field
+                                                                    name="description_line2" />
+                                                                <br />
+                                                                ➸
+                                                                <field
+                                                                    name="description_line3" />
+                                                            </span>
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="parent_property_tree_view" model="ir.ui.view">
+            <field name="name">parent.property.tree.view</field>
+            <field name="model">parent.property</field>
+            <field name="arch" type="xml">
+                <tree string="Property">
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+        <record id="parent_property_kanban_view" model="ir.ui.view">
+            <field name="name">parent.property.kanban.view</field>
+            <field name="model">parent.property</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="id" />
+                    <field name="name" />
+                    <field name="image" />
+                    <field name="type" />
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click #{kanban_classes}" style="padding:0px;">
+                                <img alt="Avtar"
+                                    t-att-src="kanban_image('parent.property','image',record.id.raw_value)"
+                                    style="width:298px;height:12rem;object-fit: cover;" />
+                                <h4 class="text-center mb-3 mt-3">
+                                    <field name="type" />
+                                </h4>
+                                <div
+                                    style="padding-left:1rem;padding-bottom:0.5rem;padding-right:1rem;">
+                                    <hr class="m-2" />
+                                    <div class="row">
+                                        <div class="col-8" style="vertical-align:middle">
+                                            <h3 class="text-primary mb-0">
+                                                <field name="name" />
+                                            </h3>
+                                        </div>
+                                        <div class="col-4"
+                                            style="vertical-align:middle;text-align:right;">
+                                            <button name="action_properties_parent" type="object"
+                                                help="View Properties"
+                                                string=" " class="btn btn-outline-dark border-0">
+                                                <i class="fa fa-building" role="properties"
+                                                    aria-label="Properties"
+                                                    title="Properties">
+                                                    Properties
+                                                </i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <hr class="m-2" />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <strong>
+                                                <!-- Landlord removed -->
+                                            </strong>
+                                            <br />
+                                            <strong>
+                                                Website :
+                                            </strong>
+                                            <field name="website" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <strong>
+                                                Address :
+                                            </strong>
+                                            <br />
+                                            <field
+                                                name="street" />
+                                            <br />
+                                            <field name="street2" />
+                                            <br />
+                                            <field
+                                                name="city_id" />, <field name="zip" />, <br />
+                                            <field
+                                                name="state_id" />
+                                            <field name="country_id" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        <record id="parent_property_search_view" model="ir.ui.view">
+            <field name="name">parent.property.search.view</field>
+            <field name="model">parent.property</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" />
+                    <filter string="Company" name="group_by_company" domain="[]"
+                        context="{'group_by':'company_id'}" />
+                </search>
+            </field>
+        </record>
+        <record id="parent_property_action" model="ir.actions.act_window">
+            <field name="name">Parent Properties</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">parent.property</field>
+            <field name="view_mode">tree,form,search,kanban</field>
+        </record>
+    </data>
+</odoo>

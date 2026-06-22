@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Vista heredada del formulario de producto -->
+        <record id="product_product_form_inherit_view" model="ir.ui.view">
+            <field name="name">product.product.inherit.form.view</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <xpath expr="//label[@for='purchase_ok']" position="after">
+                    <span class="d-inline-block">
+                        <field name="is_extra_service_product"/>
+                        <label for="is_extra_service_product"/>
+                    </span>
+                </xpath>
+
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_units" type="object" class="oe_stat_button" icon="fa-home">
+                        <field name="unit_count" string="Units" widget="statinfo"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Acción para productos de servicios extra -->
+        <record id="product_extra_service_action" model="ir.actions.act_window">
+            <field name="name">Utility Services</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.product</field>
+            <field name="view_mode">tree,form,kanban,activity</field>
+            <field name="domain">[('is_extra_service_product','=',True)]</field>
+            <field name="context">{'default_is_extra_service_product': True}</field>
+        </record>
+
+        <!-- Vista kanban con precio y moneda -->
+        <record id="product_product_kanban_price_currency_view" model="ir.ui.view">
+            <field name="name">product.product.kanban.price.currency</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_view_kanban_catalog"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="inside">
+                    <field name="lst_price"/>
+                    <field name="currency_id"/>
+                </xpath>
+                <xpath expr="//div[@name='o_kanban_price']" position="after">
+                    <div name="product_lst_price" class="mt-1">
+                        <span>Precio: </span>
+                        <field name="lst_price" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Precio readonly si hay unidades -->
+        <record id="product_product_variant_form_readonly_price" model="ir.ui.view">
+            <field name="name">product.product.form.readonly.price.units</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='lst_price']" position="attributes">
+                <attribute name="modifiers">{'readonly': [('unit_count','&gt;',0)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="modifiers">{'readonly': [('unit_count','&gt;',0)]}</attribute>
+                </xpath>
+                <!-- Ensure dependency field is present for modifier evaluation -->
+                <xpath expr="//form/header" position="inside">
+                <field name="unit_count" modifiers="{'invisible': true}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="product_template_form_readonly_price" model="ir.ui.view">
+            <field name="name">product.template.form.readonly.price.units</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="modifiers">{'readonly': [('unit_count','&gt;',0)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="modifiers">{'readonly': [('unit_count','&gt;',0)]}</attribute>
+                </xpath>
+                <!-- Ensure dependency field is present for modifier evaluation -->
+                <xpath expr="//form/header" position="inside">
+                <field name="unit_count" modifiers="{'invisible': true}"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

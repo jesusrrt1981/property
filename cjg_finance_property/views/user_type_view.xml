@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="user_type_inherit_view" model="ir.ui.view">
+            <field name="name">user.type.inherit.view</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//sheet/group/group/span[@name='address_name']" position="before">
+                    <field name="user_type" widget="radio" options="{'horizontal': true}" />
+                    <field name="is_sold_customer" invisible="user_type != 'customer'" />
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="brokerage_company_id" invisible="1" />
+                    <field name="currency_id" invisible="1" />
+                    <field name="currency_id" invisible="1" />
+                </xpath>
+                <xpath expr="//notebook/page[@name='contact_addresses']" position="before">
+
+                    <page string="Sale Contract" invisible="user_type != 'broker'">
+                        <field name="property_sold_ids">
+                            <tree>
+                                <field name="sold_seq" />
+                                <field name="date" />
+                                <field name="customer_id" />
+                                <field name="property_id" />
+                                <field name="sale_price" />
+                                <field name="commission_type" />
+                                <field name="broker_bill_id"
+                                    widget="many2one_clickable" readonly="1" />
+                                <field name="broker_bill_payment_state" widget="badge"
+                                    style="margin-left: 10px;"
+                                    decoration-success="broker_bill_payment_state=='paid'"
+                                    decoration-danger="broker_bill_payment_state=='not_paid'"
+                                    decoration-info="broker_bill_payment_state=='in_payment'"
+                                    decoration-primary="broker_bill_payment_state=='partial'"
+                                    decoration-warning="broker_bill_payment_state=='reversed'"
+                                />
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+        <record id="landlord_details_action" model="ir.actions.act_window">
+            <field name="name">LandLords</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('user_type','=','landlord')]</field>
+            <field name="context">{'default_user_type':'landlord'}</field>
+            <field name="view_mode">kanban,tree,form,activity</field>
+        </record>
+
+        <record id="customer_details_action" model="ir.actions.act_window">
+            <field name="name">Customers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('user_type','=','customer')]</field>
+            <field name="context">{'default_user_type':'customer'}</field>
+            <field name="view_mode">kanban,tree,form,activity</field>
+        </record>
+
+        <record id="broker_details_action" model="ir.actions.act_window">
+            <field name="name">Brokers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('user_type','=','broker')]</field>
+            <field name="context">{'default_user_type':'broker'}</field>
+            <field name="view_mode">kanban,tree,form,activity</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="property_document_tree_view" model="ir.ui.view">
+            <field name="name">property.document.tree.view</field>
+            <field name="model">property.documents</field>
+            <field name="arch" type="xml">
+                <tree string="Document" editable="bottom">
+                    <field name="property_id"/>
+                    <field name="document_date"/>
+                    <field name="doc_type"/>
+                    <field name="file_name" column_invisible="1"/>
+                    <field name="document" filename="file_name" widget="binary"/>
+                </tree>
+            </field>
+        </record>
+        <record id="property_document_kanban_view" model="ir.ui.view">
+            <field name="name">property.document.kanban.view</field>
+            <field name="model">property.documents</field>
+            <field name="arch" type="xml">
+                <kanban string="Kanban">
+                    <field name="id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="row oe_kanban_global_click #{kanban_classes}" style="max-width:250px !important;">
+                                <div class="col-12">
+                                    <img t-att-src="kanban_image('property.documents', 'document', record.id.raw_value)"
+                                         t-att-alt="name" style="margin: 10px 0" width="200px"
+                                         height="200px" class="img img-responsive"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        <record id="property_document_action" model="ir.actions.act_window">
+            <field name="name">Document</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">property.documents</field>
+            <field name="view_mode">kanban,tree</field>
+        </record>
+    </data>
+</odoo>

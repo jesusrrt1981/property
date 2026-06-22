@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <template id="property_details_qweb_report_template" name="Property Details QWeb Report Template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif;">
+                        <!-- Header Section -->
+                        <div class="text-center mb-4">
+                            <h1 style="color: #800020; font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">Property Brochure</h1>
+                            <hr style="border: 2px solid #800020; width: 50%; margin: 0 auto;"/>
+                        </div>
+
+                        <!-- Property Image Section -->
+                        <t t-if="doc.image">
+                            <div class="text-center mb-4">
+                                <img t-att-src="image_data_uri(doc.image)" 
+                                     style="width: 100%; max-width: 800px; height: 400px; object-fit: cover; border: 3px solid #800020; border-radius: 8px;" 
+                                     alt="Property Image"/>
+                            </div>
+                        </t>
+
+                        <!-- Property Name -->
+                        <h2 class="text-center" style="color: #800020; font-size: 2rem; font-weight: bold; margin: 20px 0;">
+                            <span t-field="doc.name"/>
+                        </h2>
+
+                        <!-- Property Details Section -->
+                        <div class="mb-4">
+                            <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                <i class="fa fa-home" style="margin-right: 8px;"></i>Property Details
+                            </h3>
+                            <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Type</td>
+                                        <td style="width: 25%; padding: 12px; border-right: 1px solid #ddd;">
+                                            <span t-field="doc.type"/> / <span t-field="doc.property_subtype_id"/>
+                                        </td>
+                                        <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Property Code</td>
+                                        <td style="width: 25%; padding: 12px;">
+                                            <span t-field="doc.property_seq"/>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Property For</td>
+                                        <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                            <span t-field="doc.sale_lease"/>
+                                        </td>
+                                        <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">
+                                            <t t-if="doc.sale_lease== 'for_sale'">Sale Price</t>
+                                        </td>
+                                        <td style="padding: 12px;">
+                                            <strong style="color: #800020; font-size: 1.1rem;">
+                                                <t t-if="doc.sale_lease== 'for_sale'">
+                                                    <span t-field="doc.price"/>
+                                                </t>
+    
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <t t-if="doc.property_project_id">
+                                        <tr style="border-bottom: 1px solid #ddd;">
+                                            <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Region</td>
+                                            <td style="padding: 12px; border-right: 1px solid #ddd;" colspan="3">
+                                                <span t-field="doc.region_id"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Address</td>
+                                        <td style="padding: 12px;" colspan="3">
+                                            <span t-field="doc.street"/>
+                                            <t t-if="doc.street2"><br/><span t-field="doc.street2"/></t>
+                                            <t t-if="doc.city_id">
+                                                <br/><span t-field="doc.city_id.name"/>, <span t-field="doc.zip"/>
+                                            </t>
+                                            <br/><span t-field="doc.state_id.name"/>, <span t-field="doc.country_id.name"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Owner Details Section -->
+                        <div class="mb-4">
+                            <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                <i class="fa fa-user" style="margin-right: 8px;"></i>Owner Details
+                            </h3>
+                            <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Website</td>
+                                        <td style="width: 75%; padding: 12px;">
+                                            <span t-field="doc.website"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Area Measurements Section -->
+                        <div class="mb-4">
+                            <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                <i class="fa fa-expand" style="margin-right: 8px;"></i>Area Measurements
+                            </h3>
+                            <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Total Area</td>
+                                        <td style="width: 25%; padding: 12px; border-right: 1px solid #ddd;">
+                                            <span t-field="doc.total_area"/> <span t-field="doc.measure_unit"/>
+                                        </td>
+                                        <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Usable Area</td>
+                                        <td style="width: 25%; padding: 12px;">
+                                            <span t-field="doc.usable_area"/> <span t-field="doc.measure_unit"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Section Measurements Table -->
+                            <t t-if="doc.is_section_measurement and doc.room_measurement_ids">
+                                <table class="table mt-3" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                    <thead>
+                                        <tr style="background-color: #800020; color: white;">
+                                            <th style="padding: 12px; border-right: 1px solid white;">Section</th>
+                                            <th style="padding: 12px; text-align: center; border-right: 1px solid white;">No of Units</th>
+                                            <th style="padding: 12px; text-align: center; border-right: 1px solid white;">Length</th>
+                                            <th style="padding: 12px; text-align: center; border-right: 1px solid white;">Width</th>
+                                            <t t-if="doc.measure_unit in ['cu_m','cu_ft']">
+                                                <th style="padding: 12px; text-align: center; border-right: 1px solid white;">Height</th>
+                                            </t>
+                                            <th style="padding: 12px; text-align: center;">Total Area</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="doc.room_measurement_ids" t-as="s">
+                                            <tr style="border-bottom: 1px solid #ddd;">
+                                                <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                    <span t-field="s.section_id.name"/>
+                                                </td>
+                                                <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                                    <span t-field="s.no_of_unit"/>
+                                                </td>
+                                                <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                                    <span t-field="s.length"/>
+                                                </td>
+                                                <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                                    <span t-field="s.width"/>
+                                                </td>
+                                                <t t-if="doc.measure_unit in ['cu_m','cu_ft']">
+                                                    <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                                                        <span t-field="s.height"/>
+                                                    </td>
+                                                </t>
+                                                <td style="padding: 12px; text-align: center;">
+                                                    <span t-field="s.carpet_area"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                        </div>
+
+                        <!-- Property Type Specific Details -->
+                        <t t-if="doc.type in ['residential','commercial','industrial']">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                    <i class="fa fa-building" style="margin-right: 8px;"></i>
+                                    <t t-if="doc.type == 'residential'">Residential Details</t>
+                                    <t t-if="doc.type == 'commercial'">Commercial Details</t>
+                                    <t t-if="doc.type == 'industrial'">Industrial Details</t>
+                                </h3>
+                                <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                    <tbody>
+                                        <tr style="border-bottom: 1px solid #ddd;">
+                                            <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">No of Floors</td>
+                                            <td style="width: 25%; padding: 12px; border-right: 1px solid #ddd;">
+                                                <span t-field="doc.total_floor"/>
+                                            </td>
+                                            <t t-if="doc.type in ['residential','commercial']">
+                                                <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Floor</td>
+                                                <td style="width: 25%; padding: 12px;">
+                                                    <span t-field="doc.floor"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #ddd;">
+                                            <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Parking</td>
+                                            <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                <span t-field="doc.parking"/>
+                                            </td>
+                                            <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Facing</td>
+                                            <td style="padding: 12px;">
+                                                <span t-field="doc.facing"/>
+                                            </td>
+                                        </tr>
+                                        <t t-if="doc.type == 'residential'">
+                                            <tr style="border-bottom: 1px solid #ddd;">
+                                                <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">BHK</td>
+                                                <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                    <span t-field="doc.unit_type"/> BHK
+                                                </td>
+                                                <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Rooms</td>
+                                                <td style="padding: 12px;">
+                                                    <span t-field="doc.bed"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="doc.type in ['residential','commercial']">
+                                            <tr>
+                                                <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Bathrooms</td>
+                                                <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                    <span t-field="doc.bathroom"/>
+                                                </td>
+                                                <t t-if="doc.furnishing_id">
+                                                    <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Furnishing</td>
+                                                    <td style="padding: 12px;">
+                                                        <span t-field="doc.furnishing_id"/>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <!-- Pricing Details Section -->
+                        <div class="mb-4">
+                            <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                <i class="fa fa-money" style="margin-right: 8px;"></i>Pricing Details
+                            </h3>
+                            <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Pricing Type</td>
+                                        <td style="width: 25%; padding: 12px; border-right: 1px solid #ddd;">
+                                            <span t-field="doc.pricing_type"/>
+                                        </td>
+                                        <t t-if="doc.pricing_type == 'area_wise'">
+                                            <td style="width: 25%; padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">
+                                                Price / <span t-field="doc.measure_unit"/>
+                                            </td>
+                                            <td style="width: 25%; padding: 12px;">
+                                                <span t-field="doc.price_per_area"/> / <span t-field="doc.measure_unit"/>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">
+                                            <t t-if="doc.sale_lease== 'for_sale'">Sale Price</t>
+                                        </td>
+                                        <td style="padding: 12px;" colspan="3">
+                                            <strong style="color: #800020; font-size: 1.2rem;">
+                                                <t t-if="doc.sale_lease== 'for_sale'">
+                                                    <span t-field="doc.price"/>
+                                                </t>
+            
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Maintenance Details Section -->
+                        <t t-if="doc.is_maintenance_service">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                    <i class="fa fa-wrench" style="margin-right: 8px;"></i>Maintenance Details
+                                </h3>
+                                <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                    <tbody>
+            
+                                        <tr>
+                                            <t t-if="doc.maintenance_type == 'area_wise'">
+                                                <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Maintenance / Area</td>
+                                                <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                    <span t-field="doc.per_area_maintenance"/>
+                                                </td>
+                                            </t>
+                                            <td style="padding: 12px; font-weight: bold; border-right: 1px solid #ddd;">Total Maintenance</td>
+                                            <td style="padding: 12px;">
+                                                <strong style="color: #800020;">
+                                                    <span t-field="doc.total_maintenance"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <!-- Utility Services Section -->
+                        <t t-if="doc.is_extra_service and doc.extra_service_ids">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                    <i class="fa fa-cogs" style="margin-right: 8px;"></i>Utility Services
+                                </h3>
+                                <table class="table" style="border: 2px solid #800020; margin: 0; background-color: white;">
+                                    <thead>
+                                        <tr style="background-color: #800020; color: white;">
+                                            <th style="padding: 12px; border-right: 1px solid white;">Service</th>
+                                            <th style="padding: 12px; text-align: right;">Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="doc.extra_service_ids" t-as="s">
+                                            <tr style="border-bottom: 1px solid #ddd;">
+                                                <td style="padding: 12px; border-right: 1px solid #ddd;">
+                                                    <span t-field="s.service_id.name"/>
+                                                </td>
+                                                <td style="padding: 12px; text-align: right;">
+                                                    <span t-field="s.price" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <!-- Page Break -->
+                        <div style="page-break-before: always;"></div>
+
+                        <!-- Amenities Section -->
+                        <t t-if="doc.amenities and doc.amenities_ids">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                    <i class="fa fa-star" style="margin-right: 8px;"></i>Amenities
+                                </h3>
+                                <div style="border: 2px solid #800020; padding: 20px; background-color: white;">
+                                    <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
+                                        <t t-foreach="doc.amenities_ids" t-as="amenity">
+                                            <div style="width: 150px; text-align: center; margin: 10px; padding: 10px;">
+                                                <t t-if="amenity.image">
+                                                    <img t-att-src="image_data_uri(amenity.image)" 
+                                                         style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #800020;"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <img src="/cjg_finance_property/static/src/img/amenity.jpeg" 
+                                                         style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #800020;"/>
+                                                </t>
+                                                <h6 style="margin-top: 10px; color: #800020; font-weight: bold;">
+                                                    <span t-field="amenity.title"/>
+                                                </h6>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Specifications Section -->
+                        <t t-if="doc.is_facilities and doc.property_specification_ids">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                    <i class="fa fa-list" style="margin-right: 8px;"></i>Specifications
+                                </h3>
+                                <div style="border: 2px solid #800020; background-color: white;">
+                                    <t t-foreach="doc.property_specification_ids" t-as="ps">
+                                        <div style="display: flex; padding: 15px; border-bottom: 1px solid #ddd;">
+                                            <div style="width: 80px; text-align: center; margin-right: 15px;">
+                                                <t t-if="ps.image">
+                                                    <img t-att-src="image_data_uri(ps.image)" 
+                                                         style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; border: 1px solid #800020;"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <img src="/cjg_finance_property/static/src/img/specifications.jpeg" 
+                                                         style="width: 70px; height: 70px; border-radius: 5px; border: 1px solid #800020;"/>
+                                                </t>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <h5 style="color: #800020; font-weight: bold; margin-bottom: 8px;">
+                                                    <span t-field="ps.title"/>
+                                                </h5>
+                                                <p style="margin: 0; line-height: 1.5;">
+                                                    <span t-field="ps.description"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Floor Plans Section -->
+                        <t t-if="doc.is_floor_plan and doc.floreplan_ids">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                                                <!-- Continue Floor Plans Section -->
+                                        <i class="fa fa-building-o" style="margin-right: 8px;"></i>Floor Plans
+                                </h3>
+                                <div style="border: 2px solid #800020; background-color: white; padding: 15px;">
+                                    <t t-foreach="doc.floreplan_ids" t-as="plan">
+                                        <div style="margin-bottom: 20px;">
+                                            <h4 style="color: #800020; font-weight: bold; margin-bottom: 10px;">
+                                                <span t-field="plan.title"/>
+                                            </h4>
+                                            <t t-if="plan.image">
+                                                <img t-att-src="image_data_uri(plan.image)" 
+                                                     style="width: 100%; max-width: 600px; height: auto; border: 1px solid #ddd; display: block; margin: 0 auto;"/>
+                                            </t>
+                                        </div>
+                                        <t t-if="plan_index != len(doc.floreplan_ids)-1">
+                                            <hr style="border-top: 1px dashed #800020; margin: 20px 0;"/>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Property Images Section -->
+                        <t t-if="doc.is_images and doc.property_images_ids">
+                            <div class="mb-4">
+                                <h3 style="background-color: #800020; color: white; padding: 12px; margin: 0; font-size: 1.2rem; font-weight: bold;">
+                                    <i class="fa fa-camera" style="margin-right: 8px;"></i>Property Images
+                                </h3>
+                                <div style="border: 2px solid #800020; background-color: white; padding: 15px;">
+                                    <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
+                                        <t t-foreach="doc.property_images_ids" t-as="img">
+                                            <div style="width: 45%; margin: 10px 0; text-align: center;">
+                                                <t t-if="img.image">
+                                                    <h4 style="color: #800020; font-weight: bold; margin-bottom: 5px;">
+                                                        <span t-field="img.title"/>
+                                                    </h4>
+                                                    <img t-att-src="image_data_uri(img.image)" 
+                                                         style="width: 100%; max-height: 300px; object-fit: contain; border: 1px solid #ddd;"/>
+                                                </t>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Footer Section -->
+                        <div style="margin-top: 40px; border-top: 2px solid #800020; padding-top: 15px; text-align: center;">
+                            <p style="color: #800020; font-weight: bold;">
+                                For more information, please contact us at:
+                            </p>
+                            <!-- landlord phone/email footer removed -->
+                            <p style="color: #666; font-size: 0.9rem; margin-top: 15px;">
+                                This brochure was generated on <span t-esc="(doc.create_date or doc.write_date).strftime('%Y-%m-%d') if (doc.create_date or doc.write_date) else ''"/>
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    </data>
+</odoo>

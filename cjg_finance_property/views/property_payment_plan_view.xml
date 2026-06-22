@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Payment Plan Template Form View -->
+        <record id="property_payment_plan_form_view" model="ir.ui.view">
+            <field name="name">property.payment.plan.form.view</field>
+            <field name="model">property.payment.plan</field>
+            <field name="arch" type="xml">
+                <form string="Payment Plan Template">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="toggle_active" icon="fa-archive">
+                                <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name" placeholder="e.g., 60% Post Handover - 4 Years"/>
+                                <field name="sequence" groups="base.group_no_one"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group>
+                                <field name="total_percentage" widget="percentage"/>
+                                <field name="description" placeholder="Description of payment plan..."/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Payment Terms">
+                                <field name="payment_plan_line_ids">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="payment_type"/>
+                                        <field name="days_after" invisible="payment_type != 'days_after_booking'"/>
+                                        <field name="percentage" widget="percentage"/>
+                                        <field name="installments" invisible="payment_type != 'post_handover'"/>
+                                        <field name="installment_frequency" invisible="payment_type != 'post_handover'"/>
+                                        <field name="note"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right">
+                                    <field name="total_percentage" widget="percentage"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Payment Plan Template Tree View -->
+        <record id="property_payment_plan_tree_view" model="ir.ui.view">
+            <field name="name">property.payment.plan.tree.view</field>
+            <field name="model">property.payment.plan</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Plan Templates">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="total_percentage" widget="percentage"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+    </data>
+</odoo>
