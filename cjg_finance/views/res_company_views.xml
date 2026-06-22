@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Vista de configuración de cuentas por servicio -->
+    <record id="view_company_form_finance_accounts" model="ir.ui.view">
+        <field name="name">res.company.form.finance.accounts</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Configuración Financiera" name="finance_config">
+                    <group>
+                        <group string="Migración Testarossa">
+                            <field name="testarossa_em_id"/>
+                            <field name="receipt_sequence_prefix"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Cuentas de Caja por Tipo de Servicio"/>
+                    <group>
+                        <group string="Preventa Funeraria (PF)">
+                            <field name="pf_cash_account_id"/>
+                            <field name="pf_journal_id"/>
+                            <field name="pf_income_account_id"/>
+                        </group>
+                        <group string="Cementerio/Mausoleo (CM)">
+                            <field name="cm_cash_account_id"/>
+                            <field name="cm_journal_id"/>
+                            <field name="cm_income_account_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Cremación (CRE)">
+                            <field name="cre_cash_account_id"/>
+                            <field name="cre_journal_id"/>
+                            <field name="cre_income_account_id"/>
+                        </group>
+                        <group string="Servicio Funerario (SF)">
+                            <field name="sf_cash_account_id"/>
+                            <field name="sf_journal_id"/>
+                            <field name="sf_income_account_id"/>
+                        </group>
+                        <group string="Información">
+                            <p class="text-muted">
+                                Configure las cuentas contables y diarios específicos para cada tipo de servicio.
+                                Los pagos se registrarán automáticamente en la cuenta correspondiente según el tipo de contrato.
+                            </p>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    </data>
+</odoo>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_form_testarossa_parity" model="ir.ui.view">
+            <field name="name">sale.credit.form.testarossa.parity</field>
+            <field name="model">sale.credit</field>
+            <field name="inherit_id" ref="cjg_finance.sale_credit_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Datos Testarossa" groups="base.group_no_one">
+                        <group string="Fiscal / ITBIS">
+                            <field name="tax_percent"/>
+                            <field name="tax_amount"/>
+                            <field name="tax_paid"/>
+                        </group>
+                        <group string="Capital y Porcentajes">
+                            <field name="discount_percent"/>
+                            <field name="initial_percent"/>
+                            <field name="improvement_capital"/>
+                            <field name="installment_interest"/>
+                            <field name="closing_periods"/>
+                            <field name="product_count_legacy"/>
+                        </group>
+                        <group string="Plan / Situación / Tipo Ingreso">
+                            <field name="financial_plan"/>
+                            <field name="situacion"/>
+                            <field name="income_type"/>
+                            <field name="sales_channel"/>
+                        </group>
+                        <group string="Fechas Operativas">
+                            <field name="cancellation_date"/>
+                            <field name="first_payment_date"/>
+                            <field name="capital_payment_date"/>
+                            <field name="print_date"/>
+                        </group>
+                        <group string="Facturación / Contabilidad">
+                            <field name="billing_partner_id"/>
+                            <field name="account_code"/>
+                        </group>
+                        <group string="Próximos Asignados">
+                            <field name="next_oficial_id"/>
+                            <field name="next_motorista_id"/>
+                        </group>
+                        <group string="Registro / Auditoría">
+                            <field name="registered_by_user_id"/>
+                            <field name="reiterator_partner_id"/>
+                            <field name="reiterated_date"/>
+                        </group>
+                        <group string="Anulación y Bloqueo">
+                            <field name="annulled_by_credit_id"/>
+                            <field name="is_blocked"/>
+                            <field name="correspondence"/>
+                        </group>
+                        <group string="Débito Automático (Legacy)">
+                            <field name="legacy_card_ref"/>
+                            <field name="legacy_bank_account_ref"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Reporte PDF de Estado de Cuenta de Crédito -->
+    <record id="action_report_credit_statement" model="ir.actions.report">
+        <field name="name">Estado de Cuenta</field>
+        <field name="model">sale.credit</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cjg_finance.report_credit_statement_document</field>
+        <field name="report_file">cjg_finance.report_credit_statement_document</field>
+        <field name="binding_model_id" ref="model_sale_credit"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_credit_statement_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h2>ESTADO DE CUENTA</h2>
+                                <h4>Crédito: <span t-field="o.name"/></h4>
+                                <p>Fecha de Emisión: <span t-esc="env['cjg.finance.qweb.helper'].now_str('%d/%m/%Y')"/></p>
+                            </div>
+                        </div>
+
+                        <!-- Información del Cliente y Crédito -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <h5>Información del Cliente</h5>
+                                <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["name", "address", "phone"]}'/>
+                            </div>
+                            <div class="col-6">
+                                <h5>Resumen del Crédito</h5>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Monto Financiado:</strong></td>
+                                        <td class="text-right"><span t-field="o.amount_financed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tasa de Interés:</strong></td>
+                                        <td class="text-right"><span t-field="o.percent_interest"/>%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cuota Mensual:</strong></td>
+                                        <td class="text-right"><span t-field="o.amount_per_rate" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fecha Inicio:</strong></td>
+                                        <td class="text-right"><span t-field="o.date_start"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fecha Fin:</strong></td>
+                                        <td class="text-right"><span t-field="o.date_end"/></td>
+                                    </tr>
+                                    <tr class="table-active">
+                                        <td><strong>Estado:</strong></td>
+                                        <td class="text-right">
+                                            <span t-if="o.state == 'approved'" class="badge badge-success">Aprobado</span>
+                                            <span t-if="o.state == 'closed'" class="badge badge-info">Completado</span>
+                                            <span t-if="o.state == 'cancelled'" class="badge badge-danger">Cancelado</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Detalle de Movimientos -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <table class="table table-sm table-bordered" style="font-size: 11px;">
+                                    <thead>
+                                        <tr style="background-color: #f0f0f0;">
+                                            <th colspan="4" class="text-center">D O C U M E N T O S</th>
+                                            <th colspan="7" class="text-center">C A R G O S  Y  A B O N O S</th>
+                                        </tr>
+                                        <tr style="background-color: #ddd;">
+                                            <th>Nro</th>
+                                            <th>Vence</th>
+                                            <th>Descripción</th>
+                                            <th class="text-right">Monto</th>
+                                            <th>Recibo</th>
+                                            <th>Fecha</th>
+                                            <th class="text-right">Capital</th>
+                                            <th class="text-right">Interés</th>
+                                            <th class="text-right">Otros</th>
+                                            <th class="text-right">Monto</th>
+                                            <th class="text-right">Saldo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="lines" t-value="o._get_statement_lines()"/>
+                                        <t t-foreach="lines" t-as="item">
+                                            
+                                            <!-- SECCION / PLAN -->
+                                            <tr t-if="item.get('type') == 'header'" style="background-color: #696969; color: white; font-weight: bold;">
+                                                <td colspan="11"><t t-esc="item['description']"/></td>
+                                            </tr>
+
+                                            <!-- CUOTA ROW (COMBINED) -->
+                                            <tr t-if="item.get('type') == 'quota_row'">
+                                                <td><t t-esc="item.get('number')"/></td>
+                                                <td><t t-esc="item.get('date')" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/></td>
+                                                <td><t t-esc="item.get('description')"/></td>
+                                                <td class="text-right"><t t-esc="item.get('amount_quota')" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                                
+                                                <!-- Payment details if exists -->
+                                                <td><t t-esc="item.get('receipt')"/></td>
+                                                <td><t t-esc="item.get('pay_date')" t-options='{"widget": "date"}'/></td>
+                                                <td class="text-right"><t t-esc="item.get('paid_capital', 0.0)" t-options='{"widget": "float", "precision": 2}'/></td>
+                                                <td class="text-right"><t t-esc="item.get('paid_interest', 0.0)" t-options='{"widget": "float", "precision": 2}'/></td>
+                                                <td class="text-right"><t t-esc="item.get('paid_others', 0.0)" t-options='{"widget": "float", "precision": 2}'/></td>
+                                                <td class="text-right"><t t-esc="item.get('paid_amount')" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                                
+                                                <td class="text-right"><t t-esc="item.get('balance')" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            </tr>
+
+                                            <!-- REFINANCIAMIENTO / CIERRE -->
+                                            <tr t-if="item.get('type') == 'refinance'" style="font-weight: bold; background-color: #f9f9f9;">
+                                                <td colspan="3"><t t-esc="item.get('description')"/></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-right"><t t-esc="item.get('amount')" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                                <td class="text-right"><t t-esc="item.get('balance')" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            </tr>
+
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Clasificación del Cliente -->
+                        <div class="row mb-3" t-if="o.client_classification">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <strong>Clasificación del Cliente:</strong>
+                                    <span t-if="o.client_classification == 'A'" class="badge badge-success">A - Al Día</span>
+                                    <span t-if="o.client_classification == 'B'" class="badge badge-warning">B - Atraso Moderado</span>
+                                    <span t-if="o.client_classification == 'C'" class="badge badge-danger">C - Atraso Significativo</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nota Legal -->
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <p class="text-muted small">
+                                    Este estado de cuenta es un documento informativo. Para cualquier aclaración, favor contactar a nuestro departamento de cobros.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    </data>
+</odoo>

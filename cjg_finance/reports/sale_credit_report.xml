@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción de reporte para Sale Credit -->
+        <record id="action_report_sale_credit" model="ir.actions.report">
+            <field name="name">Reporte de Crédito</field>
+            <field name="model">sale.credit</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_sale_credit_document</field>
+            <field name="print_report_name">(object.name and 'Reporte_Credito_' + object.name) or 'Reporte_Credito'</field>
+        </record>
+
+        <!-- Planilla del reporte -->
+        <template id="report_sale_credit_document">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <h2>Reporte de Crédito</h2>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Referencia</strong></td>
+                                        <td><span t-esc="o.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cliente</strong></td>
+                                        <td><span t-field="o.partner_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Estado</strong></td>
+                                        <td><span t-esc="o.state"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Estatus de pago</strong></td>
+                                        <td><span t-esc="o.payment_status"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Fecha inicio</strong></td>
+                                        <td><span t-esc="o.date_start"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fecha fin</strong></td>
+                                        <td><span t-esc="o.date_end"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Monto financiado</strong></td>
+                                        <td><span t-esc="o.amount_financed"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total vendido</strong></td>
+                                        <td><span t-esc="o.total_sold"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pendiente</strong></td>
+                                        <td><span t-esc="o.amount_residual"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3 class="mt-3">Líneas de Crédito</h3>
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fecha esperada</th>
+                                    <th>Monto cuota</th>
+                                    <th>Pagado</th>
+                                    <th>Pendiente</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="o.credit_lines">
+                                    <t t-foreach="o.credit_lines" t-as="l">
+                                        <tr>
+                                            <td><span t-esc="l.count"/></td>
+                                            <td><span t-esc="l.expected_date_payment"/></td>
+                                            <td><span t-esc="l.amount_fixed"/></td>
+                                            <td><span t-esc="l.amount_paid_total"/></td>
+                                            <td><span t-esc="l.amount_residual"/></td>
+                                            <td><span t-esc="l.state"/></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <tr>
+                                        <td colspan="6">Sin líneas de crédito.</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            F1.5 - Ver Listado Cartera v1 (resumen) (QWeb PDF)
+            Migrado de testarossa/modulos/cartera/class/ver_listado.php
+            Columnas: Oficial | #Contratos | Capital | Interes | Mora | Total
+        -->
+        <record id="action_report_ver_listado_cartera" model="ir.actions.report">
+            <field name="name">F1.5 Ver Listado Cartera v1 (resumen)</field>
+            <field name="model">cjg.finance.ver.listado.cartera.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_ver_listado_cartera_document</field>
+            <field name="report_file">cjg_finance.report_ver_listado_cartera_document</field>
+            <field name="print_report_name">'Ver_Listado_Cartera_%s_%s' % (object.date_from, object.date_to)</field>
+            <field name="paperformat_id" ref="base.paperformat_us"/>
+        </record>
+
+        <template id="report_ver_listado_cartera_document">
+            <t t-set="data" t-value="data or {}"/>
+            <t t-set="totals" t-value="data.get('totals', {})"/>
+            <t t-set="rows" t-value="data.get('rows', [])"/>
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">VER LISTADO CARTERA v1 (RESUMEN)</h2>
+                        <p class="text-center">
+                            <small>
+                                Generado:
+                                <span t-esc="env['cjg.finance.qweb.helper'].now_str('%d/%m/%Y %H:%M')"/>
+                            </small>
+                        </p>
+
+                        <div class="row mt-2 mb-3">
+                            <div class="col-6">
+                                <strong>Compania:</strong>
+                                <span t-esc="data.get('company_name', '')"/><br/>
+                                <strong>Estado Contrato:</strong>
+                                <span t-esc="data.get('estado_contrato', '')"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Desde:</strong> <t t-esc="data.get('date_from', '')"/><br/>
+                                <strong>Hasta:</strong> <t t-esc="data.get('date_to', '')"/><br/>
+                                <strong>Oficial:</strong> <t t-esc="data.get('oficial_name', '')"/><br/>
+                                <strong>Zona:</strong> <t t-esc="data.get('zona_name', '')"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered" style="font-size:11px;">
+                            <thead>
+                                <tr style="background:#ECEFF1;">
+                                    <th>Oficial</th>
+                                    <th class="text-end"># Contratos</th>
+                                    <th class="text-end">Capital</th>
+                                    <th class="text-end">Interes</th>
+                                    <th class="text-end">Mora</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="rows" t-as="r">
+                                    <td><t t-esc="r['oficial_name']"/></td>
+                                    <td class="text-end">
+                                        <t t-esc="r['count']"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="r['capital']"
+                                           t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="r['interes']"
+                                           t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="r['mora']"
+                                           t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="r['total']"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr t-if="not rows">
+                                    <td colspan="6" class="text-center text-muted">
+                                        Sin datos para los filtros seleccionados.
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background:#ECEFF1;">
+                                    <td><strong>TOTAL</strong></td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('count', 0)"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('capital', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('interes', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('mora', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('total', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <record id="view_ver_listado_cartera_wizard_form" model="ir.ui.view">
+            <field name="name">cjg.finance.ver.listado.cartera.wizard.form</field>
+            <field name="model">cjg.finance.ver.listado.cartera.wizard</field>
+            <field name="arch" type="xml">
+                <form string="F1.5 Ver Listado Cartera v1 (resumen)">
+                    <sheet>
+                        <group>
+                            <group string="Periodo y Compania">
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                            <group string="Filtros">
+                                <field name="oficial_id" options="{'no_create': True}"/>
+                                <field name="motorista_id" options="{'no_create': True}"/>
+                                <field name="estado_contrato"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_print_report"
+                                string="Imprimir PDF"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-print"/>
+                        <button string="Cancelar"
+                                class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ver_listado_cartera_wizard" model="ir.actions.act_window">
+            <field name="name">F1.5 Ver Listado Cartera v1</field>
+            <field name="res_model">cjg.finance.ver.listado.cartera.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

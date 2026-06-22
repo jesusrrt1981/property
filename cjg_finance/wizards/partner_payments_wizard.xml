@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_partner_payments" model="ir.actions.report">
+            <field name="name">Listado de Abonos del Cliente (sin Inicial)</field>
+            <field name="model">cjg.finance.partner.payments.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.partner_payments_report_document</field>
+            <field name="report_file">cjg_finance.partner_payments_report_document</field>
+            <field name="print_report_name">'Abonos_Cliente - %s' % (object.partner_id.name or '')"
+            </field>
+        </record>
+
+        <template id="partner_payments_report_document">
+            <t t-set="data" t-value="data or {}"/>
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">LISTADO DE ABONOS DEL CLIENTE</h2>
+                        <h4 class="text-center">
+                            <span t-esc="docs.partner_id.name or ''"/>
+                        </h4>
+
+                        <div class="row mt-3 mb-3">
+                            <div class="col-6">
+                                <strong>Cliente:</strong>
+                                <span t-field="docs.partner_id.name"/><br/>
+                                <strong>Cédula/RNC:</strong>
+                                <span t-field="docs.partner_id.vat"/>
+                            </div>
+                            <div class="col-6">
+                                <t t-if="data.get('date_from')">
+                                    <strong>Desde:</strong> <t t-esc="data['date_from']"/><br/>
+                                </t>
+                                <t t-if="data.get('date_to')">
+                                    <strong>Hasta:</strong> <t t-esc="data['date_to']"/>
+                                </t>
+                            </div>
+                        </div>
+
+                        <t t-set="receipts" t-value="env['cjg.pos.payment.receipt'].browse(data.get('receipt_ids', []))"/>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Docto</th>
+                                    <th>Serie</th>
+                                    <th>No. Doc</th>
+                                    <th class="text-end">Monto</th>
+                                    <th>Caja</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="receipts" t-as="r">
+                                    <td><span t-field="r.date"/></td>
+                                    <td><span t-field="r.name"/></td>
+                                    <td><span t-field="r.serie"/></td>
+                                    <td><span t-field="r.ref"/></td>
+                                    <td class="text-end">
+                                        <span t-field="r.amount_paid"
+                                              t-options='{"widget": "monetary", "display_currency": r.currency_id}'/>
+                                    </td>
+                                    <td>
+                                        <span t-field="r.cashbox_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="not receipts">
+                                    <td colspan="6" class="text-center text-muted">
+                                        Sin abonos
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot t-if="receipts">
+                                <tr>
+                                    <td colspan="4" class="text-end">
+                                        <strong>TOTAL</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="sum(receipts.mapped('amount_paid'))"
+                                               t-options='{"widget": "monetary", "display_currency": receipts[:1].currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <record id="view_partner_payments_wizard_form" model="ir.ui.view">
+            <field name="name">cjg.finance.partner.payments.wizard.form</field>
+            <field name="model">cjg.finance.partner.payments.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Listado de Abonos del Cliente (sin Inicial)">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_print_report"
+                                string="Imprimir PDF"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-print"/>
+                        <button string="Cancelar"
+                                class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_partner_payments_wizard" model="ir.actions.act_window">
+            <field name="name">Listado Abonos del Cliente (sin Inicial)</field>
+            <field name="res_model">cjg.finance.partner.payments.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_cjg_finance_partner_payments"
+                  name="Abonos del Cliente (sin Inicial)"
+                  action="action_partner_payments_wizard"
+                  parent="cjg_finance_pos.menu_cjg_finance_pos_reports"
+                  sequence="31"
+                  groups="cjg_finance.group_credit_manager"/>
+    </data>
+</odoo>

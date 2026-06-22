@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Kanban enfocado en visualizar contratos de un cliente -->
+        <record id="sale_credit_kanban_partner" model="ir.ui.view">
+            <field name="name">sale.credit.kanban.partner</field>
+            <field name="model">sale.credit</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_no_column">
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_card #{kanban_classes}">
+                                <div class="o_kanban_record_title">
+                                    <field name="name" />
+                                    <div class="o_kanban_label">
+                                        <field name="state" widget="badge" />
+                                    </div>
+                                </div>
+                                <div class="o_kanban_details">
+                                    <div class="o_kanban_tags">
+                                        <span>
+                                            <t>Cliente:</t>
+                                            <field name="partner_id" widget="many2one_clickable" />
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_tags">
+                                        <span>
+                                            <t>Monto financiado:</t>
+                                            <field name="amount_financed" />
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_tags">
+                                        <span>
+                                            <t>Pago:</t>
+                                            <field name="payment_status" widget="badge" />
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_tags">
+                                        <span>
+                                            <t>Periodo:</t>
+                                            <field name="date_start" />
+                                            <t>—</t>
+                                            <field name="date_end" />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_footer">
+                                    <div class="o_kanban_bottom_left">
+                                        <span class="o_kanban_badge">
+                                            <t>Moras</t>
+                                            <field name="overdue_count" />
+                                        </span>
+                                        <span class="o_kanban_badge">
+                                            <t>Docs</t>
+                                            <field name="message_attachment_count" />
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_bottom_right">
+                                        <a type="open" class="btn btn-primary btn-sm" role="button">Abrir</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                    <field name="name" />
+                    <field name="partner_id" />
+                    <field name="amount_financed" />
+                    <field name="payment_status" />
+                    <field name="state" />
+                    <field name="date_start" />
+                    <field name="date_end" />
+                    <field name="overdue_count" />
+                    <field name="message_attachment_count" />
+                </kanban>
+            </field>
+        </record>
+        <!-- <record model="ir.actions.server" id="action_generate_sale_credit_report">
+            <field name="name">Archivar</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="binding_model_id" ref="model_sale_credit" />
+            <field name="state">code</field>
+            <field name="code">
+               action = model.action_archived_solicitud()
+            </field>
+        </record> -->
+        <record id="sale_credit_view_graph" model="ir.ui.view">
+            <field name="name">sale.credit.view.graph</field>
+            <field name="model">sale.credit</field>
+            <field name="arch" type="xml">
+                <graph string="Credit Pie" type="pie" sample="1">
+                    <field name="state" type="col" />
+                    <field name="total_sold" type="measure" />
+                </graph>
+            </field>
+        </record>
+
+        <record id="sale_credit_view_form" model="ir.ui.view">
+            <field name="name">sale.credit.view.form</field>
+            <field name="model">sale.credit</field>
+            <field name="arch" type="xml">
+                <form delete="0">
+                    <header>
+                        <!-- BOTONOES POR HACER -->
+                        <button name="action_back_to_draft" string="Volver a Borrador" type="object" class="btn btn-primary" invisible="state not in ['cancelled', 'refuse']" />
+                        <button name="action_back_to_requested" string="Cambiar a Solicitado" type="object" class="btn btn-primary" invisible="state not in ['error']" />
+                        <!--TODO: Result from converting "states='draft'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_request_credit" string="Solicitar" type="object" class="btn btn-primary" invisible="state not in ['draft']" />
+                        <button name="action_approve_credit" string="Aprobar" type="object" class="btn btn-primary" invisible="state not in ['requested']" groups="cjg_finance.group_credit_manager" />
+                        <!-- groups="cjg_finance.group_see_approve_credit_id,cjg_finance.group_credit_manager" -->
+                        <button name="action_follow_credit_flow" string="Facturar" type="object" class="btn btn-primary" invisible="not to_invoice" groups="cjg_finance.group_credit_manager" />
+                        <!--TODO: Result from converting "states='requested'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_refuse_credit" string="Rechazar" type="object" class="btn btn-secondary" invisible="state not in ['requested']" groups="cjg_finance.group_credit_manager" />
+                        <!--TODO: Result from converting "states='done'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_back_to_approved" string="Cambiar a Aprobado" type="object" class="btn btn-primary" invisible="state not in ['closed']" groups="cjg_finance.group_credit_manager" />
+                        <!--TODO: Result from converting "states='approved'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_to_closed" string="Completado" type="object" class="btn btn-primary" invisible="state not in ['approved']" groups="cjg_finance.group_credit_manager" />
+                        <button name="action_tasa_credit" string="Recalcular" type="object" class="button btn-primary" invisible="state != 'draft' or customize" />
+                        <!--TODO: Result from converting "states='approved'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_cancel_credit" string="Cancelar" type="object" class="btn btn-secondary" invisible="state not in ['approved']" groups="cjg_finance.group_credit_manager" />
+                        <!--TODO: Result from converting "states='draft,cancel,requested,approved'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_cancel_credit" string="Cancelar" type="object" class="btn btn-secondary" invisible="state not in ['draft', 'cancelled', 'requested', 'approved']" groups="cjg_finance.group_sale_credit_other_permissions" />
+                        <button name="action_update_payment_status" string="Actualizar Estado Pago" type="object" class="btn btn-secondary" groups="cjg_finance.group_credit_manager" invisible="not update_payment" />
+                        <!--TODO: Result from converting "states='closed'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_create_sale" string="Crear Venta" type="object" class="oe_highlight" groups="cjg_finance.group_credit_manager" invisible="state not in ['closed']" />
+                        <!-- GAP-12.07: imprimir Acta de Cierre / Finiquito (solo si state='closed') -->
+                        <button name="action_print_finiquito" string="Imprimir Finiquito" type="object" class="btn btn-primary" groups="cjg_finance.group_credit_manager" invisible="state != 'closed'" />
+                        <!--TODO: Result from converting "states='approved'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="print_credit_report" string="Imprimir Crédito" type="object" class="btn btn-primary" />
+                        <button name="action_print_statement" string="Plan de Amortización" type="object" class="btn btn-secondary" groups="cjg_finance.group_credit_manager"/>
+                        <button name="action_create_maintenance_contract" string="Crear Mantenimiento" type="object" class="btn btn-secondary" invisible="state not in ['approved', 'closed']" groups="cjg_finance.group_credit_manager"/>
+                        <button name="refinance" type="object" class="btn btn-secondary" string="Refinanciar" invisible="state not in ['approved']" groups="cjg_finance.group_credit_manager"/>
+                        <!--TODO: Result from merging "states='approved'" attribute with an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_transfer_credit" string="Traspasar" type="object" class="btn btn-secondary" invisible="1 or state not in ['approved']" />
+                        <button name="apply_existing_payments" string="APLICAR PAGOS" type="object" class="btn btn-primary" invisible="not refinance_active" />
+                        <!-- <button 
+                            name="recover_existing_payments" 
+                            type="object" class="btn btn-primary" 
+                            string="Recuperar Pagos de Credito"  
+                            groups="cjg_finance.group_credit_manager"/> -->
+                        <button name="action_open_quick_collect" string="Cobrar Cuota" type="object" class="oe_highlight" invisible="state != 'approved'" />
+                        <button name="action_create_collection_notice" string="Crear Aviso de Cobro" type="object" class="btn-primary" invisible="state != 'approved'" />
+                        <!-- Reactivar button moved to sale_credit_process_views.xml with correct invisible condition -->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,requested,pending,verified,approved,active,withdrawing,withdrawn,cancelled,closed,inhumado,cremado,anulado_devolucion,desistido_devolucion,anulado_mejora,activo_reactivado" />
+                        <!--TODO: Result from converting "states='approved'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <!-- <button name="payment_register" type="object" class="btn btn-secondary" string="Buscar registro" invisible="state not in ['approved']"/> -->
+                    </header>
+                    <!-- <div class="alert alert-danger" role="alert" style="margin-bottom:0px; margin:5px;" invisible="not error_log">
+                        <field name="error_log" nolabel="1" readonly="1"/>
+                    </div> -->
+                    <sheet>
+                        <!-- ACTION VIEWS POR HACER -->
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_view_payments" type="object" class="oe_stat_button" icon="fa-money" invisible="credit_payments_count == 0">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Pagos</span>
+                                    <field name="credit_payments_count" nolabel="1" />
+                                </div>
+                            </button>
+                            <button name="action_view_maintenance_contracts" type="object" class="oe_stat_button" icon="fa-wrench">
+                                <field name="maintenance_contract_count" widget="statinfo" string="Mantenimiento"/>
+                            </button>
+                            <button name="action_view_refinancing" type="object" class="oe_stat_button" icon="fa-history" invisible="refinancing_count == 0">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Refinanc.</span>
+                                    <field name="refinancing_count" nolabel="1" />
+                                </div>
+                            </button>
+                            <button name="action_view_picking" type="object" class="oe_stat_button" icon="fa-truck" invisible="not picking_id">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Picking</span>
+                                    <span>1</span>
+                                    <field name="picking_id" invisible="1" />
+                                </div>
+                            </button>
+                            <button name="action_view_collection_notices" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="collection_notice_count == 0">
+                                <field name="collection_notice_count" string="Avisos" widget="statinfo" />
+                            </button>
+                            <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="invoice_count == 0">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Invoices</span>
+                                    <field name="invoice_count" nolabel="1" />
+                                </div>
+                            </button>
+                            <button name="action_view_credit_lines_backdated" type="object" class="oe_stat_button" icon="fa-eye" invisible="payment_backdated == 0">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Vencidas</span>
+                                    <field name="payment_backdated" nolabel="1" />
+                                </div>
+                            </button>
+                            <button name="action_view_credit_lines" type="object" class="oe_stat_button" icon="fa-handshake-o" invisible="credit_lines_count == 0">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Cuotas</span>
+                                    <field name="credit_lines_count" nolabel="1" />
+                                </div>
+                            </button>
+                            <button name="action_view_credit_overdues" type="object" class="oe_stat_button" icon="fa-usd" invisible="overdue_count == 0">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Overdues</span>
+                                    <field name="overdue_count" nolabel="1" />
+                                </div>
+                            </button>
+                            <button name="action_open_website" string="Firmar" type="object" class="oe_stat_button" icon="fa-globe" invisible="1" />
+                        </div>
+                        <widget name="web_ribbon" title="Paid" invisible="state != 'closed'" />
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1" />
+                            </h1>
+                            <div invisible="not migration_status_label">
+                                <span class="badge rounded-pill bg-info text-white" style="font-size: 1.2rem;">
+                                    <field name="migration_status_label" readonly="1" />
+                                </span>
+                            </div>
+                            <div invisible="process_detail_status == 'normal'">
+                                <span class="badge rounded-pill bg-warning text-dark" style="font-size: 1rem;">
+                                    <field name="process_detail_status" readonly="1" />
+                                </span>
+                            </div>
+                        </div>
+                        <group>
+                            <group name="partner_info" string="Información del Cliente">
+                                <field name="partner_id" required="1" options="{'no_create': True}" readonly="state not in ['draft', 'requested']" />
+                                <field name="vat" readonly="1" />
+                                <field name="asesor_id" string="Asesor" readonly="state not in ['draft', 'requested']" />
+                                <field name="oficial_id" string="Oficial de Cuenta" readonly="state not in ['draft', 'requested']" />
+                                <field name="user_id" string="Usuario" readonly="state not in ['draft', 'requested']" />
+                                <field name="manager_id" string="Gerente" readonly="state not in ['draft', 'requested']" />
+                                <field name="motorista_id" string="Motorista" readonly="state not in ['draft', 'requested']" />
+                                <field name="company_id" required="1" options="{'no_open': True, 'no_create': True}" readonly="state not in ['draft', 'requested']" />
+                            </group>
+                            <group name="credit_info" string="Informacion Financiamiento">
+                                <!-- <field name="product_id" readonly="state != 'draft' or sale_id" options="{'no_create': True}" force_save="1"/> -->
+                                <field name="type_id" invisible="1" readonly="state not in ['draft', 'requested']" options="{'no_open': True, 'no_create': True}" />
+                                <field name="category_id" readonly="state not in ['draft', 'requested']" options="{'no_open': True, 'no_create': True}" />
+                                <field name="method" readonly="state not in ['draft', 'requested']" />
+                                <field name="credit_flow" readonly="state not in ['draft', 'requested']" groups="cjg_finance.group_credit_manager" invisible="1" />
+                                <field name="journal_id" readonly="state not in ['draft', 'requested']" options="{'no_open': True, 'no_create': True}" />
+                                <field name="origin" invisible="1" readonly="state not in ['draft', 'requested']" />
+                                <field name="payment_msg" readonly="1" force_save="1" invisible="payment_msg in ['', False]" />
+                                <field name="currency_id_money" invisible="0" readonly="state not in ['draft', 'requested']" />
+                                <field name="process_detail_status" readonly="state not in ['draft', 'requested', 'approved', 'active', 'withdrawing', 'withdrawn', 'desistido', 'cancelled', 'closed']" />
+                                <field name="apply_mora" string="Aplicar mora" readonly="state not in ['draft', 'requested']" widget="boolean_toggle" />
+                                <field name="config_mora" string="Configuracion de mora" invisible="config_general or not apply_mora" readonly="state not in ['draft', 'requested']" />
+                            </group>
+                            <!-- Productos del Contrato - moved to modules (property in cjg_finance_property, services in cjg_finance_crm) -->
+                            <group name="products_services" string="Productos del Contrato">
+                                <field name="contract_product_type" widget="radio" options="{'horizontal': True}" readonly="state not in ['draft', 'requested']" />
+                            </group>
+                            <!-- Otras Opciones - restored for cjg_finance_crm compatibility -->
+                            <group name="other_setting" string="Otras Opciones" invisible="1">
+                                <field name="active_manual_currency_rate" />
+                                <field name="apply_manual_currency_exchange" />
+                                <field name="manual_currency_exchange_rate" />
+                                <field name="customize_date" />
+                                <field name="config_general" />
+                                <field name="to_invoice" />
+                                <field name="sale_valid" />
+                                <field name="update_payment" />
+                                <field name="re_scheduled" />
+                                <field name="show_reschedule_button" />
+                            </group>
+                            <group name="credit_data" string="Informacion Financiera">
+                                <group name="dates_period" string="Fechas y Periodicidad">
+                                    <field name="use_percentages" widget="boolean_toggle" readonly="state not in ['draft', 'requested']" invisible="1" />
+                                    <field name="date_request" readonly="state not in ['draft', 'requested']" />
+                                    <field name="date_start" readonly="state not in ['draft', 'requested']" />
+                                    <field name="date_end" readonly="not customize_date" />
+                                    <field name="customize" readonly="state not in ['draft', 'requested']" widget="boolean_toggle" invisible="1" />
+                                    <field name="frequency_id" readonly="state not in ['draft', 'requested']" options="{'no_open': True, 'no_create': True}" />
+                                    <field name="installment_id" readonly="state not in ['draft', 'requested']" options="{'no_open': True, 'no_create': True}" />
+                                </group>
+                                <group name="amounts_financing" string="Montos y Financiamiento">
+                                    <field name="total_sold" string="Precio de Lista (Propiedad)" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="1" force_save="1" />
+                                    <field name="percent_financing" string="Financiamiento (%)" readonly="1" />
+                                    <field name="amount_financed" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="1" force_save="1" />
+                                    <field name="min_amount" string="Inicial Mínimo" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="1" force_save="1" />
+                                    <field name="amount_to_pay" string="Inicial" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="state not in ['draft', 'requested']" invisible="contract_product_type != 'property'" />
+                                </group>
+                            </group>
+                            <group name="calculated_totals" string="Intereses y Totales">
+                                <group>
+                                    <field name="percent_interest" force_save="1" readonly="1" invisible="1" />
+                                    <field name="amount_interest_value" readonly="1" force_save="1" widget="monetary" options="{'currency_field': 'currency_id_money'}" />
+                                    <field name="amount_per_rate" force_save="1" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="1" />
+                                    <field name="amount_total" readonly="1" force_save="1" widget="monetary" options="{'currency_field': 'currency_id_money'}" />
+                                </group>
+                                <group>
+                                    <field name="credit_amount" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="1" />
+                                    <field name="credit_Adeudado" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="1" />
+                                    <field name="total_charges_abonos" widget="monetary" options="{'currency_field': 'currency_id_money'}" readonly="1" invisible="total_charges_abonos == 0" />
+                                    <field name="amount_residual" widget="monetary" options="{'currency_field': 'currency_id_money'}" invisible="1" />
+                                    <field name="amount_invoiced_residual" widget="monetary" options="{'currency_field': 'currency_id_money'}" invisible="1" />
+                                    <field name="refinance_active" invisible="1" />
+                                    <button name="compute_loan" string="Calcular" type="object" invisible="state != 'draft'" icon="fa-refresh" />
+                                </group>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Cuotas de pago">
+                                <field name="credit_lines" readonly="state != 'draft' or not customize" force_save="1">
+                                    <tree editable="bottom" create="0" delete="0" decoration-muted="state == 'paid'" force_save="1">
+                                        <field name="count" readonly="1" />
+                                        <field name="expected_date_payment" optional="show" readonly="1" />
+                                        <field name="sale_credit_payment_ids" optional="show" readonly="count == 0" />
+                                        <field name="internal_notes" optional="show" placeholder="This notes will be used for internal interest..." />
+                                        <field name="partner_id" widget="many2one_clickable" optional="hide" readonly="1" />
+                                        <field name="co_debtor_id" widget="many2one_clickable" optional="hide" readonly="1" />
+                                        <field name="amount_initial" widget="monetary" options="{'currency_field': 'currency_id'}" groups="cjg_finance.group_credit_manager" readonly="1" />
+                                        <field name="amount_fixed" widget="monetary" readonly="count == 0" options="{'currency_field': 'currency_id'}" sum="Total" force_save="1" />
+                                        <field name="amount_capital" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="show" groups="cjg_finance.group_credit_manager" readonly="1" />
+                                        <field name="amount_interest" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="show" groups="cjg_finance.group_credit_manager" readonly="1" />
+                                        <field name="amount_final" readonly="1" force_save="1" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                                        <field name="date_payment" optional="show" readonly="1" />
+                                        <field name="overdue_id" readonly="1" force_save="1" widget="many2one_clickable" invisible="1" />
+                                        <field name="overdue_residual" readonly="1" force_save="1" optional="show" />
+                                        <field name="amount_residual" optional="show" sum="Total" readonly="1" />
+                                        <field name="amount_paid" optional="hide" sum="Total" readonly="1" />
+                                        <field name="amount_paid_total" string="Pagado Total" optional="show" sum="Total" readonly="1" />
+                                        <field name="amount_paid_compute" string="Pagado Computado" optional="hide" sum="Total" readonly="1" />
+                                        <field name="state" readonly="1" />
+                                        <field name="currency_id" invisible="1" readonly="1" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Pagos">
+                                <field name="credit_payments" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="payment_date"/>
+                                        <field name="receipt_number"/>
+                                        <field name="amount_total" sum="Total"/>
+                                        <field name="amount_paid" sum="Pagado"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_credit_view_tree" model="ir.ui.view">
+            <field name="name">sale.credit.view.tree</field>
+            <field name="model">sale.credit</field>
+            <field name="arch" type="xml">
+                <tree delete="0" decoration-success="state == 'approved'" decoration-primary="state == 'draft'" decoration-warning="payment_status == 'paid_backdated' or payment_status == 'paid_backdateds'" decoration-muted="state == 'cancel'" decoration-danger="state =='error'" decoration-info="to_invoice==True">
+                    <field name="to_invoice" optional="hide" />
+                    <field name="name" />
+                    <field name="user_id" widget="many2one_avatar_user" />
+                    <field name="partner_id" widget="many2one_clickable" />
+                    <field name="vat" optional="show" />
+                    <field name="ref_partner_id" widget="many2one_clickable" />
+                    <field name="co_debtor_id" widget="many2one_clickable" />
+                    <field name="sale_id" widget="many2one_clickable" column_invisible="1" />
+                    <field name="type_id" optional="hide" />
+                    <field name="category_id" />
+                    <field name="frequency_id" />
+                    <field name="company_id" />
+                    <field name="date_start" />
+                    <field name="date_end" />
+                    <field name="amount_total" sum="Total" />
+                    <field name="amount_invoiced_residual" sum="Total" optional="hide" />
+                    <field name="update_payment" optional="hide" />
+                    <field name="payment_status" widget="badge" decoration-danger="payment_status == 'not_paid'" decoration-warning="payment_status == 'in_payment' or payment_status == 'paid_backdated'or payment_status == 'paid_backdateds' " decoration-success="payment_status =='paid'" optional="show" />
+                    <field name="state" decoration-success="state == 'approved'" decoration-warning="state=='requested'" decoration-info="state == 'draft'" decoration-danger="state =='cancelled'" widget="badge" optional="show" />
+                    <field name="migration_status_label" string="Estado Texto" optional="show" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="sale_credit_view_search" model="ir.ui.view">
+            <field name="name">sale.credit.view.search</field>
+            <field name="model">sale.credit</field>
+            <field name="arch" type="xml">
+                <search string="Payments">
+                    <field name="name" string="Credit" filter_domain="['|', '|', ('name', 'ilike', self), ('partner_id', 'ilike', self), ('vat', 'ilike', self)]" />
+                    <field name="vat" />
+                    <field name="partner_id" />
+                    <field name="co_debtor_id" />
+                    <field name="journal_id" />
+                    <field name="sale_id" />
+                    <field name="product_id" />
+                    <!-- <field name="type_id"/> -->
+                    <field name="category_id" />
+                    <field name="frequency_id" />
+                    <field name="installment_id" />
+                    <field name="amount_per_rate" />
+                    <field name="user_id" />
+                    <field name="manager_id" />
+                    <field name="motorista_id" />
+                    <field name="to_invoice" />
+                    <field name="is_reconcilable" />
+                    <separator />
+                    <field name="is_reconcilable" />
+                    <separator />
+                    <filter name="my_portfolio" string="Mi Cartera" domain="[('oficial_id', '=', uid)]" help="Contratos donde soy el oficial asignado" />
+                    <filter name="my_team" string="Mi Equipo" domain="[('oficial_id.employee_ids.parent_id.user_id', '=', uid)]" groups="cjg_finance.group_collection_manager" />
+                    <filter name="my_credits" string="Mis contratos (Usuario)" domain="[('user_id','=',uid)]" />
+                    <filter name="has_overdue" string="Con atraso" domain="[('has_overdue','=',True)]" />
+                    <filter name="state_draft" string="Draft" domain="[('state', '=', 'draft')]" />
+                    <filter name="state_requested" string="Requested" domain="[('state', '=', 'requested')]" />
+                    <filter name="state_approved" string="Approved" domain="[('state', '=', 'approved')]" />
+                    <filter name="state_refused" string="Refused" domain="[('state', '=', 'refused')]" />
+                    <filter name="invoiced" string="A Facturar" domain="[('to_invoice', '=', True)]" />
+                    <filter name="is_reconcilable" string="Conciliable" domain="[('is_reconcilable', '=', True)]" />
+                    <separator />
+                    <field name="company_id" />
+                    <filter name="partner" domain="[]" context="{'group_by': 'partner_id'}" />
+                    <filter name="journal" domain="[]" context="{'group_by': 'journal_id'}" />
+                    <filter name="official" string="Agrupar por Oficial" domain="[]" context="{'group_by': 'user_id'}" />
+                    <filter name="state" domain="[]" context="{'group_by': 'state'}" />
+                    <filter name="frequency" domain="[]" context="{'group_by': 'frequency_id'}" />
+                    <!-- <filter name="type" domain="[]" context="{'group_by': 'type_id'}"/> -->
+                    <filter name="category" domain="[]" context="{'group_by': 'category_id'}" />
+                    <filter name="company" domain="[]" context="{'group_by': 'company_id'}" />
+                    <filter name="archived" string="Archived" domain="[('active', '=', False)]" />
+                    <separator />
+                </search>
+            </field>
+        </record>
+
+        <record id="sale_credit_line_view_form" model="ir.ui.view">
+            <field name="name">sale.credit.line.view.form</field>
+            <field name="model">sale.credit.line</field>
+            <field name="arch" type="xml">
+                <form create="0" delete="0">
+                    <header>
+                        <!--<button name="action_register_payment" type="object" class="btn btn-primary" string="Action Pay" invisible="state != 'pending'"/>
+                      -->
+                        <field name="state" widget="statusbar" statusbar_visible="pending,paid" />
+                    </header>
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="action_view_credit_overdues" type="object" class="oe_stat_button" icon="fa-usd" invisible="not overdue_id">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Overdues</span>
+                                    <field name="overdue_id" nolabel="1" />
+                                </div>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="credit_id" readonly="1" />
+                                <field name="partner_id" readonly="1" />
+                                <field name="co_debtor_id" readonly="1" />
+                                <field name="expected_date_payment" groups="cjg_finance.group_credit_manager" />
+                                <field name="date_payment" readonly="1" />
+                                <field name="journal_id" options="{'no_open': True, 'no_create': True}" readonly="1" />
+                                <field name="internal_notes" placeholder="This notes will be used for internal interest..." />
+                            </group>
+                            <group>
+                                <field name="amount_initial" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" />
+                                <field name="amount_fixed" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" />
+                                <field name="amount_interest" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" />
+                                <field name="amount_capital" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" />
+                                <field name="amount_final" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" />
+                                <!-- <field name="sale_credit_payment_id"/>-->
+                                <field name="sale_credit_payment_ids" widget="many2many_tags" />
+                                <field name="currency_id" invisible="1" />
+                            </group>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_credit_line_view_tree" model="ir.ui.view">
+            <field name="name">sale.credit.line.view.tree</field>
+            <field name="model">sale.credit.line</field>
+            <field name="arch" type="xml">
+                <tree decoration-muted="state == 'paid'" create="0" delete="0">
+                    <field name="count" />
+                    <field name="credit_id" widget="many2one_clickable" />
+                    <field name="partner_id" widget="many2one_clickable" />
+                    <field name="co_debtor_id" />
+                    <field name="sale_id" />
+                    <field name="internal_notes" placeholder="This notes will be used for internal interest..." />
+                    <field name="amount_initial" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                    <field name="amount_fixed" widget="monetary" readonly="False" options="{'currency_field': 'currency_id'}" sum="Total" />
+                    <field name="amount_capital" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide" />
+                    <field name="amount_interest" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide" />
+                    <field name="amount_final" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" />
+                    <field name="expected_date_payment" />
+                    <field name="date_payment" />
+                    <field name="overdue_id" readonly="1" force_save="1" widget="many2one_clickable" optional="hide" />
+                    <field name="overdue_residual" readonly="1" force_save="1" optional="hide" />
+                    <!-- <field name="amount_residual" optional="hide" sum="Total"/> -->
+                    <field name="amount_paid" sum="Total" optional="show" />
+                    <field name="amount_paid_total" string="Pagado Total" optional="show" sum="Total" />
+                    <field name="amount_paid_compute" string="Pagado Computado" optional="hide" sum="Total" />
+                    <field name="state" />
+                    <field name="currency_id" invisible="0" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="sale_credit_line_view_search" model="ir.ui.view">
+            <field name="name">sale.credit.line.view.search</field>
+            <field name="model">sale.credit.line</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Cuotas">
+                    <field name="credit_id"/>
+                    <field name="partner_id"/>
+                    <field name="sale_id"/>
+                    <field name="date_payment"/>
+                    <field name="expected_date_payment"/>
+                    <filter name="pending" string="Pendientes" domain="[('state', '=', 'pending')]"/>
+                    <filter name="paid" string="Pagadas" domain="[('state', 'in', ['paid', 'paid_overdue', 'paid_reload'])]"/>
+                    <filter name="overdue" string="Vencidas" domain="[('expected_date_payment', '&lt;', context_today().strftime('%Y-%m-%d')), ('state', '=', 'pending')]"/>
+                    <group expand="0" string="Agrupar Por">
+                        <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_credit" string="Contrato" context="{'group_by': 'credit_id'}"/>
+                        <filter name="group_state" string="Estado" context="{'group_by': 'state'}"/>
+                        <filter name="group_date" string="Fecha Esperada" context="{'group_by': 'expected_date_payment:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

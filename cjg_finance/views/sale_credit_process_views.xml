@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit the search view to add process filters -->
+        <record id="sale_credit_search_process_filters" model="ir.ui.view">
+            <field name="name">sale.credit.search.process.filters</field>
+            <field name="model">sale.credit</field>
+            <field name="inherit_id" ref="cjg_finance.sale_credit_view_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <!-- Filtros por process_detail_status -->
+                    <filter name="filter_anulado_mejora" string="Anulado Mejora"
+                            domain="[('process_detail_status','=','anulado_mejora')]"/>
+                    <filter name="filter_anulado_devolucion" string="Anulado Devolución"
+                            domain="[('process_detail_status','=','anulado_devolucion')]"/>
+                    <filter name="filter_desistido_devolucion" string="Desistido Devolución"
+                            domain="[('process_detail_status','=','desistido_devolucion')]"/>
+                    <filter name="filter_reactivado" string="Reactivados"
+                            domain="[('process_detail_status','=','reactivado')]"/>
+                    <filter name="filter_withdrawing" string="Por Desistir"
+                            domain="[('state','=','withdrawing')]"/>
+                    <separator/>
+                    <!-- Filtros por contract_process_type -->
+                    <filter name="filter_new" string="Venta Nueva"
+                            domain="[('contract_process_type','=','new')]"/>
+                    <filter name="filter_improvement" string="Mejoras"
+                            domain="[('contract_process_type','=','improvement')]"/>
+                    <filter name="filter_reactivation" string="Reactivaciones"
+                            domain="[('contract_process_type','=','reactivation')]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Inherit the form view to add process action buttons, smart button and no_refund indicator -->
+        <record id="sale_credit_form_process_buttons" model="ir.ui.view">
+            <field name="name">sale.credit.form.process.buttons</field>
+            <field name="model">sale.credit</field>
+            <field name="inherit_id" ref="cjg_finance.sale_credit_view_form"/>
+            <field name="arch" type="xml">
+                <!-- Add process action buttons to header (before the statusbar field) -->
+                <xpath expr="//sheet" position="inside">
+                    <!-- Campos invisibles requeridos para modifiers de esta vista heredada -->
+                    <field name="state" invisible="1"/>
+                    <field name="no_refund_registered" invisible="1"/>
+                </xpath>
+
+                <xpath expr="//header/field[@name='state']" position="before">
+                    <!-- Botón Reactivar (visible si state in cancelled/withdrawn) -->
+                    <button name="action_open_reactivation_wizard" type="object"
+                            string="Reactivar" class="btn btn-primary"
+                            invisible="state not in ['cancelled', 'withdrawn']"
+                            groups="cjg_finance.group_credit_manager"/>
+                    <!-- Botón Iniciar Devolución (visible si state in cancelled/withdrawn) -->
+                    <button name="action_open_devolucion_wizard" type="object"
+                            string="Iniciar Devolución" class="btn btn-warning"
+                            invisible="state not in ['cancelled', 'withdrawn']"
+                            groups="cjg_finance.group_credit_manager"/>
+                    <!-- Botón Reembolso 70/30 (visible si state in cancelled/withdrawn; elegibilidad temporal se valida en el wizard) -->
+                    <button name="action_open_reembolso_wizard" type="object"
+                            string="Reembolso 70/30" class="btn btn-success"
+                            invisible="state not in ['cancelled', 'withdrawn']"
+                            groups="cjg_finance.group_credit_manager"
+                            help="Reembolso del 70% del capital pagado (legacy 12+ meses desde la última cuota)"/>
+                    <!-- Botón Mejora de Producto (visible si state in approved/closed) -->
+                    <button name="action_open_mejora_wizard" type="object"
+                            string="Mejora de Producto" class="btn btn-info"
+                            invisible="state not in ['approved', 'closed']"
+                            groups="cjg_finance.group_credit_manager"/>
+                    <!-- Botón Sin Reembolso (visible si state in cancelled/withdrawn y no registrado) -->
+                    <button name="action_register_no_refund" type="object"
+                            string="Sin Reembolso" class="btn btn-secondary"
+                            invisible="state not in ['cancelled', 'withdrawn'] or no_refund_registered"
+                            groups="cjg_finance.group_credit_manager"/>
+                    <!-- Botón No Solicitar Reembolso con captura de solicitud escrita (visible si state in cancelled/withdrawn y no registrado) -->
+                    <button name="action_open_no_reembolso_wizard" type="object"
+                            string="No Solicitar Reembolso" class="btn btn-secondary"
+                            invisible="state not in ['cancelled', 'withdrawn'] or no_refund_registered"
+                            groups="cjg_finance.group_documentation_user,cjg_finance.group_documentation_manager,cjg_finance.group_credit_manager"
+                            help="Registrar decision del cliente (por escrito) de NO solicitar reembolso ni NC. Captura motivo, fecha y autorizador (Documentacion)."/>
+                </xpath>
+
+                <!-- Add smart button for derived contracts -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_derived_credits" type="object"
+                            class="oe_stat_button" icon="fa-link"
+                            invisible="derived_credit_count == 0">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Derivados</span>
+                            <field name="derived_credit_count" nolabel="1"/>
+                        </div>
+                    </button>
+                </xpath>
+
+                <!-- Add no_refund indicator in the oe_title section -->
+                <xpath expr="//div[hasclass('oe_title')]" position="inside">
+                    <div invisible="not no_refund_registered">
+                        <span class="badge rounded-pill bg-secondary text-white" style="font-size: 0.9rem;">
+                            Sin Reembolso Registrado
+                        </span>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

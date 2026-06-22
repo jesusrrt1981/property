@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="sale_credit_personalizacion" model="ir.ui.view">
+            <field name="name">personalizacion Solicitud de Credito</field>
+            <field name="model">sale.credit.personalizacion.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Cancelar Solicitud de Credito">
+                    <group>
+                        <field name="reason_cancellation"/>
+                        <field name="sale_order_ids" invisible="1"/>
+                        <field name="sale_credit_line"/>
+                        <field name="date_payment"/>
+                        <field name="modify_type"/>
+                        <field name="amount_percent" invisible="modify_type != 'percentage'"/>
+                        <field name="amount" invisible="modify_type == 'percentage'"/> <!-- Especificado para que sea invisible cuando es 'percentage' -->
+                        <field name="current_amount" readonly="1" string="Cuota Actual"/>
+                        <field name="modified_amount" readonly="1" string="Cuota Modificada"/>
+                        <field name="line_percentage" invisible="modify_type != 'percentage'"/> <!-- Agregado para que sea invisible cuando no es 'percentage' -->
+                    </group>
+                    <footer>
+                        <button string="Recalcular" class="btn-primary" type="object" name="action_confirm"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_credit_personalizacion_wizard" model="ir.actions.act_window">
+            <field name="name">personalizacion Solicitud de Credito</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.personalizacion.wizard</field>
+            <field name="view_mode">form</field>
+        </record>
+    </data> 
+</odoo>

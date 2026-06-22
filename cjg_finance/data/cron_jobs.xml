@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+        <!-- Cron: Actualizar estados de pago diariamente -->
+        <record id="cron_update_payment_status" model="ir.cron">
+            <field name="name">Actualizar Estados de Pago</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="state">code</field>
+            <field name="code">model.action_generate_report()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Cron: Generar snapshot de cartera mensual (día 1 de cada mes) -->
+        <record id="cron_generate_portfolio_snapshot" model="ir.cron">
+            <field name="name">Generar Snapshot de Cartera Mensual</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="state">code</field>
+            <field name="code">model.generate_current_portfolio_snapshot()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(day=1, hour=2, minute=0, second=0)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        </record>
+
+        <!-- Cron: Enviar recordatorios de pagos próximos (cada lunes) -->
+        <record id="cron_send_payment_reminders" model="ir.cron">
+            <field name="name">Enviar Recordatorios de Pagos Próximos</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="state">code</field>
+            <field name="code">model.send_payment_reminders()</field>
+            <field name="interval_number">7</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="False"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Cron: Actualizar próximas fechas de pago de contratos de mantenimiento -->
+        <record id="cron_update_maintenance_next_payment" model="ir.cron">
+            <field name="name">Actualizar Próximas Fechas de Pago (Mantenimiento)</field>
+            <field name="model_id" ref="model_maintenance_contract"/>
+            <field name="state">code</field>
+            <field name="code">model.search([('state', '=', 'active')])._compute_next_payment_date()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+    </data>
+</odoo>

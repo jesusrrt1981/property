@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="sale_credit_installment_form_view" model="ir.ui.view">
+            <field name="name">sale.credit.installment.form.view</field>
+            <field name="model">sale.credit.installment</field>
+            <field name="arch" type="xml">
+                <form string="Cuotas">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="installments"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="sale_credit_installment_tree_view" model="ir.ui.view">
+            <field name="name">sale.credit.installment.tree.view</field>
+            <field name="model">sale.credit.installment</field>
+            <field name="arch" type="xml">
+                <tree string="Cuotas">
+                    <field name="name"/>
+                    <field name="installments"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>

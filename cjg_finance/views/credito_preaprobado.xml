@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_preaprovado_view_form" model="ir.ui.view">
+            <field name="name">sale_credit.preaprovado.view.form</field>
+            <field name="model">sale_credit.preaprovado</field>
+            <field name="arch" type="xml">
+                <form>             
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="client"/>
+                                <field name="credit_preapproved"/>
+                                <field name="balance_credit"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="sale_credit_preaprovado_view_tree" model="ir.ui.view">
+            <field name="name">sale_credit.preaprovado.view.tree</field>
+            <field name="model">sale_credit.preaprovado</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="client"/>
+                    <field name="credit_preapproved"/>
+                    <field name="balance_credit"/>
+                </tree>
+            </field>
+        </record>
+        <record id="sale_credit_preaprovado_action" model="ir.actions.act_window">
+            <field name="name">preaprovado</field>
+            <field name="res_model">sale_credit.preaprovado</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+         <menuitem id="customer_preaprovado_statements_menu" name=" Pre-aprovado" parent="cjg_finance.sale_credit_menu" groups="account.group_account_invoice"
+        action="sale_credit_preaprovado_action" sequence="20"/>
+
+        
+    </data>
+</odoo> 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            TRACK 3 (F10) — Cron diario: cambia el estado de los
+            contratos según el aging de sus cuotas vencidas.
+            Replica testarossa/php_script/script_cambio_estatus_contratos.php
+            Reglas:
+                - > 30 días → 'withdrawing'
+                - > 60 días → 'withdrawn'
+                - > 90 días → 'legal'
+        -->
+        <record id="ir_cron_status_change_aging" model="ir.cron">
+            <field name="name">Status Change on Aging (Cuotas Vencidas)</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_change_status_aging()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <record id="cjg_finance_res_partner_form" model="ir.ui.view">
+            <field name="name">astratech.credit.res.partner.view.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <!-- <div name="button_box" position="inside">
+                    <button type="object"
+                        class="oe_stat_button"
+                        id="partner_ledger_button"
+                        icon="fa-money"
+                        name="open_partner_ledger"
+                        string="Creditos"
+                        context="{'default_partner_id': active_id}">
+                    </button>
+                </div> -->
+                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                        <button name="action_show_credits" type="object" class="oe_stat_button" icon="fa-money" invisible="credit_count == 0">
+                            <div class="o_form_field o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="credit_count" readonly="1"/>
+                                </span>
+                                <span class="o_stat_text">Contratos</span>
+                            </div>
+                        </button>
+                        <button name="action_show_maintenance_contracts" type="object" class="oe_stat_button" icon="fa-wrench" invisible="maintenance_count == 0">
+                            <div class="o_form_field o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="maintenance_count" readonly="1"/>
+                                </span>
+                                <span class="o_stat_text">Mantenimientos</span>
+                            </div>
+                        </button>
+                        <button name="action_show_pending_installments" type="object" class="oe_stat_button" icon="fa-clock-o" invisible="pending_installments_count == 0">
+                            <div class="o_form_field o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="pending_installments_count" readonly="1"/>
+                                </span>
+                                <span class="o_stat_text">Cuotas Pendientes</span>
+                            </div>
+                        </button>
+                        <button name="action_partner_quick_collect" type="object" class="oe_stat_button" icon="fa-usd" invisible="total_debt == 0">
+                            <div class="o_form_field o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_debt" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
+                                </span>
+                                <span class="o_stat_text">Cobrar</span>
+                            </div>
+                        </button>
+                    </xpath>
+                    <xpath expr="//field[@name='vat']" position="after">
+                        <field name="next_due_date" readonly="1" invisible="not next_due_date"/>
+                    </xpath>
+                <xpath expr="//page[@name='internal_notes']" position="after">
+                        <page name="internal_notes" string="Solicitud credit Config">
+                           <group name="credit_preapproved" string="Fondo  pre-aprobado">
+                                <field name="credit_preapproved" />
+                                <field name="credit_preapproved_valid" widget="boolean_toggle"/>
+                           </group>
+                           <group name="roles" string="Roles">
+                                <field name="is_motorista" widget="boolean_toggle"/>
+                           </group>
+                        </page>
+                        
+                </xpath>    
+                <xpath expr="//notebook" position="inside">
+                    <page string="Contratos">
+                        <group>
+                            <button name="action_show_requested_credit" type="object" string="Ver todos" class="oe_highlight"/>
+                        </group>
+                        <widget name="partner_contract_tabs"/>
+                    </page>
+                    <page string="Historial">
+                        <group>
+                            <field name="followup_line_ids" mode="tree" create="true" delete="true">
+                                <tree string="Historial de Seguimiento" default_order="create_date desc" editable="bottom">
+                                    <field name="create_date" string="Fecha"/>
+                                    <field name="action_type" string="Acción"/>
+                                    <field name="credit_id" string="Contrato"/>
+                                    <field name="internal_notes" string="Descripción Cliente"/>
+                                    <field name="user_id" string="Oficial"/>
+                                    <field name="next_contact_date" string="Próximo Contacto"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+    </record>
+        
+    
+    </data>
+</odoo>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_mejora_wizard_view_form" model="ir.ui.view">
+            <field name="name">sale.credit.mejora.wizard.form</field>
+            <field name="model">sale.credit.mejora.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Mejora de Producto">
+                    <div class="alert alert-info" role="alert"
+                         invisible="is_al_dia">
+                        <p><strong>Atención:</strong> El cliente NO está al día en sus pagos. Solo se permite mejora si el contrato está saldado.</p>
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="saldo_a_favor == 0">
+                        <p><strong>Saldo a favor detectado:</strong> El capital pagado del contrato origen excede el nuevo precio neto. Requiere aceptación del cliente o aprobación de gerencia.</p>
+                    </div>
+                    <group string="Contrato Origen">
+                        <group>
+                            <field name="credit_id" readonly="1"/>
+                            <field name="current_product_id" readonly="1"/>
+                            <field name="current_product_price" widget="monetary" readonly="1"/>
+                            <field name="current_product_type" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="capital_paid" widget="monetary" readonly="1"
+                                   decoration-info="1"
+                                   help="Solo se considera el 100% del capital pagado. No se considera el interés pagado, según el documento de Mejora de Producto."/>
+                            <field name="overdue_installments" readonly="1"
+                                   decoration-danger="overdue_installments > 0"
+                                   decoration-success="overdue_installments == 0"/>
+                            <field name="is_al_dia" readonly="1"
+                                   decoration-success="is_al_dia == True"
+                                   decoration-danger="is_al_dia == False"/>
+                        </group>
+                    </group>
+                    <group string="Nuevo Producto">
+                        <group>
+                            <field name="new_product_id"
+                                   options="{'no_create': True}"/>
+                            <field name="new_product_price" widget="monetary" readonly="1"/>
+                            <field name="new_product_type" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="discount_amount" widget="monetary"
+                                   help="Descuento aplicado DESPUÉS de restar el capital pagado, según el documento Proceso reactivacion y Mejora."/>
+                            <field name="precio_neto_nuevo" widget="monetary" readonly="1"
+                                   decoration-info="1"/>
+                            <field name="completivo_inicial" widget="monetary" readonly="1"
+                                   decoration-success="completivo_inicial > 0"
+                                   decoration-muted="completivo_inicial == 0"/>
+                            <field name="saldo_a_favor" widget="monetary" readonly="1"
+                                   invisible="saldo_a_favor == 0"
+                                   decoration-warning="1"/>
+                            <field name="accept_saldo_favor"
+                                   invisible="saldo_a_favor == 0"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Observaciones sobre la mejora..."/>
+                    </group>
+                    <footer>
+                        <button string="Crear Planilla CRM" type="object"
+                                name="action_confirm_mejora" class="btn-primary"
+                                invisible="not is_al_dia"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_credit_mejora_wizard_action" model="ir.actions.act_window">
+            <field name="name">Mejora de Producto</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.mejora.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

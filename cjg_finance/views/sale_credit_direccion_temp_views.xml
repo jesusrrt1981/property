@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción -->
+        <record id="action_sale_credit_direccion_temp" model="ir.actions.act_window">
+            <field name="name">Direcciones Temporales</field>
+            <field name="res_model">cjg.sale.credit.direccion.temp</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Aún no hay direcciones temporales
+                </p>
+                <p>
+                    Las direcciones temporales se crean desde los formularios
+                    de captura (motorizados, portal, etc.) y se promueven al
+                    cliente con el botón "Promover".
+                </p>
+            </field>
+        </record>
+
+        <!-- Tree view -->
+        <record id="view_sale_credit_direccion_temp_tree" model="ir.ui.view">
+            <field name="name">cjg.sale.credit.direccion.temp.tree</field>
+            <field name="model">cjg.sale.credit.direccion.temp</field>
+            <field name="arch" type="xml">
+                <tree string="Direcciones Temporales" decoration-muted="status == 'cancelled'" decoration-success="status == 'committed'" decoration-info="status == 'draft'">
+                    <field name="display_name" invisible="1"/>
+                    <field name="partner_id"/>
+                    <field name="direccion"/>
+                    <field name="status" decoration-bf="1"/>
+                    <field name="create_date"/>
+                    <field name="commit_date"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form view -->
+        <record id="view_sale_credit_direccion_temp_form" model="ir.ui.view">
+            <field name="name">cjg.sale.credit.direccion.temp.form</field>
+            <field name="model">cjg.sale.credit.direccion.temp</field>
+            <field name="arch" type="xml">
+                <form string="Dirección Temporal">
+                    <header>
+                        <button name="action_commit" string="Promover al Cliente" type="object"
+                                class="btn-primary" icon="fa-check"
+                                invisible="status != 'draft'"/>
+                        <button name="action_cancel_temp" string="Cancelar" type="object"
+                                class="btn-secondary" icon="fa-ban"
+                                invisible="status != 'draft'"/>
+                        <field name="status" widget="statusbar"
+                               statusbar_visible="draft,committed,cancelled"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id" readonly="status != 'draft'"/>
+                                <field name="status" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="create_date" readonly="1"/>
+                                <field name="commit_date" readonly="1" invisible="not commit_date"/>
+                                <field name="cancel_date" readonly="1" invisible="not cancel_date"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <group string="Dirección Capturada">
+                            <field name="direccion" readonly="status != 'draft'"
+                                   placeholder="Calle, número, sector, ciudad, provincia..."/>
+                        </group>
+                        <group string="Notas">
+                            <field name="notes" readonly="status != 'draft'"
+                                   placeholder="Observaciones del operador o motivo de cancelación..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search view -->
+        <record id="view_sale_credit_direccion_temp_search" model="ir.ui.view">
+            <field name="name">cjg.sale.credit.direccion.temp.search</field>
+            <field name="model">cjg.sale.credit.direccion.temp</field>
+            <field name="arch" type="xml">
+                <search string="Direcciones Temporales">
+                    <field name="partner_id"/>
+                    <field name="direccion"/>
+                    <field name="status"/>
+                    <filter string="Borrador" name="filter_draft"
+                            domain="[('status', '=', 'draft')]"/>
+                    <filter string="Promovidas" name="filter_committed"
+                            domain="[('status', '=', 'committed')]"/>
+                    <filter string="Canceladas" name="filter_cancelled"
+                            domain="[('status', '=', 'cancelled')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Cliente" name="group_by_partner"
+                                context="{'group_by': 'partner_id'}"/>
+                        <filter string="Estado" name="group_by_status"
+                                context="{'group_by': 'status'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Menú -->
+        <menuitem id="menu_cjg_finance_sale_credit_direccion_temp"
+                  name="Direcciones Temporales"
+                  action="action_sale_credit_direccion_temp"
+                  parent="cjg_finance_pos.menu_cjg_finance_pos_settings"
+                  sequence="20"
+                  groups="cjg_finance.group_credit_manager"/>
+    </data>
+</odoo>

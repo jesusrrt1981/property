@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_credit_no_reembolso_wizard_form" model="ir.ui.view">
+        <field name="name">sale.credit.no.reembolso.wizard.form</field>
+        <field name="model">sale.credit.no.reembolso.wizard</field>
+        <field name="arch" type="xml">
+            <form string="No Solicitar Reembolso">
+                <div class="alert alert-info" role="alert">
+                    <p><strong>Procedimiento (Opcion 2):</strong> El cliente
+                    decide por escrito NO solicitar reembolso ni nota de
+                    credito. El monto pagado queda en los ingresos de la
+                    empresa hasta que el titular solicite formalmente el
+                    reembolso o la NC.</p>
+                    <p class="mb-0"><small>Esta accion es auditable. Complete
+                    todos los campos. El motivo es obligatorio (min. 20
+                    caracteres).</small></p>
+                </div>
+                <group>
+                    <group string="Datos del Contrato">
+                        <field name="credit_id" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="current_state" string="Estado (Proceso)"/>
+                        <field name="current_state_tech" string="Estado (Tecnico)"/>
+                        <field name="capital_pagado" widget="monetary" readonly="1"/>
+                    </group>
+                    <group string="Solicitud Escrita">
+                        <field name="fecha_solicitud_escrita"/>
+                        <field name="documentacion_autoriza"
+                                options="{'no_create': True, 'no_open': True}"/>
+                        <field name="bloquea_futuro_reembolso"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="motivo"
+                           placeholder="Resumen de la solicitud escrita del cliente por la que decide NO solicitar reembolso ni NC..."/>
+                </group>
+                <footer>
+                    <button name="action_confirm_no_reembolso"
+                            string="Registrar Decision"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancelar"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

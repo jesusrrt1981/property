@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Tree View -->
+    <record id="view_sale_credit_portfolio_tree" model="ir.ui.view">
+        <field name="name">sale.credit.portfolio.tree</field>
+        <field name="model">sale.credit.portfolio</field>
+        <field name="arch" type="xml">
+            <tree string="Portfolio de Cartera" decoration-success="status == 'al_dia'" decoration-warning="status == 'mora'" decoration-danger="status in ('desistido', 'anulado')" decoration-info="status == 'saldado'">
+                <field name="period_key" string="Periodo"/>
+                <field name="credit_id"/>
+                <field name="partner_id"/>
+                <field name="expected_amount" sum="Total Esperado"/>
+                <field name="collected_amount" sum="Total Cobrado"/>
+                <field name="balance" sum="Balance Total"/>
+                <field name="status"/>
+                <field name="client_classification"/>
+                <field name="collector_id"/>
+                <field name="late_fee" sum="Mora Total"/>
+                <field name="days_overdue" avg="Promedio Días Atraso"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_sale_credit_portfolio_form" model="ir.ui.view">
+        <field name="name">sale.credit.portfolio.form</field>
+        <field name="model">sale.credit.portfolio</field>
+        <field name="arch" type="xml">
+            <form string="Portfolio de Cartera">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="period_info" string="Información del Periodo">
+                            <field name="year"/>
+                            <field name="month"/>
+                            <field name="period_key" readonly="1"/>
+                            <field name="installment_number"/>
+                        </group>
+                        <group name="credit_info" string="Información del Crédito">
+                            <field name="credit_id"/>
+                            <field name="partner_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="collector_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group name="amounts" string="Montos">
+                            <field name="expected_amount"/>
+                            <field name="collected_amount"/>
+                            <field name="balance" class="oe_subtotal_footer_separator"/>
+                            <field name="late_fee"/>
+                        </group>
+                        <group name="status_info" string="Estado y Clasificación">
+                            <field name="status"/>
+                            <field name="client_classification"/>
+                            <field name="days_overdue"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Notas adicionales..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_sale_credit_portfolio_pivot" model="ir.ui.view">
+        <field name="name">sale.credit.portfolio.pivot</field>
+        <field name="model">sale.credit.portfolio</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Cartera">
+                <field name="year" type="col"/>
+                <field name="month" type="col"/>
+                <field name="status" type="row"/>
+                <field name="client_classification" type="row"/>
+                <field name="expected_amount" type="measure"/>
+                <field name="collected_amount" type="measure"/>
+                <field name="balance" type="measure"/>
+                <field name="late_fee" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_sale_credit_portfolio_graph" model="ir.ui.view">
+        <field name="name">sale.credit.portfolio.graph</field>
+        <field name="model">sale.credit.portfolio</field>
+        <field name="arch" type="xml">
+            <graph string="Gráfico de Cartera" type="bar" stacked="True">
+                <field name="period_key"/>
+                <field name="expected_amount" type="measure"/>
+                <field name="collected_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_sale_credit_portfolio_search" model="ir.ui.view">
+        <field name="name">sale.credit.portfolio.search</field>
+        <field name="model">sale.credit.portfolio</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Portfolio">
+                <field name="credit_id"/>
+                <field name="partner_id"/>
+                <field name="collector_id"/>
+                <field name="period_key"/>
+                <filter name="filter_al_dia" string="Al Día" domain="[('status', '=', 'al_dia')]"/>
+                <filter name="filter_mora" string="En Mora" domain="[('status', '=', 'mora')]"/>
+                <filter name="filter_desistido" string="Desistido" domain="[('status', '=', 'desistido')]"/>
+                <filter name="filter_anulado" string="Anulado" domain="[('status', '=', 'anulado')]"/>
+                <filter name="filter_saldado" string="Saldado" domain="[('status', '=', 'saldado')]"/>
+                <separator/>
+                <filter name="filter_class_a" string="Clase A" domain="[('client_classification', '=', 'A')]"/>
+                <filter name="filter_class_b" string="Clase B" domain="[('client_classification', '=', 'B')]"/>
+                <filter name="filter_class_c" string="Clase C" domain="[('client_classification', '=', 'C')]"/>
+                <separator/>
+                <filter name="current_month" string="Mes Actual" 
+                        domain="[('month', '=', context_today().month), ('year', '=', context_today().year)]"/>
+                <filter name="current_year" string="Año Actual" 
+                        domain="[('year', '=', context_today().year)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_period" string="Periodo" context="{'group_by': 'period_key'}"/>
+                    <filter name="group_status" string="Estado" context="{'group_by': 'status'}"/>
+                    <filter name="group_classification" string="Clasificación" context="{'group_by': 'client_classification'}"/>
+                    <filter name="group_collector" string="Oficial de Cobro" context="{'group_by': 'collector_id'}"/>
+                    <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_sale_credit_portfolio" model="ir.actions.act_window">
+        <field name="name">Portfolio de Cartera</field>
+        <field name="res_model">sale.credit.portfolio</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="context">{
+            'search_default_current_year': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un registro de portfolio
+            </p>
+            <p>
+                El portfolio de cartera permite hacer un seguimiento mensual del estado de los créditos,
+                incluyendo montos esperados vs cobrados, clasificación de clientes y métricas por oficial de cobro.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_sale_credit_portfolio"
+              name="Portfolio Mensual"
+              parent="cjg_finance.menu_cobros_cartera"
+              action="action_sale_credit_portfolio"
+              groups="cjg_finance.group_collection_officer,cjg_finance.group_collection_manager,cjg_finance.group_credit_manager"
+              sequence="15"/>
+    </data>
+</odoo>

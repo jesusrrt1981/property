@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_reembolso_wizard_view_form" model="ir.ui.view">
+            <field name="name">sale.credit.reembolso.wizard.form</field>
+            <field name="model">sale.credit.reembolso.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Reembolso 70/30 (12+ meses)">
+                    <field name="currency_id" invisible="1"/>
+
+                    <div invisible="elegible == True"
+                         style="color: #b71c1c; padding: 10px; border: 1px solid #b71c1c; background: #ffebee; border-radius: 4px; margin-bottom: 10px;">
+                        <p><strong>⚠️ No elegible para reembolso 70/30</strong></p>
+                        <ul>
+                            <li>El contrato debe estar en estado <em>Anulado</em> o <em>Desistido</em>.</li>
+                            <li>Deben haber transcurrido <strong>12 meses o más</strong> desde la fecha de la última cuota.</li>
+                            <li>Si el contrato no tuvo pagos, no hay base para reembolso.</li>
+                        </ul>
+                        <p>Si el cliente requiere devolución anticipada (menos de 12 meses), use el flujo de <strong>Devolución</strong>.</p>
+                    </div>
+
+                    <group string="Datos del Contrato">
+                        <group>
+                            <field name="credit_id" readonly="1"/>
+                            <field name="current_state" readonly="1"/>
+                            <field name="fecha_anulacion" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="meses_transcurridos" readonly="1"/>
+                            <field name="elegible" readonly="1" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group string="Cálculo del Reembolso 70/30">
+                        <group>
+                            <field name="capital_pagado" widget="monetary" readonly="1"/>
+                            <field name="intereses_pagados" widget="monetary" readonly="1"/>
+                            <field name="porcentaje_reembolso" widget="percentage"/>
+                        </group>
+                        <group>
+                            <field name="monto_reembolso" widget="monetary" readonly="1"
+                                   decoration-success="monto_reembolso &gt; 0"
+                                   decoration-muted="monto_reembolso == 0"/>
+                            <field name="monto_retenido" widget="monetary" readonly="1"
+                                   decoration-warning="monto_retenido &gt; 0"/>
+                        </group>
+                    </group>
+
+                    <group string="Autorización">
+                        <field name="motivo" placeholder="Resumen de la solicitud escrita del cliente (motivo del reembolso)..."/>
+                        <field name="documentacion_autoriza" placeholder="Usuario de Documentación que revisa y autoriza..."/>
+                    </group>
+
+                    <footer>
+                        <button string="Procesar Reembolso" type="object"
+                                name="action_confirm_reembolso"
+                                class="btn-primary"
+                                invisible="elegible == False"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_credit_reembolso_wizard_action" model="ir.actions.act_window">
+            <field name="name">Reembolso 70/30 (12+ meses)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.reembolso.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

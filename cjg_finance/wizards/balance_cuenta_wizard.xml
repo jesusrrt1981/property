@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_balance_cuenta" model="ir.actions.report">
+            <field name="name">Plantilla Cuenta Corriente (CxC)</field>
+            <field name="model">cjg.finance.balance.cuenta.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.balance_cuenta_report_document</field>
+            <field name="report_file">cjg_finance.balance_cuenta_report_document</field>
+            <field name="print_report_name">'Balance_Cuenta - %s' % (object.partner_id.name or '')"
+            </field>
+        </record>
+
+        <template id="balance_cuenta_report_document">
+            <t t-set="data" t-value="data or {}"/>
+            <t t-set="initial_balance" t-value="data.get('initial_balance', 0.0)"/>
+            <t t-set="movements" t-value="env['cjg.pos.payment.receipt'].browse(data.get('movement_ids', []))"/>
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">BALANCE — CUENTA CORRIENTE</h2>
+                        <h4 class="text-center">
+                            <span t-esc="docs.partner_id.name or ''"/>
+                        </h4>
+
+                        <div class="row mt-3 mb-3">
+                            <div class="col-6">
+                                <strong>Cliente:</strong>
+                                <span t-field="docs.partner_id.name"/><br/>
+                                <strong>Cédula/RNC:</strong>
+                                <span t-field="docs.partner_id.vat"/><br/>
+                                <strong>Compañía:</strong>
+                                <span t-field="docs.company_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Desde:</strong> <t t-esc="data.get('date_from')"/><br/>
+                                <strong>Hasta:</strong> <t t-esc="data.get('date_to')"/><br/>
+                                <strong>Emitido:</strong>
+                                <t t-esc="env['cjg.finance.qweb.helper'].now_str('%Y-%m-%d %H:%M')"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr style="background:#ECEFF1;">
+                                    <th>Fecha</th>
+                                    <th>Docto</th>
+                                    <th>Descripción</th>
+                                    <th class="text-end">Debe</th>
+                                    <th class="text-end">Haber</th>
+                                    <th class="text-end">Saldo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background:#FAFAFA; font-style:italic;">
+                                    <td colspan="5" class="text-end">
+                                        <strong>Saldo inicial</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="initial_balance"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <t t-set="running" t-value="initial_balance"/>
+                                <t t-set="total_debit" t-value="0.0"/>
+                                <t t-set="total_credit" t-value="0.0"/>
+                                <tr t-foreach="movements" t-as="m">
+                                    <td><span t-field="m.date"/></td>
+                                    <td><span t-field="m.name"/></td>
+                                    <td>
+                                        <span t-field="m.descripcion"/>
+                                        <t t-if="m.movement_type">
+                                            <small class="text-muted">
+                                                [<t t-esc="m.concept_id.name if m.concept_id else (m.movement_type or '')"/>]
+                                            </small>
+                                        </t>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-if="m.amount_paid &gt;= 0">
+                                            <span t-field="m.amount_paid"
+                                                  t-options='{"widget": "monetary", "display_currency": m.currency_id}'/>
+                                        </t>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-if="m.amount_paid &lt; 0">
+                                            <span t-field="m.amount_paid"
+                                                  t-options='{"widget": "monetary", "display_currency": m.currency_id}'/>
+                                        </t>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-set="running" t-value="running + m.amount_paid"/>
+                                        <t t-set="total_debit" t-value="total_debit + (m.amount_paid if m.amount_paid &gt; 0 else 0)"/>
+                                        <t t-set="total_credit" t-value="total_credit + (-m.amount_paid if m.amount_paid &lt; 0 else 0)"/>
+                                        <t t-esc="running"
+                                           t-options='{"widget": "monetary", "display_currency": m.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr t-if="not movements">
+                                    <td colspan="6" class="text-center text-muted">
+                                        Sin movimientos en el período
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background:#ECEFF1;">
+                                    <td colspan="3" class="text-end">
+                                        <strong>TOTALES DEL PERÍODO</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="total_debit"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="total_credit"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="running"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <div class="row mt-4">
+                            <div class="col-12 text-end">
+                                <t t-if="running &lt;= 0">
+                                    <em>* Saldo a favor del cliente</em>
+                                </t>
+                                <t t-else="">
+                                    <em>* Saldo a nuestro favor</em>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <record id="view_balance_cuenta_wizard_form" model="ir.ui.view">
+            <field name="name">cjg.finance.balance.cuenta.wizard.form</field>
+            <field name="model">cjg.finance.balance.cuenta.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Plantilla Cuenta Corriente (CxC)">
+                    <sheet>
+                        <group>
+                            <group string="Cliente y Período">
+                                <field name="partner_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group string="Rango de Fechas">
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_print_report"
+                                string="Imprimir PDF"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-print"/>
+                        <button string="Cancelar"
+                                class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_balance_cuenta_wizard" model="ir.actions.act_window">
+            <field name="name">Balance — Cuenta Corriente (CxC)</field>
+            <field name="res_model">cjg.finance.balance.cuenta.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

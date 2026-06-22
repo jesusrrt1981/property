@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="finan_category" model="product.category">
+            <field name="name">Financiamiento</field>
+        </record>
+
+        <record id="credit_mora" model="product.product">
+            <field name="name">Mora</field>
+            <field name="standard_price">0.00</field>
+            <field name="list_price">0.00</field>
+            <field name="type">service</field>
+            <field name="categ_id" ref="cjg_finance.finan_category" />
+            <field name="uom_id" ref="uom.product_uom_unit" />
+            <field name="uom_po_id" ref="uom.product_uom_unit" />
+            <field name="default_code">MORA</field>
+            <field name="purchase_ok">False</field>
+        </record>
+
+        <record id="credit_interes" model="product.product">
+            <field name="name">Interes</field>
+            <field name="standard_price">0.00</field>
+            <field name="list_price">0.00</field>
+            <field name="type">service</field>
+            <field name="categ_id" ref="cjg_finance.finan_category" />
+            <field name="uom_id" ref="uom.product_uom_unit" />
+            <field name="uom_po_id" ref="uom.product_uom_unit" />
+            <field name="default_code">INTERES</field>
+            <field name="purchase_ok">False</field>
+        </record>
+        <!-- <function model="sale.credit" name="post_install_credit_installation" /> -->
+
+        <function model="sale.credit.installment" name="_ensure_standard_installments" />
+
+        <record id="8_cuota" model="sale.credit.installment">
+            <field name="name">8 Cuotas</field>
+            <field name="installments">8</field>
+        </record>
+
+        <!-- FIX 2026-06-17: declarar estos records en XML para que Odoo NO los borre
+             durante la limpieza post-upgrade. El metodo _ensure_standard_installments
+             los crea via codigo, pero Odoo 17 solo marca como "tocados" los xmlids
+             que se cargan via <record> en el XML. Sin estas declaraciones, el upgrade
+             del modulo borra los registros 12_cuota, 24_cuota, 36_cuota, 48_cuota,
+             60_cuota, 72_cuota y 84_cuota (memorial-new-33677967). -->
+        <record id="12_cuota" model="sale.credit.installment">
+            <field name="name">12 Cuotas</field>
+            <field name="installments">12</field>
+        </record>
+        <record id="24_cuota" model="sale.credit.installment">
+            <field name="name">24 Cuotas</field>
+            <field name="installments">24</field>
+        </record>
+        <record id="36_cuota" model="sale.credit.installment">
+            <field name="name">36 Cuotas</field>
+            <field name="installments">36</field>
+        </record>
+        <record id="48_cuota" model="sale.credit.installment">
+            <field name="name">48 Cuotas</field>
+            <field name="installments">48</field>
+        </record>
+        <record id="60_cuota" model="sale.credit.installment">
+            <field name="name">60 Cuotas</field>
+            <field name="installments">60</field>
+        </record>
+        <record id="72_cuota" model="sale.credit.installment">
+            <field name="name">72 Cuotas</field>
+            <field name="installments">72</field>
+        </record>
+        <record id="84_cuota" model="sale.credit.installment">
+            <field name="name">84 Cuotas</field>
+            <field name="installments">84</field>
+        </record>
+
+        <record id="identification" model="sale.credit.document">
+            <field name="name">Identificacion</field>
+        </record>
+
+        <record id="mensual" model="sale.credit.frequency">
+            <field name="name">Mensual</field>
+            <field name="type">month</field>
+            <field name="interval">1</field>
+            <field name="installment_ids" eval="[(6, 0, [
+            ref('8_cuota'),
+            ref('12_cuota'),
+            ref('24_cuota'),
+            ref('36_cuota'),
+            ref('60_cuota'),
+            ref('48_cuota'),
+            
+            ])]" />
+            <field name="description">Mensual</field>
+        </record>
+
+        <record id="12_interes" model="sale.credit.category">
+            <field name="name">Tasa 12%</field>
+            <field name="percent_interest">12</field>
+            <field name="description">Interes a 12</field>
+            <field name="percent_financing">75</field>
+            <field name="is_doc_required">True</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="sale_credit_doc_ids" eval="[(6, 0, [
+            ref('identification')
+           
+            ])]" />
+        </record>
+
+        <record id="0_interes" model="sale.credit.category">
+            <field name="name">Tasa 0%</field>
+            <field name="percent_interest">0</field>
+            <field name="percent_financing">75</field>
+            <field name="is_doc_required">True</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="sale_credit_doc_ids" eval="[(6, 0, [
+            ref('identification')
+           
+            ])]" />
+        </record>
+
+        <record id="seguimiento_1" model="sale_credit.followup.line">
+            <field name="name">15 DIAS</field>
+            <field name="delay">15</field>
+        </record>
+    </data>
+</odoo>

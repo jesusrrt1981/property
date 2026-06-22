@@ -1,0 +1,249 @@
+// Dashboard Moderno - Fondo Blanco con Círculo de Color
+
+.section.tk_rental_dash {
+  padding: 24px;
+  background: #F9FAFB;
+  min-height: 100vh;
+}
+
+/* Forzar tarjetas sin fondos de color en todo el dashboard */
+.success-bg,
+.info-bg,
+.warn-bg,
+.danger-bg {
+  background: #FFFFFF !important;
+}
+
+.tk-primary {
+  color: #111827;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+hr.border-primary {
+  border: 0;
+  height: 1px;
+  background: #E5E7EB;
+  margin-bottom: 24px;
+}
+
+// Tarjetas con fondo blanco
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: #FFFFFF;
+  overflow: visible;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.p-32 {
+  padding: 20px 24px;
+}
+
+.p-16 {
+  padding: 16px;
+}
+
+.mt32 {
+  margin-top: 32px;
+}
+
+.mt8 {
+  margin-top: 8px;
+}
+
+.mb16 {
+  margin-bottom: 16px;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+// Remover fondos de color
+.success-bg,
+.info-bg,
+.warn-bg,
+.danger-bg {
+  background: #FFFFFF !important;
+}
+
+// Layout de tarjetas - TODAS IGUALES
+.tk-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 !important;
+}
+
+.tk-icon-wrapper {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #E5E7EB;
+  color: #6B7280;
+}
+
+.tk-icon-wrapper.neutral {
+  background: #E5E7EB;
+  color: #6B7280;
+}
+
+.tk-icon-wrapper i {
+  font-size: 18px;
+}
+
+.tk-content {
+  flex: 1;
+  min-width: 0;
+  padding-right: 60px;
+}
+
+.tk-st-1 {
+  margin: 0 0 6px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tk-st-2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+/* Eliminado bloque de deltas para estilo sin comparativos */
+
+// Gráfica sparkline
+.card-graph {
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+}
+
+.sparkline {
+  width: 100%;
+  height: 60px;
+}
+
+.sparkline svg {
+  width: 100%;
+  height: 60px;
+}
+
+.sparkline .spark-path {
+  stroke: #374151;
+  stroke-width: 2;
+}
+
+// Tabla
+.table {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.table thead {
+  background: #F9FAFB;
+}
+
+.table th {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border: none;
+}
+
+.table td {
+  padding: 12px 16px;
+  color: #111827;
+  font-size: 14px;
+  border-top: 1px solid #F3F4F6;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #F9FAFB;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-muted {
+  color: #9CA3AF;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+ .icon-badge {
+   width: 28px;
+   height: 28px;
+   border-radius: 50%;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   margin-right: 10px;
+   flex-shrink: 0;
+   background: #E5E7EB;
+   color: #374151;
+ }
+ .icon-badge i {
+   font-size: 14px;
+ }
+
+// Colores específicos para iconos
+.tk-icon-wrapper.icon-green {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10B981 !important;
+}
+
+.tk-icon-wrapper.icon-blue {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #3B82F6 !important;
+}
+
+.tk-icon-wrapper.icon-orange {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #F59E0B !important;
+}
+
+.tk-icon-wrapper.icon-red {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #EF4444 !important;
+}
+
+.tk-icon-wrapper.icon-purple {
+  background: rgba(139, 92, 246, 0.15) !important;
+  color: #8B5CF6 !important;
+}
+
+.tk-icon-wrapper.icon-gray {
+  background: rgba(107, 114, 128, 0.15) !important;
+  color: #6B7280 !important;
+}

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_cierre_contable_tree" model="ir.ui.view">
+            <field name="name">cierre.contable.tree</field>
+            <field name="model">cierre.contable</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'open'" decoration-success="state == 'closed'" decoration-muted="state == 'closed'">
+                    <field name="display_name" string="Periodo"/>
+                    <field name="ano"/>
+                    <field name="mes" widget="selection"/>
+                    <field name="fecha_inicio_ventas"/>
+                    <field name="fecha_fin_ventas"/>
+                    <field name="state" widget="badge" decoration-info="state == 'open'" decoration-success="state == 'closed'"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_cierre_contable_form" model="ir.ui.view">
+            <field name="name">cierre.contable.form</field>
+            <field name="model">cierre.contable</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_cerrar" string="Cerrar" type="object" class="oe_highlight" invisible="state == 'closed'" groups="cjg_finance.group_credit_manager"/>
+                        <button name="action_reabrir" string="Reabrir" type="object" invisible="state == 'open'" groups="cjg_finance.group_credit_manager"/>
+                        <button name="action_recalcular_rango" string="Recalcular Rango" type="object" groups="cjg_finance.group_credit_manager"/>
+                        <field name="state" widget="statusbar" statusbar_visible="open,closed"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="display_name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="ano"/>
+                                <field name="mes" widget="selection"/>
+                            </group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <group string="Periodo de Ventas" name="periodo_ventas">
+                            <group>
+                                <field name="fecha_inicio_ventas"/>
+                                <field name="fecha_fin_ventas"/>
+                            </group>
+                            <group>
+                                <field name="name" readonly="1" string="Código"/>
+                            </group>
+                        </group>
+                        <group string="Notas" name="notas">
+                            <field name="notes" nolabel="1" placeholder="Observaciones del cierre contable..."/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_cierre_contable_search" model="ir.ui.view">
+            <field name="name">cierre.contable.search</field>
+            <field name="model">cierre.contable</field>
+            <field name="arch" type="xml">
+                <search string="Cierres Contables">
+                    <field name="display_name" string="Periodo"/>
+                    <field name="ano"/>
+                    <field name="mes"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <separator/>
+                    <filter name="state_open" string="Abiertos" domain="[('state', '=', 'open')]"/>
+                    <filter name="state_closed" string="Cerrados" domain="[('state', '=', 'closed')]"/>
+                    <separator/>
+                    <filter name="ano_actual" string="Año actual" domain="[('ano', '=', context_today().year)]"/>
+                    <group string="Agrupar Por" expand="0">
+                        <filter name="group_ano" string="Año" context="{'group_by': 'ano'}"/>
+                        <filter name="group_mes" string="Mes" context="{'group_by': 'mes'}"/>
+                        <filter name="group_company" string="Compañía" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                        <filter name="group_state" string="Estado" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_cierre_contable" model="ir.actions.act_window">
+            <field name="name">Cierres Contables</field>
+            <field name="res_model">cierre.contable</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Cree un nuevo cierre contable mensual.</p>
+                <p>Cada cierre delimita el periodo contable usado por los reportes (reporte_todito, reporte_cobros).</p>
+            </field>
+        </record>
+
+        <record id="action_generar_cierre_contable_wizard" model="ir.actions.act_window">
+            <field name="name">Generar Año de Cierres</field>
+            <field name="res_model">generar.cierre.contable.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_cierre_contable_root"
+                  name="Cierres Contables"
+                  parent="credito_configuracion"
+                  sequence="10"
+                  groups="cjg_finance.group_credit_user,cjg_finance.group_credit_manager"/>
+
+        <menuitem id="menu_cierre_contable"
+                  name="Cierres Mensuales"
+                  parent="menu_cierre_contable_root"
+                  action="action_cierre_contable"
+                  sequence="10"
+                  groups="cjg_finance.group_credit_user,cjg_finance.group_credit_manager"/>
+
+        <menuitem id="menu_cierre_contable_generar"
+                  name="Generar Año"
+                  parent="menu_cierre_contable_root"
+                  action="action_generar_cierre_contable_wizard"
+                  sequence="20"
+                  groups="cjg_finance.group_credit_manager"/>
+    </data>
+</odoo>

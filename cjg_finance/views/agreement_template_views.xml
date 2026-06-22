@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Agreement Template views -->
+        <record id="agreement_template_tree_view" model="ir.ui.view">
+            <field name="name">agreement.template.tree</field>
+            <field name="model">agreement.template</field>
+            <field name="arch" type="xml">
+                <tree string="Plantillas de Contratos">
+                    <field name="name"/>
+                    <field name="company_id"/>
+                    <field name="model"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Preview wizard -->
+        <record id="agreement_preview_form_view" model="ir.ui.view">
+            <field name="name">agreement.preview.form</field>
+            <field name="model">agreement.preview</field>
+            <field name="arch" type="xml">
+                <form string="Vista previa" create="false" edit="false">
+                    <sheet>
+                        <field name="agreement_id" invisible="1"/>
+                        <field name="body" nolabel="1" widget="html" readonly="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="agreement_preview_action" model="ir.actions.act_window">
+            <field name="name">Vista previa de Contrato</field>
+            <field name="res_model">agreement.preview</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="agreement_preview_form_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="agreement_template_form_view" model="ir.ui.view">
+            <field name="name">agreement.template.form</field>
+            <field name="model">agreement.template</field>
+            <field name="arch" type="xml">
+                <form string="Plantilla de Contrato">
+                    <header>
+                        <button name="%(agreement_preview_action)d"
+                                string="Vista previa"
+                                type="action"
+                                class="oe_highlight"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id"/>
+                            <field name="model"/>
+                        </group>
+                        <notebook>
+                            <page string="Contrato">
+                                <field name="agreement" widget="html"/>
+                            </page>
+                            <page string="Variables">
+                                <field name="template_variable_ids">
+                                    <tree editable="bottom">
+                                        <field name="name" readonly="1"/>
+                                        <field name="field_type"/>
+                                        <field name="field_name"/>
+                                        <field name="demo"/>
+                                        <field name="free_text"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Menu and action -->
+        <record id="agreement_template_action" model="ir.actions.act_window">
+            <field name="name">Contratos</field>
+            <field name="res_model">agreement.template</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="agreement_documents_menu"
+                  name="Documentos"
+                  parent="cjg_finance.credito_menu"
+                  sequence="22"
+                  groups="cjg_finance.group_credit_user,cjg_finance.group_credit_manager"/>
+        <menuitem id="agreement_template_menu"
+                  name="Crear Contratos"
+                  parent="agreement_documents_menu"
+                  action="agreement_template_action"
+                  sequence="1"
+                  groups="cjg_finance.group_credit_user,cjg_finance.group_credit_manager"/>
+    </data>
+</odoo>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="cjg_finance.finance_dashboard" owl="1">
+        <section class="section tk_rental_dash">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Estadísticas</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewCredits('all')">
+                        <div class="card p-32" style="background: #FFFFFF !important;">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">CRÉDITOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.credits.total"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-green"><i class="fa fa-credit-card" aria-hidden="true"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewCredits('requested')">
+                        <div class="card p-32" style="background: #FFFFFF !important;">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">SOLICITADOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.credits.requested"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-blue"><i class="fa fa-hourglass-half" aria-hidden="true"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewCredits('approved')">
+                        <div class="card p-32" style="background: #FFFFFF !important;">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">APROBADOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.credits.approved"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-green"><i class="fa fa-check" aria-hidden="true"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewCredits('refuse')">
+                        <div class="card p-32" style="background: #FFFFFF !important;">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">RECHAZADOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.credits.refused"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-red"><i class="fa fa-times" aria-hidden="true"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Pagos</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPayments('draft')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">BORRADOR</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.payments.draft"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-orange"><i class="fa fa-file-text-o" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPayments('validated')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">VALIDADOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.payments.validated"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-blue"><i class="fa fa-check-square-o" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewPayments('paid')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">PAGADOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.payments.paid"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-green"><i class="fa fa-money" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 mt8 mb16" t-on-click="() => this.viewOverdues()">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">MORAS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.overdues.total"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper icon-orange"><i class="fa fa-exclamation-triangle" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Tendencia mensual</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card-graph p-16">
+                            <div class="sparkline">
+                                <svg t-att-viewBox="`0 0 240 60`" preserveAspectRatio="none">
+                                    <path t-att-d="state.payments.spark_path" class="spark-path" fill="none" stroke-width="2"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clasificación de Cartera A/B/C -->
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Clasificación de Cartera</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-4 mb-4 mt8 mb16" t-on-click="() => this.viewPortfolioByClass('A')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">CLASE A - AL DÍA</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.portfolio.classA.count"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper neutral"><i class="fa fa-star" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 mt8 mb16" t-on-click="() => this.viewPortfolioByClass('B')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">CLASE B - ATRASO MODERADO</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.portfolio.classB.count"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper neutral"><i class="fa fa-clock-o" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 mt8 mb16" t-on-click="() => this.viewPortfolioByClass('C')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">CLASE C - ATRASO SIGNIFICATIVO</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.portfolio.classC.count"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper neutral"><i class="fa fa-exclamation-circle" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 5 Oficiales de Cobro -->
+                <div class="row" t-if="state.officers.length">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Top 5 Oficiales de Cobro</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-12">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Oficial</th>
+                                    <th class="text-right">Créditos</th>
+                                    <th class="text-right">Cobrado</th>
+                                    <th class="text-right">Pendiente</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="state.officers" t-as="officer" t-key="officer.name">
+                                    <td><t t-esc="officer.name"/></td>
+                                    <td class="text-right"><t t-esc="officer.count"/></td>
+                                    <td class="text-right"><t t-esc="formatCurrency(officer.collected)"/></td>
+                                    <td class="text-right"><t t-esc="formatCurrency(officer.pending)"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Contratos de Mantenimiento -->
+                <div class="row">
+                    <div class="col-md-12 mt32">
+                        <h4 class="tk-primary">Contratos de Mantenimiento</h4>
+                        <hr class="border-primary"/>
+                    </div>
+                    <div class="col-md-4 mb-4 mt8 mb16" t-on-click="() => this.viewMaintenanceContracts('active')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">ACTIVOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.maintenance.active"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper neutral"><i class="fa fa-check-circle" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 mt8 mb16" t-on-click="() => this.viewMaintenanceContracts('suspended')">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">SUSPENDIDOS</h4>
+                                    <h6 class="tk-st-2"><t t-esc="state.maintenance.suspended"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper neutral"><i class="fa fa-pause-circle" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 mt8 mb16" t-on-click="() => this.viewMaintenanceContracts()">
+                        <div class="card p-32">
+                            <div class="tk-card-body">
+                                <div class="tk-content">
+                                    <h4 class="tk-st-1">INGRESOS TOTALES</h4>
+                                    <h6 class="tk-st-2"><t t-esc="formatCurrency(state.maintenance.revenue)"/></h6>
+                                </div>
+                                <div class="tk-icon-wrapper neutral"><i class="fa fa-dollar" aria-hidden="true"/></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </t>
+</templates>

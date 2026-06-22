@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_refuse" model="ir.ui.view">
+            <field name="name">Traspasar Solicitud de Credito</field>
+            <field name="model">sale.credit.transfer.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Rechazar Solicitud de Credito">
+                    <group>
+                        <field name="transfer_partner_id"/>
+                        <field name="transfer_ref_partner_id"/>
+                        <field name="transfer_cob_debtor_id"/>
+
+                        <field name="reason_cancellation"/>
+                    </group>
+                    <footer>
+                        <button string="Confirmar" type="object" name="action_confirm"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel" data-hotkey="z" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="sale_credit_refuse_wizard" model="ir.actions.act_window">
+            <field name="name">Traspasar Solicitud de Credito</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.transfer.wizard</field>
+            <field name="view_mode">form</field>
+        </record>
+    </data> 
+</odoo>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_collection_notice" model="ir.actions.report">
+            <field name="name">Aviso de Cobro</field>
+            <field name="model">sale.credit.collection.notice</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_collection_notice_template</field>
+            <field name="report_file">cjg_finance.report_collection_notice_template</field>
+            <field name="print_report_name">'Aviso_Cobro_%s' % object.name</field>
+            <field name="binding_model_id" ref="model_sale_credit_collection_notice"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_collection_notice_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="text-center mb-4">
+                                <h2>AVISO DE COBRO</h2>
+                                <h4><span t-field="o.name"/></h4>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <strong>Cliente:</strong> <span t-field="o.partner_id.name"/><br/>
+                                    <strong>Expediente:</strong> <span t-field="o.partner_id.expediente"/><br/>
+                                    <strong>Dirección:</strong> <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/><br/>
+                                    <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.state_id.name"/>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong>Fecha:</strong> <span t-field="o.date"/><br/>
+                                    <strong>Contrato:</strong> <span t-field="o.credit_id.name"/><br/>
+                                    <strong>Oficial:</strong> <span t-field="o.official_id.name"/><br/>
+                                    <strong>Motorizado:</strong> <span t-field="o.collector_id.name"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Descripción</th>
+                                        <th class="text-right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.line_ids" t-as="line">
+                                        <td><span t-field="line.description"/></td>
+                                        <td class="text-right">
+                                            <span t-field="line.amount" 
+                                                  t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row justify-content-end">
+                                <div class="col-4">
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <td><strong>Total a Pagar:</strong></td>
+                                            <td class="text-right">
+                                                <span t-field="o.amount_total" 
+                                                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-12">
+                                    <p><strong>Notas:</strong> <span t-field="o.notes"/></p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-5">
+                                <div class="col-6 text-center">
+                                    ____________________________________<br/>
+                                    Recibido Conforme (Cliente)
+                                </div>
+                                <div class="col-6 text-center">
+                                    ____________________________________<br/>
+                                    Entregado Por (Motorizado)
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ═══════════════════════════════════════════════════════════════════
+             Gap 4 — Drilldown de un Abono (vista detalle de un recibo).
+             Equivalente a testarossa/.../caja/view/cliente/listado_abono_view_detail.php.
+             Header con cliente, fecha, total, NCF + tree de líneas aplicadas.
+             ═══════════════════════════════════════════════════════════════════ -->
+        <record id="view_partner_payment_detail_wizard_form" model="ir.ui.view">
+            <field name="name">cjg.finance.partner.payment.detail.wizard.form</field>
+            <field name="model">cjg.finance.partner.payment.detail.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Detalle del Abono" create="false" edit="false">
+                    <sheet>
+                        <h2>Detalle del Abono</h2>
+                        <!-- ══ HEADER (paridad con listado_abono_view_detail.php) ══ -->
+                        <group>
+                            <group string="Cliente">
+                                <field name="partner_id"/>
+                                <field name="partner_vat"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group string="Documento">
+                                <field name="date"/>
+                                <field name="document_name"/>
+                                <field name="ncf"/>
+                                <field name="serie" string="Serie"/>
+                                <field name="movement_type" string="Tipo Movimiento"/>
+                                <field name="state"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Montos">
+                                <field name="amount_total" widget="monetary"/>
+                                <field name="amount_paid" widget="monetary"/>
+                                <field name="total_lines_amount" widget="monetary"
+                                       string="Total Aplicado en Líneas"/>
+                                <field name="line_count"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="receipt_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <!-- ══ TREE DE LÍNEAS APLICADAS ══ -->
+                        <notebook>
+                            <page string="Líneas Aplicadas" name="lines">
+                                <field name="line_ids" nolabel="1" readonly="1">
+                                    <tree string="Líneas del Abono" create="false"
+                                          decoration-info="True">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="cuota_nro"/>
+                                        <field name="movement_label" optional="show"/>
+                                        <field name="monto" sum="Total Monto"
+                                               widget="monetary"/>
+                                        <field name="capital" sum="Capital"
+                                               widget="monetary"/>
+                                        <field name="interes" sum="Interés"
+                                               widget="monetary"/>
+                                        <field name="mora" sum="Mora"
+                                               widget="monetary"/>
+                                        <field name="mantenimiento" sum="Mantenimiento"
+                                               widget="monetary"/>
+                                        <field name="saldo" sum="Saldo"
+                                               widget="monetary"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <footer>
+                        <button name="action_back"
+                                string="Volver"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-arrow-left"/>
+                        <button string="Cerrar"
+                                class="btn-secondary"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action del wizard — se invoca pasando receipt_id en contexto -->
+        <record id="action_partner_payment_detail_wizard" model="ir.actions.act_window">
+            <field name="name">Detalle del Abono</field>
+            <field name="res_model">cjg.finance.partner.payment.detail.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

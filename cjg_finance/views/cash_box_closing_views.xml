@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <record id="view_cash_box_closing_tree" model="ir.ui.view">
+        <field name="name">cash.box.closing.tree</field>
+        <field name="model">cash.box.closing</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'" decoration-success="state == 'closed'">
+                <field name="name" />
+                <field name="user_id" />
+                <field name="date_closing" />
+                <field name="total_amount" sum="Total" />
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'closed'" />
+                <field name="company_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cash_box_closing_form" model="ir.ui.view">
+        <field name="name">cash.box.closing.form</field>
+        <field name="model">cash.box.closing</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_load_payments" string="Cargar Pagos" type="object" class="oe_highlight" invisible="state != 'draft'" />
+                    <button name="action_close" string="Cerrar Caja" type="object" class="oe_highlight" invisible="state != 'draft'" confirm="¿Está seguro de que desea cerrar la caja?" />
+                    <button name="action_print_report" string="Imprimir Arqueo" type="object" invisible="state != 'closed'" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,closed" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id" readonly="state != 'draft'" />
+                            <field name="date_closing" readonly="state != 'draft'" />
+                        </group>
+                        <group>
+                            <field name="company_id" />
+                            <field name="currency_id" invisible="1" />
+                            <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                        </group>
+                    </group>
+                    <group name="totals_by_method" string="Totales por Método">
+                        <group>
+                            <field name="total_cash" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                            <field name="total_card" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                        </group>
+                        <group>
+                            <field name="total_transfer" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="credit_payments" string="Pagos de Crédito">
+                            <field name="payment_ids" readonly="1">
+                                <tree>
+                                    <field name="payment_date" />
+                                    <field name="name" />
+                                    <field name="partner_id" />
+                                    <field name="journal_id" />
+                                    <field name="amount_total" sum="Total" />
+                                    <field name="state" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="maintenance_payments" string="Pagos de Mantenimiento">
+                            <field name="maintenance_payment_ids" readonly="1">
+                                <tree>
+                                    <field name="payment_date" />
+                                    <field name="communication" string="Referencia" />
+                                    <field name="partner_id" />
+                                    <field name="journal_id" />
+                                    <field name="amount" sum="Total" />
+                                    <field name="state" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="notes" string="Notas">
+                            <field name="notes" placeholder="Observaciones del cierre..." />
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cash_box_closing_search" model="ir.ui.view">
+        <field name="name">cash.box.closing.search</field>
+        <field name="model">cash.box.closing</field>
+        <field name="arch" type="xml">
+            <search string="Arqueos de Caja">
+                <field name="name" />
+                <field name="user_id" />
+                <separator />
+                <filter name="draft" string="Borrador" domain="[('state', '=', 'draft')]" />
+                <filter name="closed" string="Cerrado" domain="[('state', '=', 'closed')]" />
+                <separator />
+                <filter name="my_closes" string="Mi Caja" domain="[('user_id', '=', uid)]" />
+                <group string="Agrupar Por" expand="0">
+                    <filter name="group_user" string="Cajero" context="{'group_by': 'user_id'}" />
+                    <filter name="group_date" string="Fecha" context="{'group_by': 'date_closing:day'}" />
+                    <filter name="group_state" string="Estado" context="{'group_by': 'state'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cash_box_closing" model="ir.actions.act_window">
+        <field name="name">Arqueos de Caja</field>
+        <field name="res_model">cash.box.closing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Inicie un nuevo arqueo de caja para procesar sus cobros del día.</p>
+        </field>
+    </record>
+    </data>
+</odoo>

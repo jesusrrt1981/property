@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_massive_collection_notice_wizard_form" model="ir.ui.view">
+            <field name="name">massive.collection.notice.wizard.form</field>
+            <field name="model">massive.collection.notice.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Aviso de Cobro Masivo (XLSX)">
+                    <group>
+                        <group string="Período de Reagenda">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group string="Filtros">
+                            <field name="oficial_id" options="{'no_create': True}"/>
+                            <field name="motorista_id" options="{'no_create': True}"/>
+                            <field name="include_calls"/>
+                            <field name="include_no_calls"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_export_xlsx"
+                            string="Generar XLSX"
+                            type="object"
+                            class="btn-primary"/>
+                        <button string="Cancelar"
+                            class="btn-secondary"
+                            special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_massive_collection_notice_wizard" model="ir.actions.act_window">
+            <field name="name">Aviso de Cobro Masivo</field>
+            <field name="res_model">massive.collection.notice.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

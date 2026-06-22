@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            TRACK 3 (F10) — Vista del log de auditoría de cambios de status
+            por aging. Tree + form.
+        -->
+        <record id="view_cjg_finance_status_aging_audit_tree" model="ir.ui.view">
+            <field name="name">cjg.finance.status.aging.audit.tree</field>
+            <field name="model">cjg.finance.status.aging.audit</field>
+            <field name="arch" type="xml">
+                <tree string="Auditoría Aging Status" decoration-warning="rule=='overdue_30'"
+                      decoration-danger="rule in ('overdue_60', 'overdue_90')"
+                      decoration-success="rule=='revert_paid'">
+                    <field name="create_date" string="Fecha"/>
+                    <field name="credit_id"/>
+                    <field name="credit_name"/>
+                    <field name="partner_id"/>
+                    <field name="from_state"/>
+                    <field name="to_state"/>
+                    <field name="rule"/>
+                    <field name="days_overdue"/>
+                    <field name="affected_lines"/>
+                    <field name="executed_by"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_cjg_finance_status_aging_audit_form" model="ir.ui.view">
+            <field name="name">cjg.finance.status.aging.audit.form</field>
+            <field name="model">cjg.finance.status.aging.audit</field>
+            <field name="arch" type="xml">
+                <form string="Auditoría de Cambio de Status por Aging">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="credit_id"/>
+                                <field name="credit_name" readonly="1"/>
+                                <field name="partner_id" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="from_state"/>
+                                <field name="to_state"/>
+                                <field name="rule"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="days_overdue"/>
+                                <field name="affected_lines"/>
+                                <field name="executed_by"/>
+                                <field name="create_date" string="Fecha" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="note" placeholder="(sin notas)"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_cjg_finance_status_aging_audit" model="ir.actions.act_window">
+            <field name="name">Auditoría Aging Status</field>
+            <field name="res_model">cjg.finance.status.aging.audit</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Historial de cambios automáticos de status por aging.
+                </p>
+                <p>
+                    Cada cambio ejecutado por el cron
+                    <code>ir_cron_status_change_aging</code> deja un registro
+                    aquí. Use este log para auditoría y troubleshooting.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_cjg_finance_status_aging_audit"
+                  name="Auditoría Aging Status"
+                  parent="menu_cobros_root"
+                  action="action_cjg_finance_status_aging_audit"
+                  sequence="80"
+                  groups="cjg_finance.group_credit_manager"/>
+    </data>
+</odoo>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_category_form_view" model="ir.ui.view">
+            <field name="name">sale.credit.category.form.view</field>
+            <field name="model">sale.credit.category</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group >
+                            <group string="Detalle Tasa" name="info_category">
+                                <field name="name"/>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="description"/>
+                                <field name="is_doc_required"/>
+                                <field name="use_credit"/>
+                                <field name="sale_credit_doc_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                            <group string="Porcentaje" name="porcentaje_category">
+                                <field name="percent_interest"/>
+                                <field name="percent_financing"/>
+                            </group>
+                        </group>
+
+                    <notebook>
+                     <page string="Contabilidad">
+                        <group>
+                            <group string="Cuentas Contables" name="accounting_entries">
+                                <field name="journal_id" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="credit_account_receivable_id" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="credit_account_advanced_id" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="credit_earning_id" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="is_extra_invocing"/>
+                            </group>
+                        </group>
+                        
+                    </page>
+                    </notebook>
+                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="sale_credit_category_tree_view" model="ir.ui.view">
+            <field name="name">sale.credit.category.tree.view</field>
+            <field name="model">sale.credit.category</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="sale_credit_doc_ids" widget="many2many_tags"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>

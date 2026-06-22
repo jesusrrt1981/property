@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_cashbook_diary_wizard_form" model="ir.ui.view">
+            <field name="name">cashbook.diary.wizard.form</field>
+            <field name="model">cashbook.diary.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Diario de Caja / Libro Auxiliar">
+                    <sheet>
+                        <div class="alert alert-info" role="alert">
+                            Consolida todos los movimientos de caja en el rango
+                            seleccionado: apuntes contables, recibos POS, pagos
+                            de crédito y cierres/arqueos. Útil para conciliación
+                            bancaria y auditoría fiscal.
+                        </div>
+                        <group>
+                            <group string="Período">
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                            <group string="Compañía y Cuenta">
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="account_id"
+                                       domain="[('account_type', 'in', ('asset_cash', 'liability_current'))]"/>
+                            </group>
+                        </group>
+                        <group string="Fuentes a incluir">
+                            <group>
+                                <field name="include_account_lines"/>
+                                <field name="include_pos"/>
+                                <field name="include_credit"/>
+                            </group>
+                            <group>
+                                <field name="include_closing"/>
+                                <field name="only_posted"/>
+                                <field name="include_cancelled"/>
+                            </group>
+                        </group>
+                        <footer>
+                            <button name="action_export_xlsx"
+                                    string="Exportar XLSX"
+                                    type="object"
+                                    class="btn-success"
+                                    icon="fa-file-excel-o"/>
+                            <button name="action_preview_count"
+                                    string="Vista Previa"
+                                    type="object"
+                                    class="btn-primary"
+                                    icon="fa-eye"/>
+                            <button string="Cerrar"
+                                    class="btn-secondary"
+                                    special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_cashbook_diary_wizard" model="ir.actions.act_window">
+            <field name="name">Diario de Caja / Libro Auxiliar</field>
+            <field name="res_model">cashbook.diary.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_cashbook_diary_report"
+                  name="Diario de Caja / Libro Auxiliar"
+                  parent="cjg_finance.menu_cobros_root"
+                  action="cjg_finance.action_cashbook_diary_wizard"
+                  sequence="50"
+                  groups="cjg_finance.group_credit_manager,cjg_finance.group_collection_manager"/>
+    </data>
+</odoo>

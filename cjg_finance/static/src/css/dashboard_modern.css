@@ -1,0 +1,105 @@
+/* Dashboard Moderno - Diseño Limpio */
+
+.section.tk_rental_dash {
+  padding: 24px;
+  background: #F9FAFB;
+  min-height: 100vh;
+}
+
+.tk_rental_dash .card {
+  background: #FFFFFF !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer;
+  overflow: visible !important;
+  position: relative;
+}
+
+.tk_rental_dash .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.tk_rental_dash .success-bg,
+.tk_rental_dash .info-bg,
+.tk_rental_dash .warn-bg,
+.tk_rental_dash .danger-bg {
+  background: #FFFFFF !important;
+}
+
+.tk_rental_dash .tk-card-body {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  padding: 0 !important;
+}
+
+.tk_rental_dash .tk-icon-wrapper {
+  position: absolute !important;
+  right: 20px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+.tk_rental_dash .tk-icon-wrapper.success,
+.tk_rental_dash .tk-icon-wrapper.info,
+.tk_rental_dash .tk-icon-wrapper.warn,
+.tk_rental_dash .tk-icon-wrapper.danger {
+  background: #E5E7EB !important;
+  color: #374151 !important;
+}
+
+.tk_rental_dash .tk-icon-wrapper i {
+  font-size: 20px !important;
+}
+
+.tk_rental_dash .tk-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+  padding-right: 70px !important;
+}
+
+.tk_rental_dash .tk-st-1 {
+  margin: 0 0 8px 0 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #6B7280 !important;
+  text-transform: capitalize !important;
+  letter-spacing: 0 !important;
+}
+
+.tk_rental_dash .tk-st-2 {
+  margin: 0 !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  line-height: 1 !important;
+}
+
+.tk_rental_dash .p-32 {
+  padding: 20px 24px !important;
+}
+
+.tk_rental_dash .tk-primary {
+  color: #111827 !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  margin-bottom: 16px !important;
+}
+
+.tk_rental_dash hr.border-primary {
+  border: 0 !important;
+  height: 1px !important;
+  background: #E5E7EB !important;
+  margin-bottom: 24px !important;
+}

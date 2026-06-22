@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="sale_credit_payment_view_form" model="ir.ui.view">
+            <field name="name">sale.credit.payment.view.form</field>
+            <field name="model">sale.credit.payment</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <!--TODO: Result from converting "states='draft'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_validate" type="object" class="btn btn-primary" string="Validar Pago" invisible="state not in ['draft']"/>
+                        <!--TODO: Result from converting "states='paid'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="print_payment_report" type="object" class="btn btn-primary" string="Imprimir Reporte de Pago" invisible="state not in ['paid']"/>
+                        <!--TODO: Result from merging "states='cancel'" attribute with an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_set_to_draft" type="object" class="btn btn-primary" string="Establecer como Borrador" invisible="1 or state not in ['cancel']"/>
+                        <!--TODO: Result from converting "states='error'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_set_to_validated" type="object" class="btn btn-primary" string="Cambiar a Validado" invisible="state not in ['error']"/>
+                        <!--TODO: Result from converting "states='validated,draft'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_cancel" type="object" class="btn btn-secondary" string="Cancelar" invisible="state not in ['validated', 'draft']" groups="cjg_finance.group_credit_manager"/>
+                        <!--TODO: Result from converting "states='paid'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="action_send_payment_mail_notification" type="object" class="btn btn-secondary" string="Enviar por Correo" invisible="state not in ['paid']"/>
+                        <!--TODO: Result from converting "states='validated'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <!-- <button name="create_account_payment" type="object" class="btn btn-primary" groups="cjg_finance.group_credit_manager" string="Registrar Pago" invisible="state not in ['validated']"/> -->
+
+                
+
+                        <!--TODO: Result from converting "states='paid'" attribute into an 'invisible' attribute
+                             Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                        <button name="cancelled_payment" type="object" class="btn btn-primary" groups="cjg_finance.group_credit_manager" string="Cancelar Pago" invisible="state not in ['paid']"/>
+
+                  <field name="state" widget="statusbar" statusbar_visible="draft,validated,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payments" class="oe_stat_button" type="object" icon="fa-usd" invisible="payment_count == 0">                            <div class="o_stat_info">
+                                <span class="o_stat_text">Payments</span>
+
+                            </div>
+                            <field name="payment_count" nolabel="1"/>
+                        </button>
+                    </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                           
+                                <field name="partner_id" force_save="1" options="{'no_open': True, 'no_create': True}" readonly="state != 'draft'"/>
+                                <field name="credit_id" force_save="1" options="{'no_create': True}" readonly="state != 'draft'"/>
+                                <field name="currency_id" force_save="1" string="Moneda" options="{'no_create': True}" readonly="state != 'draft' or credit_id in False"/>
+                                <field name="apply_manual_currency" force_save="1" options="{'readonly': [('state', '!=', 'draft')]}" readonly="state != 'draft'"/>
+                                <field name="manual_currency_exchange" force_save="1" options="{'no_create': True},{'readonly': [('state', '!=', 'draft')]}" invisible="not apply_manual_currency" readonly="True or (state != 'draft')"/>
+                                <field name="apply_payment_preview" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="is_currency_id_different" invisible="1"/>
+                                <field name="amount_divisas" options="{'currency_field': 'currency_id'}" invisible="not is_currency_id_different" readonly="state != 'draft'" force_save="1"/>
+                                <!-- <field name="amount_total" options="{'currency_field': 'currency_id'}" readonly="state != 'draft'"/> -->
+                                <field name="amount_total" options="{'currency_field': 'currency_id'}" readonly="state != 'draft' or is_currency_id_different"/>
+                                <field name="journal_and_date_readonly" invisible="1"/>
+                                <field name="journal_id" readonly="journal_and_date_readonly or state != 'draft'" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="payment_date" readonly="journal_and_date_readonly or state != 'draft'"/>
+                                <field name="user_id" options="{'no_open': True, 'no_create': True}" readonly="1" invisible="1"/>
+                                <field name="create_date" string="Fecha Creación"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook> 
+                            <page string="Credit Payments">
+                                <field name="credit_payment_lines" readonly="1" force_save="1">
+                                    <tree editable="bottom" create="0" delete="0" decoration-success="state == 'paid'">
+                                        <field name="credit_line_id" force_save="1"/>
+                                        <field name="count" force_save="1"/>
+                                        <field name="partner_id" options="{'no_open': True, 'no_create': True}" force_save="1"/>
+                                        <field name="amount_initial" optional="hide" groups="cjg_finance.group_credit_manager" widget="monetary" options="{'currency_field': 'currency_id'}" force_save="1"/>
+                                        <field name="amount_fixed" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" force_save="1"/>
+                                        <field name="amount_interest" optional="hide" groups="cjg_finance.group_credit_manager" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" force_save="1"/>
+                                        <field name="amount_capital" optional="hide" groups="cjg_finance.group_credit_manager" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" force_save="1"/>
+                                        <field name="amount_final" optional="hide" groups="cjg_finance.group_credit_manager" widget="monetary" options="{'currency_field': 'currency_id'}" force_save="1"/>
+                                        <field name="expected_date_payment" force_save="1"/>
+                                        <field name="amount_overdue" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" force_save="1" string="Overdue Included"/>
+                                        <field name="amount_payable" options="{'currency_field': 'currency_id'}" force_save="1"/>
+                                        <field name="amount_paid" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="state"/>
+                                        <field name="remanente" widget="monetary"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                    <form>
+                                        <header>
+                                            <field name="state" widget="statusbar"/>
+                                        </header>
+                                        <group col="2">
+                                            <!-- <field name="payment_ids" widget="many2many_tags"/> -->
+                                            <field name="partner_id" readonly="1"/>
+                                            <field name="amount_initial" readonly="1"/>
+                                            <field name="amount_paid" readonly="1"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+        </record>
+        <record id="sale_credit_payment_view_tree" model="ir.ui.view">
+            <field name="name">sale.credit.payment.view.tree</field>
+            <field name="model">sale.credit.payment</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'validated'" decoration-success="state == 'paid'" decoration-muted="state == 'cancel'" decoration-danger="state =='error'">
+                    <field name="name"/>
+                    <field name="credit_id" widget="many2one_clickable"/>
+                    <field name="user_id" readonly="1"/>
+                    <field name="partner_id" widget="many2one_clickable"/>
+                    <field name="company_id"/>
+                    <field name="payment_date"/>
+                    <field name="journal_id"/>
+                    <field name="amount_total" sum="Total"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="sale_credit_payment_view_search" model="ir.ui.view">
+            <field name="name">sale.credit.payment.view.search</field>
+            <field name="model">sale.credit.payment</field>
+            <field name="arch" type="xml">
+                <search string="Payments">
+                    <field name="name" string="Payment" filter_domain="['|', ('name', 'ilike', self), ('partner_id', 'ilike', self)]"/>
+                    <field name="partner_id" string="Customer"/>
+                    <!-- <field name="journal_id" groups="cjg_finance.group_see_payment_journal_id"/> -->
+                    <field name="journal_id"/>
+                    <field name="payment_date"/>
+                    <field name="user_id"/>
+                    <separator/>
+                    <filter string="Draft" name="state_draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Validado" name="state_validated" domain="[('state', '=', 'validated')]"/>
+                    <filter string="Paid" name="state_paid" domain="[('state', '=', 'paid')]"/>
+                    <filter string="Error" name="state_error" domain="[('state', '=', 'error')]"/>
+                    <separator/>
+                    <field name="company_id"/>
+                    <filter string="Customer" name="partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Journal" name="journal" domain="[]" context="{'group_by': 'journal_id'}"/>
+                    <filter string="Status" name="state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Company" name="company" domain="[]" context="{'group_by': 'company_id'}" />
+                    <separator/>
+                </search>
+            </field>
+        </record>
+<!--
+        <record id="cjg_finance_sale_payment_form6" model="ir.ui.view">
+            <field name="name">astratech.credit.sale.payment.view.form6</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_draft']" position="replace">
+                 <field name="sale_credit_payment" invisible="1"/>
+                 <button name="action_credit_valid" string="Restablecer a borrador" type="object" class="btn btn-secondary" invisible="state not in ('posted', 'cancel') or sale_credit_payment == 'False'" groups="account.group_account_invoice" data-hotkey="w"/>
+                </xpath>
+               
+            </field>
+        </record>
+-->
+    </data>
+</odoo>

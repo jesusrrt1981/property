@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Sale Credit Categories -->
+    <record id="sale_credit_category_1" model="sale.credit.category">
+        <field name="name">Category 1</field>
+        <!-- Otros campos relacionados con la categoría -->
+    </record>
+
+    <!-- Sale Credit Frequencies -->
+    <record id="sale_credit_frequency_1" model="sale.credit.frequency">
+        <field name="name">Monthly</field>
+        <!-- Otros campos relacionados con la frecuencia -->
+    </record>
+
+    <!-- Sale Credit Installments -->
+    <record id="sale_credit_installment_1" model="sale.credit.installment">
+        <field name="name">12 Installments</field>
+        <!-- Otros campos relacionados con la cantidad de cuotas -->
+    </record>
+
+    <!-- Sale Credit Configuration -->
+    <record id="sale_credit_configuration_1" model="credit.overdue.configuration">
+        <field name="name">Configuration 1</field>
+        <!-- Otros campos relacionados con la configuración de mora -->
+    </record>
+
+    <!-- Sale Credit -->
+    <record id="sale_credit_demo" model="sale.credit">
+        <field name="name">Sale Credit 1</field>
+        <field name="amount_total">1000.00</field>
+        <field name="category_id" ref="sale_credit_category_1"/>
+        <field name="frequency_id" ref="sale_credit_frequency_1"/>
+        <field name="installment_id" ref="sale_credit_installment_1"/>
+        <field name="config_mora" ref="sale_credit_configuration_1"/>
+        <!-- Otros campos y sus valores -->
+    </record>
+
+    <!-- Agregar más registros según sea necesario -->
+
+    </data>
+</odoo>

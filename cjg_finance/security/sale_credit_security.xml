@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="0">
+        <!-- Access Rights for sale.credit.line -->
+        <record id="sale_credit_line_rule_user" model="ir.rule">
+            <field name="name">sale.credit.line.user.rule</field>
+            <field name="model_id" ref="model_sale_credit_line"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field eval="True" name="global"/>
+        </record>
+
+        <record id="sale_credit_payment_rule_user" model="ir.rule">
+            <field name="name">sale.credit.payment.user.rule</field>
+            <field name="model_id" ref="model_sale_credit_payment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field eval="True" name="global"/>
+        </record>
+
+        <record id="sale_credit_payment_line_rule_user" model="ir.rule">
+            <field name="name">sale.credit.payment.line.user.rule</field>
+            <field name="model_id" ref="model_sale_credit_payment_line"/>
+             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field eval="True" name="global"/>
+        </record>
+
+
+        <record id="sale_credit_attachment_rule_user" model="ir.rule">
+            <field name="name">sale.credit.attachment.user.rule</field>
+            <field name="model_id" ref="model_sale_credit_attachment"/>
+            <field name="domain_force">[('credit_id.company_id', 'in', company_ids)]</field>
+            <field eval="True" name="global"/>
+        </record>
+
+        <record id="sale_credit_overdue_rule_user" model="ir.rule">
+            <field name="name">credit.overdue.user.rule</field>
+            <field name="model_id" ref="model_credit_overdue"/>
+            <field name="domain_force">[('credit_id.company_id', 'in', company_ids)]</field>
+            <field eval="True" name="global"/>
+        </record>
+
+        <record id="sale_credit_followup_line_rule_user" model="ir.rule">
+            <field name="name">sale_credit.followup.line.user.rule</field>
+            <field name="model_id" ref="model_sale_credit_followup_line"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field eval="True" name="global"/>
+        </record>
+
+        <!-- REGLA: Permitir lectura/creación para todos los usuarios autenticados -->
+        <record id="sale_credit_rule_create" model="ir.rule">
+            <field name="name">Crear Contratos</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- REGLA: Oficial ve todos los contratos (lectura) pero maneja sus propios contratos -->
+        <record id="sale_credit_rule_oficial_own" model="ir.rule">
+            <field name="name">Oficial: Solo mis contratos</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="domain_force">[
+                '|', '|',
+                ('collection_user_id', '=', user.id),
+                ('user_id', '=', user.id),
+                ('company_id', 'in', company_ids)
+            ]</field>
+            <field name="groups" eval="[(4, ref('group_collection_officer'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- REGLA: Gerente ve todos los contratos (lectura y escritura) -->
+        <record id="sale_credit_rule_manager_team" model="ir.rule">
+            <field name="name">Gerente: Contratos del equipo</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="domain_force">[
+                '|', '|', '|',
+                ('user_id', '=', user.id),
+                ('oficial_id', '=', user.id),
+                ('manager_id', '=', user.id),
+                ('company_id', 'in', company_ids)
+            ]</field>
+            <field name="groups" eval="[(4, ref('group_collection_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        
+        <!-- REGLA: Admin ve TODOS los contratos (acceso completo) -->
+        <record id="sale_credit_rule_admin_all" model="ir.rule">
+            <field name="name">Admin: Todos los contratos</field>
+            <field name="model_id" ref="model_sale_credit"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+    </data>
+</odoo>

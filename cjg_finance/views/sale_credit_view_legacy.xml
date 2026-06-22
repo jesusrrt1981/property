@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Extensión de vista form de sale.credit para mostrar campos legacy y portfolio -->
+    <record id="view_sale_credit_form_legacy" model="ir.ui.view">
+        <field name="name">sale.credit.form.legacy</field>
+        <field name="model">sale.credit</field>
+        <field name="inherit_id" ref="cjg_finance.sale_credit_view_form"/>
+        <field name="arch" type="xml">
+
+            <!--  Añadir página de Portfolio en el notebook -->
+            <xpath expr="//sheet" position="inside">
+                <field name="state" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Portfolio &amp; Clasificación" name="portfolio_page">
+                    <group>
+                        <group string="Información Legacy">
+                            <field name="legacy_contract_number" readonly="state not in ['draft', 'requested']"/>
+                        </group>
+                        <group string="Clasificación de Cliente">
+                            <field name="client_classification" widget="badge"
+                                   decoration-success="client_classification == 'A'"
+                                   decoration-warning="client_classification == 'B'"
+                                   decoration-danger="client_classification == 'C'"/>
+                            <field name="current_portfolio_status" widget="badge"
+                                   decoration-success="current_portfolio_status == 'al_dia'"
+                                   decoration-warning="current_portfolio_status == 'mora'"
+                                   decoration-danger="current_portfolio_status in ('desistido', 'anulado')"
+                                   decoration-info="current_portfolio_status == 'saldado'"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Portfolio Actual">
+                            <field name="portfolio_month"/>
+                            <field name="portfolio_year"/>
+                            <field name="portfolio_count"/>
+                        </group>
+                    </group>
+
+                    <group string="Historial de Portfolio">
+                        <button name="action_view_portfolio"
+                                string="Ver Historial Completo"
+                                type="object"
+                                class="oe_highlight"
+                                icon="fa-line-chart"/>
+                        <button name="generate_current_portfolio_snapshot"
+                                string="Generar Snapshot Mensual"
+                                type="object"
+                                icon="fa-camera"/>
+                    </group>
+
+                    <!-- Lista de portfolios recientes -->
+                    <field name="portfolio_ids" mode="tree" nolabel="1">
+                        <tree decoration-success="status == 'al_dia'"
+                              decoration-warning="status == 'mora'"
+                              decoration-danger="status in ('desistido', 'anulado')"
+                              decoration-info="status == 'saldado'">
+                            <field name="period_key"/>
+                            <field name="expected_amount"/>
+                            <field name="collected_amount"/>
+                            <field name="balance"/>
+                            <field name="status"/>
+                            <field name="client_classification"/>
+                            <field name="late_fee"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+
+            <!-- Añadir stat button para portfolio -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_portfolio"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-line-chart">
+                    <field name="portfolio_count" widget="statinfo" string="Portfolio"/>
+                </button>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Añadir campos a la vista tree -->
+    <record id="view_sale_credit_tree_legacy" model="ir.ui.view">
+        <field name="name">sale.credit.tree.legacy</field>
+        <field name="model">sale.credit</field>
+        <field name="inherit_id" ref="cjg_finance.sale_credit_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-success">client_classification == 'A'</attribute>
+                <attribute name="decoration-warning">client_classification == 'B'</attribute>
+                <attribute name="decoration-danger">client_classification == 'C'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="client_classification" optional="show"/>
+                <field name="current_portfolio_status" optional="hide"/>
+                <field name="legacy_contract_number" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Añadir filtros de búsqueda -->
+    <record id="view_sale_credit_search_legacy" model="ir.ui.view">
+        <field name="name">sale.credit.search.legacy</field>
+        <field name="model">sale.credit</field>
+        <field name="inherit_id" ref="cjg_finance.sale_credit_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="filter_class_a" string="Clase A" domain="[('client_classification', '=', 'A')]"/>
+                <filter name="filter_class_b" string="Clase B" domain="[('client_classification', '=', 'B')]"/>
+                <filter name="filter_class_c" string="Clase C" domain="[('client_classification', '=', 'C')]"/>
+                <separator/>
+                <filter name="filter_portfolio_al_dia" string="Portfolio Al Día" domain="[('current_portfolio_status', '=', 'al_dia')]"/>
+                <filter name="filter_portfolio_mora" string="Portfolio En Mora" domain="[('current_portfolio_status', '=', 'mora')]"/>
+                <separator/>
+                <filter name="filter_has_legacy" string="Tiene Número Legacy" domain="[('legacy_contract_number', '!=', False)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_classification" string="Clasificación" context="{'group_by': 'client_classification'}"/>
+                    <filter name="group_portfolio_status" string="Estado Portfolio" context="{'group_by': 'current_portfolio_status'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    </data>
+</odoo>

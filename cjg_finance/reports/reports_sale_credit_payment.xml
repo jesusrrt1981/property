@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+
+
+        <record id="paperformat_thermal_paper" model="report.paperformat">
+            <field name="name">Thermal Paper</field>
+            <field name="default" eval="True"/>
+            <field name="format">custom</field>
+            <field name="page_height">1500</field>
+            <field name="page_width">90</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">35</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">0</field>
+            <field name="margin_right">0</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">35</field>
+            <field name="dpi">96</field>
+        </record>
+
+
+        <record id="action_report_sale_payment_credit" model="ir.actions.report">
+            <field name="name">Imprimir reporte pagos de credito</field>
+            <field name="model">sale.credit.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_sale_credit</field>
+            <field name="print_report_name">('Pago_de_credito_%s' % object.name.replace('/', '_').replace(' ', '_')) if object.name else 'Pago_de_credito'</field>
+            <field name="binding_model_id" ref="model_sale_credit_payment"/>
+        </record>
+
+
+        <record id="action_report_sale_termica" model="ir.actions.report">
+            <field name="name">Imprimir Termica</field>
+            <field name="model">sale.credit.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_credit_payment_ticket</field>
+            <field name="print_report_name">('Pago_de_credito_%s' % object.name.replace('/', '_').replace(' ', '_')) if object.name else 'Pago_de_credito'</field>
+            <field name="binding_model_id" ref="model_sale_credit_payment"/>
+            <field name="paperformat_id" ref="paperformat_thermal_paper"/>
+        </record>
+    </data>
+</odoo>

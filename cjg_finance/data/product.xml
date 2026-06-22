@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+        <!-- Crear el producto "Moras de Crédito" -->
+        <record id="overdue_product" model="product.product">
+            <field name="name">Moras de Crédito</field>
+            <field name="type">service</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">False</field>
+        </record>
+    </data>
+</odoo>

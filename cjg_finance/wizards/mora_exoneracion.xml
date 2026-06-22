@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_exoneracion" model="ir.ui.view">
+            <field name="name">Exoneracion Solicitud de Credito</field>
+            <field name="model">sale.credit.exoneracion.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Cancelar Solicitud de Credito">
+                    <group>
+                        <field name="reason_cancellation"/>
+                        <field name="advance_payment_method" class="oe_inline" widget="radio"/>
+                        <field name="amount" invisible="advance_payment_method != 'fixed'"/>
+                        <field name="amount_percent" invisible="advance_payment_method != 'percentage'"/>
+                        <field name="current_overdue_amount"/>
+                        <field name="projected_overdue_amount"/>
+                    </group>
+                    <footer>
+                        <button string="Confirmar" class="btn-primary" type="object" name="action_confirm"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="sale_credit_exoneracion_wizard" model="ir.actions.act_window">
+            <field name="name">Exoneracion Solicitud de Credito</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.exoneracion.wizard</field>
+            <field name="view_mode">form</field>
+        </record>
+    </data> 
+</odoo>

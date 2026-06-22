@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+        <!-- Sequences for Credit and Debit Notes -->
+        <record id="seq_sale_credit_adjustment_credit" model="ir.sequence">
+            <field name="name">Nota de Crédito de Contrato</field>
+            <field name="code">sale.credit.adjustment.credit</field>
+            <field name="prefix">NCC-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False" />
+        </record>
+
+        <record id="seq_sale_credit_adjustment_debit" model="ir.sequence">
+            <field name="name">Nota de Débito de Contrato</field>
+            <field name="code">sale.credit.adjustment.debit</field>
+            <field name="prefix">NDC-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False" />
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_sale_credit_adjustment_tree" model="ir.ui.view">
+            <field name="name">sale.credit.adjustment.tree</field>
+            <field name="model">sale.credit.adjustment</field>
+            <field name="arch" type="xml">
+                <tree string="Ajustes de Crédito" decoration-info="state == 'draft'" decoration-muted="state == 'cancelled'">
+                    <field name="name" />
+                    <field name="date" />
+                    <field name="credit_id" />
+                    <field name="adjustment_type" />
+                    <field name="amount" sum="Total Amount" />
+                    <field name="state" widget="badge" decoration-success="state == 'confirmed'" decoration-info="state == 'draft'" decoration-danger="state == 'cancelled'" />
+                </tree>
+            </field>
+        </record>
+        <!-- Form View -->
+        <record id="view_sale_credit_adjustment_form" model="ir.ui.view">
+            <field name="name">sale.credit.adjustment.form</field>
+            <field name="model">sale.credit.adjustment</field>
+            <field name="arch" type="xml">
+                <form string="Ajuste de Crédito">
+                    <header>
+                        <button name="action_confirm" string="Confirmar" type="object" class="oe_highlight" invisible="state != 'draft'" />
+                        <button name="action_cancel" string="Cancelar" type="object" invisible="state != 'draft'" />
+                        <button name="action_draft" string="Volver a Borrador" type="object" invisible="state != 'cancelled'" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="credit_id" readonly="state != 'draft'" />
+                                <field name="credit_line_id" readonly="state != 'draft'" />
+                                <field name="adjustment_type" readonly="state != 'draft'" />
+                            </group>
+                            <group>
+                                <field name="date" readonly="state != 'draft'" />
+                                <field name="amount" widget="monetary" readonly="state != 'draft'" />
+                                <field name="currency_id" invisible="1" />
+                                <field name="user_id" />
+                            </group>
+                        </group>
+                        <group string="Detalles">
+                            <field name="reason" placeholder="Describa el motivo del ajuste..." readonly="state != 'draft'" />
+                        </group>
+                        <group string="Información de Migración" groups="base.group_no_one">
+                            <group>
+                                <field name="testarossa_dcmto" readonly="1" />
+                                <field name="testarossa_plan" readonly="1" />
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" />
+                        <field name="activity_ids" />
+                        <field name="message_ids" />
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- Search View -->
+        <record id="view_sale_credit_adjustment_search" model="ir.ui.view">
+            <field name="name">sale.credit.adjustment.search</field>
+            <field name="model">sale.credit.adjustment</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Ajustes">
+                    <field name="name" />
+                    <field name="credit_id" />
+                    <field name="reason" />
+                    <separator />
+                    <filter name="credit_note" string="Notas de Crédito" domain="[('adjustment_type', '=', 'credit_note')]" />
+                    <filter name="debit_note" string="Notas de Débito" domain="[('adjustment_type', '=', 'debit_note')]" />
+                    <separator />
+                    <filter name="draft" string="Borrador" domain="[('state', '=', 'draft')]" />
+                    <filter name="confirmed" string="Confirmado" domain="[('state', '=', 'confirmed')]" />
+                    <group string="Agrupar Por" expand="0">
+                        <filter name="group_by_credit" string="Contrato" context="{'group_by': 'credit_id'}" />
+                        <filter name="group_by_type" string="Tipo" context="{'group_by': 'adjustment_type'}" />
+                        <filter name="group_by_state" string="Estado" context="{'group_by': 'state'}" />
+                        <filter name="group_by_date" string="Fecha" context="{'group_by': 'date'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_sale_credit_adjustment" model="ir.actions.act_window">
+            <field name="name">Ajustes de Crédito</field>
+            <field name="res_model">sale.credit.adjustment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="cjg_finance.view_sale_credit_adjustment_search" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Crear un nuevo ajuste de crédito (Nota de Crédito/Débito)</p>
+                <p>Utilice los ajustes para corregir montos en las cuotas de los contratos
+                    sin necesidad de registrar pagos reales.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_cancel" model="ir.ui.view">
+            <field name="name">Cancelar Solicitud de Credito</field>
+            <field name="model">sale.credit.cancel.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Cancelar Solicitud de Credito">
+                    <group>
+                        <field name="cancellation_detail_status"/>
+                        <field name="reason_cancellation"/>
+                    </group>
+                    <footer>
+                        <button string="Si" type="object" name="action_confirm"/>
+                        <button string="No" class="btn-secondary" special="cancel" data-hotkey="z" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="sale_credit_cancel_wizard" model="ir.actions.act_window">
+            <field name="name">Cancelar Solicitud de Credito</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.cancel.wizard</field>
+            <field name="view_mode">form</field>
+        </record>
+    </data> 
+</odoo>

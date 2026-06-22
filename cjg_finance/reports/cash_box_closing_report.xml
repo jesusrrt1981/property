@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <record id="action_report_cash_box_closing" model="ir.actions.report">
+        <field name="name">Arqueo de Caja</field>
+        <field name="model">cash.box.closing</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cjg_finance.report_cash_box_closing</field>
+        <field name="report_file">cjg_finance.report_cash_box_closing</field>
+        <field name="binding_model_id" ref="model_cash_box_closing" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_cash_box_closing">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure" />
+                        <div class="text-center">
+                            <h2>Arqueo de Caja</h2>
+                            <h3>
+                                <t t-esc="o.name" />
+                            </h3>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-3">
+                                <strong>Cajero:</strong>
+                                <p t-field="o.user_id" />
+                            </div>
+                            <div class="col-3">
+                                <strong>Fecha de Cierre:</strong>
+                                <p t-field="o.date_closing" />
+                            </div>
+                            <div class="col-3">
+                                <strong>Estado:</strong>
+                                <p t-field="o.state" />
+                            </div>
+                            <div class="col-3">
+                                <strong>Compañía:</strong>
+                                <p t-field="o.company_id" />
+                            </div>
+                        </div>
+                        <h4>Resumen de Totales</h4>
+                        <table class="table table-sm o_main_table">
+                            <thead>
+                                <tr>
+                                    <th>Concepto</th>
+                                    <th class="text-right">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Efectivo</td>
+                                    <td class="text-right">
+                                        <span t-field="o.total_cash" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Total Tarjeta</td>
+                                    <td class="text-right">
+                                        <span t-field="o.total_card" />
+                                    </td>
+                                </tr>
+                                <tr name="total_transfer">
+                                    <td>Total Transferencia</td>
+                                    <td class="text-right">
+                                        <span t-field="o.total_transfer" />
+                                    </td>
+                                </tr>
+                                <tr class="border-black o_total">
+                                    <td>
+                                        <strong>Total General</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>
+                                            <span t-field="o.total_amount" />
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <t t-if="o.payment_ids">
+                            <h4 class="mt32">Detalle de Pagos de Crédito</h4>
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Referencia</th>
+                                        <th>Cliente</th>
+                                        <th>Diario</th>
+                                        <th class="text-right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.payment_ids" t-as="p">
+                                        <td>
+                                            <span t-field="p.payment_date" />
+                                        </td>
+                                        <td>
+                                            <span t-field="p.name" />
+                                        </td>
+                                        <td>
+                                            <span t-field="p.partner_id" />
+                                        </td>
+                                        <td>
+                                            <span t-field="p.journal_id" />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="p.amount_total" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                        <t t-if="o.maintenance_payment_ids">
+                            <h4 name="maintenance_payments_title" class="mt32">Detalle de Pagos de Mantenimiento</h4>
+                            <table name="maintenance_payments_table" class="table table-sm o_main_table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Referencia</th>
+                                        <th>Cliente</th>
+                                        <th>Diario</th>
+                                        <th class="text-right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.maintenance_payment_ids" t-as="p">
+                                        <td>
+                                            <span t-field="p.payment_date" />
+                                        </td>
+                                        <td>
+                                            <span t-field="p.communication" />
+                                        </td>
+                                        <td>
+                                            <span t-field="p.partner_id" />
+                                        </td>
+                                        <td>
+                                            <span t-field="p.journal_id" />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="p.amount" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                        <div class="row mt64">
+                            <div class="col-6 text-center">
+                                <hr style="width: 200px; border: 1px solid black;" />
+                                <p>Firma del Cajero</p>
+                                <p t-field="o.user_id" />
+                            </div>
+                            <div class="col-6 text-center">
+                                <hr style="width: 200px; border: 1px solid black;" />
+                                <p>Firma del Supervisor</p>
+                            </div>
+                        </div>
+                        <div class="oe_structure" />
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    </data>
+</odoo>

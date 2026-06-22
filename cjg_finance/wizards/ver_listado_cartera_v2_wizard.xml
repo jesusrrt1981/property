@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            F1.6 - Ver Listado Cartera v2 (congregado por oficial + zona) (QWeb PDF)
+            Migrado de testarossa/modulos/cartera/class/ver_listado_1.php
+            Estructura: Oficial -> Zona | #Contratos | Capital | Interes | Mora | Total
+        -->
+        <record id="action_report_ver_listado_cartera_v2" model="ir.actions.report">
+            <field name="name">F1.6 Ver Listado Cartera v2 (congregado)</field>
+            <field name="model">cjg.finance.ver.listado.cartera.v2.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_ver_listado_cartera_v2_document</field>
+            <field name="report_file">cjg_finance.report_ver_listado_cartera_v2_document</field>
+            <field name="print_report_name">'Ver_Listado_Cartera_V2_%s_%s' % (object.date_from, object.date_to)</field>
+            <field name="paperformat_id" ref="base.paperformat_us"/>
+        </record>
+
+        <template id="report_ver_listado_cartera_v2_document">
+            <t t-set="data" t-value="data or {}"/>
+            <t t-set="groups" t-value="data.get('groups', [])"/>
+            <t t-set="totals" t-value="data.get('totals', {})"/>
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">VER LISTADO CARTERA v2 (CONGREGADO OFICIAL + ZONA)</h2>
+                        <p class="text-center">
+                            <small>
+                                Generado:
+                                <span t-esc="env['cjg.finance.qweb.helper'].now_str('%d/%m/%Y %H:%M')"/>
+                            </small>
+                        </p>
+
+                        <div class="row mt-2 mb-3">
+                            <div class="col-6">
+                                <strong>Compania:</strong>
+                                <span t-esc="data.get('company_name', '')"/><br/>
+                                <strong>Estado Contrato:</strong>
+                                <span t-esc="data.get('estado_contrato', '')"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Desde:</strong> <t t-esc="data.get('date_from', '')"/><br/>
+                                <strong>Hasta:</strong> <t t-esc="data.get('date_to', '')"/><br/>
+                                <strong>Oficial:</strong> <t t-esc="data.get('oficial_name', '')"/><br/>
+                                <strong>Zona:</strong> <t t-esc="data.get('zona_name', '')"/>
+                            </div>
+                        </div>
+
+                        <t t-foreach="groups" t-as="oficial">
+                            <h4 class="mt-3">
+                                Oficial: <t t-esc="oficial['oficial_name']"/>
+                            </h4>
+                            <table class="table table-sm table-bordered" style="font-size:11px;">
+                                <thead>
+                                    <tr style="background:#ECEFF1;">
+                                        <th>Zona</th>
+                                        <th class="text-end"># Contratos</th>
+                                        <th class="text-end">Capital</th>
+                                        <th class="text-end">Interes</th>
+                                        <th class="text-end">Mora</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="oficial['zonas_list']" t-as="z">
+                                        <td><t t-esc="z['zona_name']"/></td>
+                                        <td class="text-end">
+                                            <t t-esc="z['count']"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="z['capital']"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="z['interes']"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="z['mora']"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="z['total']"
+                                                   t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background:#F5F5F5;">
+                                        <td><strong>Subtotal Oficial</strong></td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="oficial['count']"/>
+                                            </strong>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="oficial['capital']"
+                                                   t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="oficial['interes']"
+                                                   t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="oficial['mora']"
+                                                   t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="oficial['total']"
+                                                   t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </t>
+                        <p t-if="not groups" class="text-center text-muted">
+                            Sin datos para los filtros seleccionados.
+                        </p>
+
+                        <table t-if="groups" class="table table-sm table-bordered" style="font-size:11px;">
+                            <tfoot>
+                                <tr style="background:#1976D2; color:white;">
+                                    <td><strong>TOTAL GENERAL</strong></td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('count', 0)"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('capital', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('interes', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('mora', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="totals.get('total', 0.0)"
+                                               t-options='{"widget": "monetary", "display_currency": docs.company_id.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <record id="view_ver_listado_cartera_v2_wizard_form" model="ir.ui.view">
+            <field name="name">cjg.finance.ver.listado.cartera.v2.wizard.form</field>
+            <field name="model">cjg.finance.ver.listado.cartera.v2.wizard</field>
+            <field name="arch" type="xml">
+                <form string="F1.6 Ver Listado Cartera v2 (congregado)">
+                    <sheet>
+                        <group>
+                            <group string="Periodo y Compania">
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                            <group string="Filtros">
+                                <field name="oficial_id" options="{'no_create': True}"/>
+                                <field name="motorista_id" options="{'no_create': True}"/>
+                                <field name="estado_contrato"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_print_report"
+                                string="Imprimir PDF"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-print"/>
+                        <button string="Cancelar"
+                                class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ver_listado_cartera_v2_wizard" model="ir.actions.act_window">
+            <field name="name">F1.6 Ver Listado Cartera v2</field>
+            <field name="res_model">cjg.finance.ver.listado.cartera.v2.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="cjg_finance.credit_payment_ticket_layout">
+            <t t-if="not o and doc">
+                <t t-set="o" t-value="doc"/>
+            </t>
+            <t t-if="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id"/>
+            </t>
+            <t t-if="not o or not 'company_id' in o">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+            <div class="header text-center pt-3">
+                <div>
+                    <img t-if="o.company_id.logo"
+                         t-att-src="image_data_uri(o.company_id.logo)"
+                         style="max-height: 70px;" alt="Logo"/>
+                    <br/>
+                </div>
+                <t t-set="company" t-value="o.company_id"/>
+                <strong>
+                    <span t-esc="company.name"/>
+                </strong>
+                <span t-esc="company.payment_mail"/>
+                <p style="font-size: 10px;">
+                     <span t-esc="company.phone"/>
+                    <span t-esc="company.street"/>
+                    <span t-esc="company.street2"/>
+                    <span t-esc="company.city"/>
+                </p>
+            </div>
+            <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-raw="0"/>
+            </div>
+        </template>
+        <template id="cjg_finance.report_credit_payment_ticket">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="cjg_finance.credit_payment_ticket_layout">
+                        <div class="page" style="font-size: 12px; text-transform: uppercase;">
+                            <div class="row">
+                                <div class="col-5">
+                                    <img t-att-src="'/report/barcode/?barcode_type=QR&amp;width=100&amp;height=100&amp;value=' + o.qr_code if o.qr_code else ''"/>
+                                </div>
+                                <div class="col-7 text-right">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-12  text-right">
+                                                <strong>RECIBO</strong>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <strong>No. :
+                                                    <span t-esc="o.name"/>
+                                                </strong>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <strong>Fecha: </strong>
+                                                <span t-esc="o.payment_date" t-options='{"widget": "date"}'/>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col text-right">
+                                                <span>COBRADO POR:</span>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col text-right">
+                                                <span t-esc="o.user_id.name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr style="color: black;"/>
+                            <div class="row">
+                                <div class="col-6 text-left">
+                                    <strong>CLIENTE:
+                                        <span t-esc="o.partner_id.id"/>
+                                    </strong>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <t t-if="o.payment_id">
+                                        <span t-esc="o.payment_id[0].name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-left">
+                                    <span t-esc="o.partner_id.name"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 text-left">
+                                    <strong>PRÉSTAMO NO.:</strong>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong>
+                                        <span t-esc="o.credit_id.name"/>
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6 text-left">
+                                    <strong>PROPIEDAD:</strong>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong>
+                                        <span t-esc="o.credit_id.product_id.name"/>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 text-left">
+                                    <span>FECHA CONTRATO:</span>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong>
+                                        <span t-esc="o.credit_id.date_contract"/>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 text-left">
+                                    <span>MONEDA:</span>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong>
+                                        <span t-esc="o.currency_id.name"/>
+                                    </strong>
+                                </div>
+                            </div>
+                            <hr style="border: solid 1px;"/>
+
+                            <div class="row text-center" style="font-size: 16px;">
+                                <div class="col-6 text-right">
+                                    <strong>MONTO PAGADO</strong>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <strong>
+                                        <span t-esc="o.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <hr style="border: solid 1px;"/>
+                            <div class="row">
+                                <div class="col-4 text-left">
+                                    <strong>#CUOTA</strong>
+                                </div>
+                                <div class="col-4 text-left">
+                                    <strong>PAGO</strong>
+                                </div>
+                                <div class="col-4 text-left">
+                                    <strong>PENDIENTE</strong>
+                                </div>
+                            </div>
+                            <t t-foreach="o.credit_payment_lines.filtered_domain([('payable','in',['full','partial'])])" t-as="line">
+                                <div class="row">
+                                    <div class="col-4 text-left">
+                                        <span t-esc="line.count"/>
+                                        <span>/</span>
+                                        <span t-esc="len(o.credit_id.credit_lines)"/>
+                                    </div>
+                                    <div class="col-4 text-left">
+                                        <span t-esc="round(line.amount_paid,2)" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <span t-esc="round(line.remanente,2)" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                    </div>
+                                </div>
+                            </t>
+                            <hr style="border: solid 1px;"/>
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <strong>CUOTAS PENDIENTE</strong>
+                                </div>
+                            </div>
+                            <t t-foreach="o.credit_payment_lines.filtered_domain([('payable','in',['partial','not']), ('remanente', '>=', 1)])" t-as="line">
+                                <div class="row">
+                                    <div class="col-4 text-left">
+                                        <span t-esc="line.count"/>
+                                        <span>/</span>
+                                        <span t-esc="len(o.credit_id.credit_lines)"/>
+                                    </div>
+                                    <div class="col-4 text-left">
+                                        <span t-esc="line.expected_date_payment" t-options='{"widget": "date"}' />
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <span t-esc="round(line.remanente,2)" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                    </div>
+                                </div>
+                            </t>
+                            <hr style="border: solid 1px;"/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <div class="row">
+                                <div class="col-2"/>
+                                <div class="col-8 text-center">
+                                    <hr style="border: solid 1px;"/>
+                                </div>
+                                <div class="col-2"/>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <span>FIRMA</span>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <span t-esc="o.company_id.name"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <span>Impreso:</span>
+                                    <span t-esc="env['cjg.finance.qweb.helper'].now_str('%d/%m/%Y %I:%M:%S %p')"/>
+                                </div>
+                            </div>
+                            <div class="oe_structure"/>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

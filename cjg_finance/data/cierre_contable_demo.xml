@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="cierre_contable_demo_2025_01" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">1</field>
+            <field name="fecha_inicio_ventas">2025-01-01</field>
+            <field name="fecha_fin_ventas">2025-01-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_02" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">2</field>
+            <field name="fecha_inicio_ventas">2025-02-01</field>
+            <field name="fecha_fin_ventas">2025-02-28</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_03" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">3</field>
+            <field name="fecha_inicio_ventas">2025-03-01</field>
+            <field name="fecha_fin_ventas">2025-03-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_04" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">4</field>
+            <field name="fecha_inicio_ventas">2025-04-01</field>
+            <field name="fecha_fin_ventas">2025-04-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_05" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">5</field>
+            <field name="fecha_inicio_ventas">2025-05-01</field>
+            <field name="fecha_fin_ventas">2025-05-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_06" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">6</field>
+            <field name="fecha_inicio_ventas">2025-06-01</field>
+            <field name="fecha_fin_ventas">2025-06-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_07" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">7</field>
+            <field name="fecha_inicio_ventas">2025-07-01</field>
+            <field name="fecha_fin_ventas">2025-07-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_08" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">8</field>
+            <field name="fecha_inicio_ventas">2025-08-01</field>
+            <field name="fecha_fin_ventas">2025-08-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_09" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">9</field>
+            <field name="fecha_inicio_ventas">2025-09-01</field>
+            <field name="fecha_fin_ventas">2025-09-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_10" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">10</field>
+            <field name="fecha_inicio_ventas">2025-10-01</field>
+            <field name="fecha_fin_ventas">2025-10-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_11" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">11</field>
+            <field name="fecha_inicio_ventas">2025-11-01</field>
+            <field name="fecha_fin_ventas">2025-11-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2025_12" model="cierre.contable">
+            <field name="ano">2025</field>
+            <field name="mes">12</field>
+            <field name="fecha_inicio_ventas">2025-12-01</field>
+            <field name="fecha_fin_ventas">2025-12-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_01" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">1</field>
+            <field name="fecha_inicio_ventas">2026-01-01</field>
+            <field name="fecha_fin_ventas">2026-01-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_02" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">2</field>
+            <field name="fecha_inicio_ventas">2026-02-01</field>
+            <field name="fecha_fin_ventas">2026-02-28</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_03" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">3</field>
+            <field name="fecha_inicio_ventas">2026-03-01</field>
+            <field name="fecha_fin_ventas">2026-03-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_04" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">4</field>
+            <field name="fecha_inicio_ventas">2026-04-01</field>
+            <field name="fecha_fin_ventas">2026-04-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_05" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">5</field>
+            <field name="fecha_inicio_ventas">2026-05-01</field>
+            <field name="fecha_fin_ventas">2026-05-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_06" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">6</field>
+            <field name="fecha_inicio_ventas">2026-06-01</field>
+            <field name="fecha_fin_ventas">2026-06-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_07" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">7</field>
+            <field name="fecha_inicio_ventas">2026-07-01</field>
+            <field name="fecha_fin_ventas">2026-07-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_08" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">8</field>
+            <field name="fecha_inicio_ventas">2026-08-01</field>
+            <field name="fecha_fin_ventas">2026-08-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_09" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">9</field>
+            <field name="fecha_inicio_ventas">2026-09-01</field>
+            <field name="fecha_fin_ventas">2026-09-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_10" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">10</field>
+            <field name="fecha_inicio_ventas">2026-10-01</field>
+            <field name="fecha_fin_ventas">2026-10-31</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_11" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">11</field>
+            <field name="fecha_inicio_ventas">2026-11-01</field>
+            <field name="fecha_fin_ventas">2026-11-30</field>
+            <field name="state">open</field>
+        </record>
+        <record id="cierre_contable_demo_2026_12" model="cierre.contable">
+            <field name="ano">2026</field>
+            <field name="mes">12</field>
+            <field name="fecha_inicio_ventas">2026-12-01</field>
+            <field name="fecha_fin_ventas">2026-12-31</field>
+            <field name="state">open</field>
+        </record>
+    </data>
+</odoo>

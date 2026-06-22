@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción del wizard F8 -->
+        <record id="action_partner_payments_tree_wizard" model="ir.actions.act_window">
+            <field name="name">Listado Abonos del Cliente (tree)</field>
+            <field name="res_model">cjg.finance.partner.payments.tree.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Form view del wizard F8 -->
+        <record id="view_partner_payments_tree_wizard_form" model="ir.ui.view">
+            <field name="name">cjg.finance.partner.payments.tree.wizard.form</field>
+            <field name="model">cjg.finance.partner.payments.tree.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Listado de Abonos del Cliente (sin Inicial)">
+                    <sheet>
+                        <group>
+                            <group string="Cliente y Período">
+                                <field name="partner_id"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                            <group string="Filtros">
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="state"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_open_tree"
+                                string="Ver Listado (tree)"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-list"/>
+                        <button name="action_export_xlsx"
+                                string="Exportar XLSX"
+                                type="object"
+                                class="btn-secondary"
+                                icon="fa-file-excel-o"/>
+                        <button string="Cancelar"
+                                class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Menú -->
+        <menuitem id="menu_cjg_finance_partner_payments_tree"
+                  name="Abonos del Cliente (tree)"
+                  action="action_partner_payments_tree_wizard"
+                  parent="cjg_finance_pos.menu_cjg_finance_pos_reports"
+                  sequence="32"
+                  groups="cjg_finance.group_credit_manager"/>
+    </data>
+</odoo>

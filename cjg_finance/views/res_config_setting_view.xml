@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="cjg_finance_settings_view_form" model="ir.ui.view">
+            <field name="name">astratech.credit.settings.view.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="15"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app data-string="Credit Management" string="Credit Management" name="cjg_finance" groups="cjg_finance.group_credit_manager">
+                        <block title="Configuracion de Credito" name="loan_setting_container">
+                            <setting string="Gerentes con Acceso" help="Los Gerente con Accesos" id="manager_ids">
+                                <field name="manager_ids" widget="many2many_tags"/>
+                            </setting>
+                            <setting string="Tiempo de Mora" help="Asignar el Tiempo de Mora" id="overdue_type_credit">
+                                <field name="overdue_type_credit"/>
+                            </setting>
+                            <setting string="Correo de Pagos" help="Asignar correo para enviar/recibir los creditos" id="payment_mail">
+                                <field name="payment_mail"/>
+                            </setting>
+                            <setting string="Teléfono" help="Asginar Telefono" id="payment_phone">
+                                <field name="payment_phone"/>
+                            </setting>
+                            <setting string="Dividir Proceso" help="Divir los proceso de los crons" id="split_credit_process">
+                                <field name="split_credit_process"/>
+                                <div class="content-group" invisible="not split_credit_process">
+                                    <div class="row mt16">
+                                        <label for="credit_cron_limit" class="col-lg-4 o_light_label"/>
+                                        <field name="credit_cron_limit"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label for="payment_cron_limit" class="col-lg-4 o_light_label"/>
+                                        <field name="payment_cron_limit"/>
+                                    </div>
+                                </div>
+                            </setting>
+                            <setting string="Términos y Condiciones" id="term_and_conditions">
+                                <field name="term_and_conditions" class="oe_account_terms mt-5 w-100" placeholder="Insert your terms &amp; conditions here..."/>
+                            </setting>
+                        </block>
+                        
+                        <block title="Mora" name="overdue_settings">
+                            <setting string="Frecuencia de Mora" help="Seleccionar Frecuencia de Mora" id="overdue_period">
+                                <field name="overdue_period"/>
+                            </setting>
+                            <setting string="Configuración de Mora" help="Seleccionar Configuracion de Mora" id="overdue_type_apply">
+                                <field name="overdue_type_apply" widget="selection"/>
+                            </setting>
+                            <setting string="Máximo Monto de Deuda" help="Maximo Monto de Deuda Aceptada" id="overdue_allowed_amount">
+                                <field name="overdue_allowed_amount"/>
+                            </setting>
+                            <setting string="Mora" help="Configuración del importe o porcentaje de mora" id="credit_overdue">
+                                <field name="credit_overdue" invisible="1"/>
+                                <field name="importe" invisible="overdue_type != 'amount'"/>
+                                <field name="porcentaje" invisible="overdue_type != 'percent'"/>
+                            </setting>
+                            <setting string="Tipo de Mora" help="Seleccionar el Tipo de Mora" id="overdue_type">
+                                <field name="overdue_type"/>
+                            </setting>
+                            <setting string="Límite de Días" help="Limite de Dias Permitidos" id="overdue_invoice_limit">
+                                <field name="overdue_invoice_limit"/>
+                            </setting>
+                        </block>
+                        
+                        <block title="Producto" name="ac_product_config">
+                            <setting string="Producto Mora" help="Producto Por Defecto de la Mora, para fines de factuación" id="product_overdue">
+                                <field name="product_overdue"/>
+                            </setting>
+                            <setting string="Producto Interés" help="Producto Por Defecto del Interes, para fines de factuación" id="product_interest">
+                                <field name="product_interest"/>
+                            </setting>
+                        </block>
+                        
+                        <block title="Cuenta" name="credit_accounts">
+                            <setting string="Diario" help="Diario por Defecto para los asientos contables" id="credit_journal_id">
+                                <field name="credit_journal_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                            <setting string="Cuenta por Cobrar" help="Cuenta por Cobrar a Clientes por Defecto para los asientos contables" id="credit_account_receivable_id">
+                                <field name="credit_account_receivable_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                            <setting string="Cuenta de Avance" help="Cuenta por Avance de Clientes por Defecto para los asientos contables" id="credit_account_advanced_id">
+                                <field name="credit_account_advanced_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                            <setting string="Cuenta de Ingreso" help="Cuenta de Ingreso por Defecto para los asientos contables" id="credit_earning_id">
+                                <field name="credit_earning_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                        </block>
+                        
+                        <block title="Integración Contable - Créditos" name="accounting_integration_credit">
+                            <setting string="Cuenta de Ingreso (Créditos)" help="Cuenta contable para registrar ingresos por pagos de créditos">
+                                <field name="credit_income_account_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                            <setting string="Cuenta de Caja (Créditos)" help="Cuenta de caja/banco para recibir pagos de créditos">
+                                <field name="credit_cash_account_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                            <setting string="Diario de Pagos (Créditos)" help="Diario contable para registrar pagos de créditos">
+                                <field name="credit_payment_journal_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                        </block>
+                        
+                        <block title="Integración Contable - Mantenimiento" name="accounting_integration_maintenance">
+                            <setting string="Cuenta de Ingreso (Mantenimiento)" help="Cuenta contable para registrar ingresos por mantenimiento">
+                                <field name="maintenance_income_account_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                            <setting string="Cuenta de Caja (Mantenimiento)" help="Cuenta de caja/banco para recibir pagos de mantenimiento">
+                                <field name="maintenance_cash_account_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                            <setting string="Diario de Pagos (Mantenimiento)" help="Diario contable para registrar pagos de mantenimiento">
+                                <field name="maintenance_payment_journal_id" options="{'no_open': True, 'no_create': True}"/>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+        
+        <!-- Añadir acciones y menús -->
+        <record id="res_config_settings_action" model="ir.actions.act_window">
+            <field name="name">Configuración</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'cjg_finance'}</field>
+        </record>
+        
+       
+<!--                  
+        <menuitem id="cjg_finance_menu_action"
+                 name="Configuración"
+                 parent="cjg_finance_menu_root"
+                 sequence="6"/>
+                 
+        <menuitem id="cjg_finance_settings_menu_action"
+                 name="Ajustes"
+                 parent="cjg_finance_menu_action"
+                 action="res_config_settings_action"
+                 sequence="7"/> -->
+    </data>
+</odoo>

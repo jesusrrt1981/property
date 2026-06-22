@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_reactivation_wizard_view_form" model="ir.ui.view">
+            <field name="name">sale.credit.reactivation.wizard.form</field>
+            <field name="model">sale.credit.reactivation.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Reactivar Contrato">
+                    <field name="step" invisible="1"/>
+                    <field name="penalty_rate_modified" invisible="1"/>
+                    <field name="penalty_rate_auto_adjusted" invisible="1"/>
+                    <group string="Información del Contrato">
+                        <group>
+                            <field name="credit_id" readonly="1"/>
+                            <field name="current_state" readonly="1"/>
+                            <field name="paid_capital" widget="monetary" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="pending_installments" readonly="1"/>
+                            <field name="penalty_rate" widget="percentage"/>
+                            <field name="penalty_amount" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Sugerencia del Sistema" invisible="not suggested_penalty_reason">
+                        <group>
+                            <field name="suggested_penalty_rate" widget="percentage" readonly="1"/>
+                            <field name="suggested_penalty_reason" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Aprobación de Penalidad Ajustada"
+                           invisible="penalty_rate == 30.0">
+                        <group>
+                            <field name="penalty_rate_justification"
+                                   placeholder="Ej: Monto elevado excede 8 cuotas, autorizado por María Santana"/>
+                            <field name="penalty_rate_approved_by"/>
+                            <field name="penalty_rate_approval_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Resumen de Penalidad" invisible="step == 'confirm'">
+                        <group>
+                            <field name="penalty_per_installment" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Detalle u observaciones de la reactivación..."/>
+                    </group>
+                    <footer>
+                        <button string="Ver Resumen" type="object" name="action_confirm"
+                                class="btn-primary"
+                                invisible="step == 'apply'"/>
+                        <button string="Crear Planilla CRM" type="object" name="action_apply_reactivation"
+                                class="btn-primary"
+                                invisible="step == 'confirm'"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_credit_reactivation_wizard_action" model="ir.actions.act_window">
+            <field name="name">Reactivar Contrato</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.reactivation.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

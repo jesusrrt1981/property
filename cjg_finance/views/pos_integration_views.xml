@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <!-- Integración de Créditos con POS -->
+        <!-- Integración de Créditos con POS - Removido por duplicado con cjg_finance_pos -->
+        <!-- <record id="cjg_finance_sale_credit_inherit_pos" model="ir.ui.view">
+            <field name="name">sale.credit.form.inherit.pos</field>
+            <field name="model">sale.credit</field>
+            <field name="inherit_id" ref="cjg_finance.sale_credit_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='credit_lines']/tree/field[@name='sale_credit_payment_ids']" position="after">
+                   <field name="pos_payment_ids" widget="many2many_tags" optional="show" readonly="1"/>
+                </xpath>      
+            </field>
+        </record> -->
+
+        <!-- Heredar formulario de pago de crédito para mostrar info POS -->
+        <record id="view_sale_credit_payment_form_pos_inherit" model="ir.ui.view">
+            <field name="name">sale.credit.payment.form.pos.inherit</field>
+            <field name="model">sale.credit.payment</field>
+            <field name="inherit_id" ref="cjg_finance.sale_credit_payment_view_form"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="after">
+                    <field name="session_id" readonly="1" string="Sesión POS"/>
+                    <field name="cashbox_id" readonly="1" string="Caja"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Heredar formulario de pago de mantenimiento para mostrar info POS -->
+        <record id="view_maintenance_contract_payment_form_pos_inherit" model="ir.ui.view">
+            <field name="name">maintenance.contract.payment.form.pos.inherit</field>
+            <field name="model">maintenance.contract.payment</field>
+            <field name="inherit_id" ref="cjg_finance.view_maintenance_payment_form"/>
+            <field name="arch" type="xml">
+                <field name="payment_method_id" position="after">
+                    <field name="session_id" readonly="1" string="Sesión POS"/>
+                    <field name="cashbox_id" readonly="1" string="Caja"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Menú Arqueos de Caja en POS -->
+        <menuitem id="menu_cjg_finance_pos_cash_box_closing" 
+                  name="Arqueos de Caja" 
+                  action="cjg_finance.action_cash_box_closing" 
+                  parent="cjg_finance_pos.menu_cjg_finance_pos_processes" 
+                  sequence="2"/>
+    </data>
+</odoo>

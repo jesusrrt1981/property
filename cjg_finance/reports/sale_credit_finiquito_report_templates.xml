@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            GAP-12.07: Acción de reporte "Acta de Cierre / Finiquito".
+            Solo aplica a sale.credit en estado 'closed'.
+        -->
+        <record id="action_report_sale_credit_finiquito" model="ir.actions.report">
+            <field name="name">Acta de Cierre / Finiquito</field>
+            <field name="model">sale.credit</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_sale_credit_finiquito_document</field>
+            <field name="print_report_name">
+                (object.name and 'Finiquito_' + object.name.replace('/', '_')) or 'Finiquito_Contrato'
+            </field>
+        </record>
+
+        <!--
+            Plantilla QWeb: Finiquito de Contrato.
+            Muestra datos del contrato, cliente, montos y fecha de cierre.
+        -->
+        <template id="report_sale_credit_finiquito_document">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="company" t-value="o.company_id or res_company"/>
+                    <div class="page">
+                        <!-- Encabezado del acta -->
+                        <div class="text-center" style="margin-top:24px;">
+                            <h2 style="margin-bottom:0;">FINIQUITO DE CONTRATO</h2>
+                            <h4 t-esc="company.name"/>
+                            <p class="text-muted">
+                                RNC:
+                                <t t-esc="company.vat or 'N/D'"></t>
+                            </p>
+                        </div>
+
+                        <hr/>
+
+                        <!-- Datos del contrato -->
+                        <h4>Datos del Contrato</h4>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td style="width:25%;"><strong>Número</strong></td>
+                                <td style="width:25%;"><span t-field="o.name"/></td>
+                                <td style="width:25%;"><strong>Estado</strong></td>
+                                <td style="width:25%;">
+                                    <t t-esc="dict(o._fields['state'].selection).get(o.state, o.state)"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fecha de inicio</strong></td>
+                                <td><span t-field="o.date_start"/></td>
+                                <td><strong>Fecha de fin</strong></td>
+                                <td><span t-field="o.date_end"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fecha de cierre</strong></td>
+                                <td><span t-field="o.closed_date"/></td>
+                                <td><strong>Tipo de proceso</strong></td>
+                                <td>
+                                    <t t-if="o.contract_process_type"
+                                       t-esc="dict(o._fields['contract_process_type'].selection).get(o.contract_process_type, o.contract_process_type)"/>
+                                    <t t-else="">N/D</t>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Datos del cliente -->
+                        <h4>Datos del Cliente</h4>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td style="width:25%;"><strong>Cliente</strong></td>
+                                <td style="width:75%;" colspan="3"><span t-field="o.partner_id"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>RNC / Cédula</strong></td>
+                                <td colspan="3"><span t-field="o.partner_id.vat"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Teléfono</strong></td>
+                                <td>
+                                    <span t-field="o.partner_id.phone"/>
+                                </td>
+                                <td style="width:25%;"><strong>Email</strong></td>
+                                <td style="width:25%;">
+                                    <span t-field="o.partner_id.email"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Resumen financiero -->
+                        <h4>Resumen Financiero</h4>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td style="width:30%;"><strong>Monto total del contrato</strong></td>
+                                <td style="width:20%;" class="text-right">
+                                    <span t-field="o.currency_id_money" invisible="1"/>
+                                    <t t-esc="'%.2f' % (o.amount_total or o.total_sold or 0.0)"/>
+                                </td>
+                                <td style="width:30%;"><strong>Monto financiado</strong></td>
+                                <td style="width:20%;" class="text-right">
+                                    <t t-esc="'%.2f' % (o.amount_financed or 0.0)"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total pagado</strong></td>
+                                <td class="text-right">
+                                    <t t-esc="'%.2f' % (o.credit_amount or 0.0)"/>
+                                </td>
+                                <td><strong>Balance final</strong></td>
+                                <td class="text-right">
+                                    <t t-esc="'%.2f' % (o.credit_Adeudado or 0.0)"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Observaciones -->
+                        <h4>Observaciones</h4>
+                        <div class="well" style="min-height:80px;">
+                            <p t-field="o.internal_notes"/>
+                        </div>
+
+                        <!-- Firmas -->
+                        <div class="row mt-5" style="margin-top:64px;">
+                            <div class="col-6 text-center">
+                                <div style="border-top:1px solid #000; padding-top:8px;">
+                                    <strong>Por la Empresa</strong>
+                                </div>
+                                <p class="text-muted" t-esc="company.name"/>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div style="border-top:1px solid #000; padding-top:8px;">
+                                    <strong>El Cliente</strong>
+                                </div>
+                                <p class="text-muted" t-field="o.partner_id"/>
+                            </div>
+                        </div>
+
+                        <!-- Footer del acta -->
+                        <div class="text-center" style="margin-top:48px;">
+                            <p>
+                                <em>
+                                    Saldado y cerrado en fecha
+                                    <strong t-field="o.closed_date"/>.
+                                </em>
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

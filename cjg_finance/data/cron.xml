@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="0">
+        <!-- <record model="ir.cron" id="loan_seguiemiento_credito">
+                <field name="name">Solicitud  : Seguimiento credito</field>
+                <field name="interval_number">1</field>
+                <field name="interval_type">minutes</field>
+                <field name="numbercall">-1</field>
+                <field name="model_id" ref="model_sale_credit"/>
+                <field name="state">code</field>
+                <field name="code">action = model.action_generate_report()</field>
+        </record> -->
+        <!--
+            H-C28 + H-C10: Cron de moras automáticas.
+            ACTIVADO tras fix H-C10 (búsqueda idempotente por (cuota, fecha)).
+            Antes de este fix, el método duplicaba moras en cada corrida porque
+            el search() usaba solo credit_line_id. Ahora el search() filtra
+            también por date=today(), garantizando idempotencia.
+            Monitorear moras generadas en los primeros 7 días tras activar.
+        -->
+        <record id="credit_overdue_cron" model="ir.cron">
+            <field name="name">Generar Moras Automáticas</field>
+            <field name="model_id" ref="model_credit_overdue"/>
+            <field name="state">code</field>
+            <field name="code">model.generar_moras_automaticas()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+        <!--
+            C-04: Batch nocturno de actualizacion de pagos (replica testarossa).
+            DESACTIVADO POR DEFECTO. Activar solo despues de validar en staging:
+              1) Ir a Ajustes > Tecnico > Acciones planificadas > "Batch Nocturno: Actualizar Pagos"
+              2) Cambiar Activo a True
+              3) Monitorear log en /var/log/odoo/odoo-server.log buscando "[BATCH NOCTURNO]"
+        -->
+        <record id="cron_batch_nocturno_update_pagos" model="ir.cron">
+            <field name="name">Batch Nocturno: Actualizar Pagos y Marcar POR ANULAR</field>
+            <field name="model_id" ref="model_cjg_finance_batch_nocturno"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_update_pagos_contratos_mes()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

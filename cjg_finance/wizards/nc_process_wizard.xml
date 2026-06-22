@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            TRACK 5 (F5) — Vista XML del wizard de procesar NC.
+            Wizard transient: nc.process.wizard
+        -->
+        <record id="view_nc_process_wizard_form" model="ir.ui.view">
+            <field name="name">nc.process.wizard.form</field>
+            <field name="model">nc.process.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Procesar NC (Asignar a Contrato)">
+                    <group>
+                        <group>
+                            <field name="move_id" readonly="1"/>
+                            <field name="credit_id" required="1"/>
+                            <field name="credit_line_id"
+                                   domain="[('credit_id', '=', credit_id)]"/>
+                        </group>
+                        <group>
+                            <field name="amount" required="1" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="currency_id" readonly="1"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" placeholder="Observaciones opcionales..."/>
+                    </group>
+                    <separator string="Resultado del Procesamiento" invisible="not processed"/>
+                    <group invisible="not processed">
+                        <field name="processed" readonly="1"/>
+                        <field name="adjustment_id" readonly="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_process"
+                                string="Procesar NC"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-cog"
+                                invisible="processed"/>
+                        <button name="action_open_contrato"
+                                string="Abrir Contrato"
+                                type="object"
+                                class="btn-secondary"
+                                icon="fa-folder-open"
+                                invisible="not credit_id"/>
+                        <button string="Cerrar"
+                                class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_nc_process_wizard" model="ir.actions.act_window">
+            <field name="name">Procesar NC</field>
+            <field name="res_model">nc.process.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

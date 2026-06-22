@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista form del Index: hub con 3 botones -->
+        <record id="view_balance_index_router_form" model="ir.ui.view">
+            <field name="name">cjg.finance.balance.index.form</field>
+            <field name="model">cjg.finance.balance.index</field>
+            <field name="arch" type="xml">
+                <form string="Balance — Pantalla Index" create="0" delete="0">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Balance de Cuentas por Cobrar</h1>
+                            <p class="text-muted">
+                                Conciliación financiera — equivalente a
+                                <em>testarossa/modulos/balance/view/view_index.php</em>.
+                                Seleccione un rango de fechas y el reporte que desea generar.
+                            </p>
+                        </div>
+                        <group>
+                            <group string="Parámetros por defecto">
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                        </group>
+                        <group string="Reportes disponibles" col="3">
+                            <button name="action_open_cuenta"
+                                    string="Cuenta Corriente (CxC)"
+                                    type="object"
+                                    class="btn-primary"
+                                    icon="fa-file-pdf-o"
+                                    help="Detalle cronológico de un cliente: saldo inicial, movimientos y saldo final (PDF QWeb)."/>
+                            <button name="action_open_global"
+                                    string="Balance Global (XLSX)"
+                                    type="object"
+                                    class="btn-primary"
+                                    icon="fa-file-excel-o"
+                                    help="Listado de todos los oficiales/gerentes agrupados por categoría (XLSX)."/>
+                            <button name="action_open_movimiento"
+                                    string="Movimiento por Oficial (XLSX)"
+                                    type="object"
+                                    class="btn-primary"
+                                    icon="fa-file-excel-o"
+                                    help="Movimientos pre/cierre de un oficial específico (XLSX)."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Acción de ventana: muestra el hub -->
+        <record id="action_balance_index_router" model="ir.actions.act_window">
+            <field name="name">Balance de Cuentas por Cobrar</field>
+            <field name="res_model">cjg.finance.balance.index</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+            <field name="view_id" ref="view_balance_index_router_form"/>
+        </record>
+
+        <!-- Menú principal de Balance (Index) -->
+        <menuitem id="menu_cjg_finance_balance_root"
+                  name="Balance CxC"
+                  parent="cjg_finance_pos.menu_cjg_finance_pos_reports"
+                  sequence="40"
+                  groups="cjg_finance.group_credit_manager"/>
+        <menuitem id="menu_cjg_finance_balance_index"
+                  name="Pantalla Index"
+                  action="action_balance_index_router"
+                  parent="menu_cjg_finance_balance_root"
+                  sequence="1"
+                  groups="cjg_finance.group_credit_manager"/>
+        <menuitem id="menu_cjg_finance_balance_cuenta"
+                  name="Cuenta Corriente (CxC)"
+                  action="action_balance_cuenta_wizard"
+                  parent="menu_cjg_finance_balance_root"
+                  sequence="2"
+                  groups="cjg_finance.group_credit_manager"/>
+        <menuitem id="menu_cjg_finance_balance_global"
+                  name="Balance Global"
+                  action="action_balance_global_wizard"
+                  parent="menu_cjg_finance_balance_root"
+                  sequence="3"
+                  groups="cjg_finance.group_credit_manager"/>
+        <menuitem id="menu_cjg_finance_balance_movimiento"
+                  name="Movimiento por Oficial"
+                  action="action_balance_movimiento_wizard"
+                  parent="menu_cjg_finance_balance_root"
+                  sequence="4"
+                  groups="cjg_finance.group_credit_manager"/>
+    </data>
+</odoo>

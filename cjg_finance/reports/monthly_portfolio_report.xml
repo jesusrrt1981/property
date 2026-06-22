@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Reporte PDF de Cartera Mensual -->
+    
+    <record id="action_report_monthly_portfolio" model="ir.actions.report">
+        <field name="name">Reporte de Cartera Mensual</field>
+        <field name="model">sale.credit.portfolio</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cjg_finance.report_monthly_portfolio_document</field>
+        <field name="report_file">cjg_finance.report_monthly_portfolio_document</field>
+        <field name="binding_model_id" ref="model_sale_credit_portfolio"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_monthly_portfolio_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h2>REPORTE DE CARTERA MENSUAL</h2>
+                                <h4>
+                                    <t t-esc="['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][o.portfolio_month - 1]"/>
+                                    <t t-esc="o.portfolio_year"/>
+                                </h4>
+                                <p>Generado: <span t-esc="env['cjg.finance.qweb.helper'].now_str('%d/%m/%Y %H:%M')"/></p>
+                            </div>
+                        </div>
+
+                        <!-- Resumen Ejecutivo -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Resumen Ejecutivo</h4>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td width="50%"><strong>Total de Créditos en Cartera:</strong></td>
+                                        <td class="text-right">
+                                            <t t-set="total_credits" t-value="len(docs)"/>
+                                            <span t-esc="total_credits"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Monto Total Adeudado:</strong></td>
+                                        <td class="text-right">
+                                            <t t-set="total_due" t-value="sum(docs.mapped('amount_due'))"/>
+                                            <span t-esc="total_due" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Monto Total Pagado:</strong></td>
+                                        <td class="text-right">
+                                            <t t-set="total_paid" t-value="sum(docs.mapped('amount_paid'))"/>
+                                            <span t-esc="total_paid" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-active">
+                                        <td><strong>Saldo Pendiente:</strong></td>
+                                        <td class="text-right">
+                                            <t t-set="total_balance" t-value="sum(docs.mapped('balance'))"/>
+                                            <strong><span t-esc="total_balance" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Clasificación de Cartera -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Clasificación de Cartera (A/B/C)</h4>
+                                <table class="table table-bordered">
+                                    <thead class="table-active">
+                                        <tr>
+                                            <th>Clasificación</th>
+                                            <th class="text-right">Cantidad</th>
+                                            <th class="text-right">Monto Adeudado</th>
+                                            <th class="text-right">% del Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="class_a" t-value="docs.filtered(lambda p: p.client_classification == 'A')"/>
+                                        <t t-set="class_b" t-value="docs.filtered(lambda p: p.client_classification == 'B')"/>
+                                        <t t-set="class_c" t-value="docs.filtered(lambda p: p.client_classification == 'C')"/>
+                                        
+                                        <tr class="table-success">
+                                            <td><strong>Clase A - Al Día</strong></td>
+                                            <td class="text-right"><t t-esc="len(class_a)"/></td>
+                                            <td class="text-right">
+                                                <t t-set="amount_a" t-value="sum(class_a.mapped('amount_due'))"/>
+                                                <span t-esc="amount_a" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-esc="'%.1f%%' % (amount_a / total_due * 100 if total_due else 0)"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="table-warning">
+                                            <td><strong>Clase B - Atraso Moderado</strong></td>
+                                            <td class="text-right"><t t-esc="len(class_b)"/></td>
+                                            <td class="text-right">
+                                                <t t-set="amount_b" t-value="sum(class_b.mapped('amount_due'))"/>
+                                                <span t-esc="amount_b" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-esc="'%.1f%%' % (amount_b / total_due * 100 if total_due else 0)"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="table-danger">
+                                            <td><strong>Clase C - Atraso Significativo</strong></td>
+                                            <td class="text-right"><t t-esc="len(class_c)"/></td>
+                                            <td class="text-right">
+                                                <t t-set="amount_c" t-value="sum(class_c.mapped('amount_due'))"/>
+                                                <span t-esc="amount_c" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-esc="'%.1f%%' % (amount_c / total_due * 100 if total_due else 0)"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Estado de Cartera -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Estado de Cartera</h4>
+                                <table class="table table-bordered">
+                                    <thead class="table-active">
+                                        <tr>
+                                            <th>Estado</th>
+                                            <th class="text-right">Cantidad</th>
+                                            <th class="text-right">Monto</th>
+                                            <th class="text-right">% del Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="current" t-value="docs.filtered(lambda p: p.portfolio_status == 'current')"/>
+                                        <t t-set="overdue" t-value="docs.filtered(lambda p: p.portfolio_status == 'overdue')"/>
+                                        <t t-set="paid" t-value="docs.filtered(lambda p: p.portfolio_status == 'paid')"/>
+                                        
+                                        <tr>
+                                            <td>Al Corriente</td>
+                                            <td class="text-right"><t t-esc="len(current)"/></td>
+                                            <td class="text-right">
+                                                <t t-set="amount_current" t-value="sum(current.mapped('balance'))"/>
+                                                <span t-esc="amount_current" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-esc="'%.1f%%' % (amount_current / total_balance * 100 if total_balance else 0)"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vencido</td>
+                                            <td class="text-right"><t t-esc="len(overdue)"/></td>
+                                            <td class="text-right">
+                                                <t t-set="amount_overdue" t-value="sum(overdue.mapped('balance'))"/>
+                                                <span t-esc="amount_overdue" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-esc="'%.1f%%' % (amount_overdue / total_balance * 100 if total_balance else 0)"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pagado</td>
+                                            <td class="text-right"><t t-esc="len(paid)"/></td>
+                                            <td class="text-right">
+                                                <t t-set="amount_paid_status" t-value="sum(paid.mapped('amount_paid'))"/>
+                                                <span t-esc="amount_paid_status" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-esc="'%.1f%%' % (amount_paid_status / total_paid * 100 if total_paid else 0)"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Detalle de Créditos (Top 10 por saldo) -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Top 10 Créditos por Saldo Pendiente</h4>
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-active">
+                                        <tr>
+                                            <th>Crédito</th>
+                                            <th>Cliente</th>
+                                            <th>Clasificación</th>
+                                            <th class="text-right">Adeudado</th>
+                                            <th class="text-right">Pagado</th>
+                                            <th class="text-right">Saldo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="top_credits" t-value="docs.sorted(key=lambda p: p.balance, reverse=True)[:10]"/>
+                                        <tr t-foreach="top_credits" t-as="portfolio">
+                                            <td><span t-field="portfolio.credit_id.name"/></td>
+                                            <td><span t-field="portfolio.partner_id.name"/></td>
+                                            <td class="text-center">
+                                                <span t-if="portfolio.client_classification == 'A'" class="badge badge-success">A</span>
+                                                <span t-if="portfolio.client_classification == 'B'" class="badge badge-warning">B</span>
+                                                <span t-if="portfolio.client_classification == 'C'" class="badge badge-danger">C</span>
+                                            </td>
+                                            <td class="text-right"><span t-field="portfolio.amount_due" t-options='{"widget": "monetary", "display_currency": portfolio.currency_id}'/></td>
+                                            <td class="text-right"><span t-field="portfolio.amount_paid" t-options='{"widget": "monetary", "display_currency": portfolio.currency_id}'/></td>
+                                            <td class="text-right"><span t-field="portfolio.balance" t-options='{"widget": "monetary", "display_currency": portfolio.currency_id}'/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Notas y Observaciones -->
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <p class="text-muted small">
+                                    <strong>Notas:</strong><br/>
+                                    - Clasificación A: Clientes al día con sus pagos<br/>
+                                    - Clasificación B: Clientes con atraso moderado (1-30 días)<br/>
+                                    - Clasificación C: Clientes con atraso significativo (más de 30 días)<br/>
+                                    - Este reporte refleja el estado de la cartera al final del mes indicado
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    </data>
+</odoo>

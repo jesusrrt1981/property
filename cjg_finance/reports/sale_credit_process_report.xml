@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción de reporte de proceso por contrato -->
+        <record id="action_report_sale_credit_process" model="ir.actions.report">
+            <field name="name">Reporte de Proceso</field>
+            <field name="model">sale.credit</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cjg_finance.report_sale_credit_process_document</field>
+            <field name="print_report_name">(object.name and 'Proceso_' + object.name) or 'Proceso_Contrato'</field>
+            <field name="binding_model_id" ref="model_sale_credit"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <!-- Template del reporte de proceso -->
+        <template id="report_sale_credit_process_document">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <h2>Reporte de Proceso de Contrato</h2>
+                        <h3><t t-esc="o.name"/> — <t t-esc="o.partner_id.name"/></h3>
+
+                        <!-- Estado y Detalle de Proceso -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h4>Estado del Contrato</h4>
+                                <table class="table table-sm table-bordered">
+                                    <tr>
+                                        <td><strong>Estado Técnico</strong></td>
+                                        <td><t t-esc="dict(o._fields['state'].selection).get(o.state, o.state)"/></td>
+                                        <td><strong>Detalle de Proceso</strong></td>
+                                        <td><t t-esc="dict(o._fields['process_detail_status'].selection).get(o.process_detail_status, o.process_detail_status)"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tipo de Proceso</strong></td>
+                                        <td><t t-esc="dict(o._fields['contract_process_type'].selection).get(o.contract_process_type, o.contract_process_type)"/></td>
+                                        <td><strong>Fecha de Inicio</strong></td>
+                                        <td><t t-esc="o.date_start"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Métricas Financieras del Proceso -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h4>Métricas Financieras</h4>
+                                <table class="table table-sm table-bordered">
+                                    <tr>
+                                        <td><strong>Capital Pagado</strong></td>
+                                        <td><t t-esc="'%.2f' % (o.process_capital_paid or 0.0)"/></td>
+                                        <td><strong>Interés Pagado</strong></td>
+                                        <td><t t-esc="'%.2f' % (o.process_interest_paid or 0.0)"/></td>
+                                    </tr>
+                                    <tr t-if="o.reactivation_penalty_amount">
+                                        <td><strong>Penalidad Aplicada</strong></td>
+                                        <td><t t-esc="'%.2f' % o.reactivation_penalty_amount"/> (<t t-esc="o.reactivation_penalty_rate"/>%)</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr t-if="o.capitalized_amount">
+                                        <td><strong>Monto Capitalizado</strong></td>
+                                        <td><t t-esc="'%.2f' % o.capitalized_amount"/></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr t-if="o.devolucion_amount">
+                                        <td><strong>Monto Devuelto</strong></td>
+                                        <td><t t-esc="'%.2f' % o.devolucion_amount"/></td>
+                                        <td><strong>Método Devolución</strong></td>
+                                        <td><t t-esc="dict(o._fields['devolucion_method'].selection).get(o.devolucion_method, '') if o.devolucion_method else ''"/></td>
+                                    </tr>
+                                    <tr t-if="o.devolucion_reference">
+                                        <td><strong>Referencia Devolución</strong></td>
+                                        <td><t t-esc="o.devolucion_reference"/></td>
+                                        <td><strong>Fecha Emisión</strong></td>
+                                        <td><t t-esc="o.devolucion_date"/></td>
+                                    </tr>
+                                    <tr t-if="o.no_refund_registered">
+                                        <td><strong>Sin Reembolso</strong></td>
+                                        <td>Registrado el <t t-esc="o.no_refund_date"/> por <t t-esc="o.no_refund_user_id.name"/></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Contrato Origen (si aplica) -->
+                        <div class="row mt-3" t-if="o.origin_credit_id">
+                            <div class="col-12">
+                                <h4>Contrato Origen</h4>
+                                <table class="table table-sm table-bordered">
+                                    <tr>
+                                        <td><strong>Referencia</strong></td>
+                                        <td><t t-esc="o.origin_credit_id.name"/></td>
+                                        <td><strong>Cliente</strong></td>
+                                        <td><t t-esc="o.origin_credit_id.partner_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Estado</strong></td>
+                                        <td><t t-esc="dict(o.origin_credit_id._fields['state'].selection).get(o.origin_credit_id.state, o.origin_credit_id.state)"/></td>
+                                        <td><strong>Capital Pagado</strong></td>
+                                        <td><t t-esc="'%.2f' % (o.origin_credit_id.process_capital_paid or 0.0)"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Contratos Derivados (si aplica) -->
+                        <div class="row mt-3" t-if="o.derived_credit_ids">
+                            <div class="col-12">
+                                <h4>Contratos Derivados</h4>
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Referencia</th>
+                                            <th>Tipo de Proceso</th>
+                                            <th>Estado</th>
+                                            <th>Detalle</th>
+                                            <th>Capital Pagado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.derived_credit_ids" t-as="d">
+                                            <tr>
+                                                <td><t t-esc="d.name"/></td>
+                                                <td><t t-esc="dict(d._fields['contract_process_type'].selection).get(d.contract_process_type, d.contract_process_type)"/></td>
+                                                <td><t t-esc="dict(d._fields['state'].selection).get(d.state, d.state)"/></td>
+                                                <td><t t-esc="dict(d._fields['process_detail_status'].selection).get(d.process_detail_status, d.process_detail_status)"/></td>
+                                                <td><t t-esc="'%.2f' % (d.process_capital_paid or 0.0)"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

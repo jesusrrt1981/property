@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- ========== MAINTENANCE CONTRACT VIEWS ========== -->
+    <!-- Tree View -->
+    <record id="view_maintenance_contract_tree" model="ir.ui.view">
+        <field name="name">maintenance.contract.tree</field>
+        <field name="model">maintenance.contract</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state == 'cancelled'" decoration-muted="state == 'expired'" decoration-success="state == 'active'" decoration-warning="state == 'suspended'" string="Contratos de Mantenimiento">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="partner_vat"/>
+                <field name="maintenance_fee" sum="Total Cuota"/>
+                <field name="currency_id"/>
+                <field name="use_manual_exchange_rate"/>
+                <field name="manual_exchange_rate" optional="hide"/>
+                <field name="frequency"/>
+                <field name="date_start"/>
+                <field name="next_payment_date"/>
+                <field name="total_paid" sum="Total Pagado"/>
+                <field name="balance" sum="Saldo Total"/>
+                <field decoration-danger="state == 'cancelled'" decoration-info="state == 'expired'" decoration-success="state == 'active'" decoration-warning="state == 'suspended'" name="state" widget="badge"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+            </tree></field>
+    </record>
+    <!-- Maintenance Payment Action (moved earlier to allow reference in form) -->
+    <record id="action_maintenance_contract_payment" model="ir.actions.act_window">
+        <field name="name">Pagos de Mantenimiento</field>
+        <field name="res_model">maintenance.contract.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            'search_default_filter_posted': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registrar un Pago de Mantenimiento
+            </p>
+            <p>
+                Registre los pagos recibidos por concepto de mantenimiento de contratos funerarios.
+            </p></field>
+    </record>
+    <!-- Form View -->
+    <record id="view_maintenance_contract_form" model="ir.ui.view">
+        <field name="name">maintenance.contract.form</field>
+        <field name="model">maintenance.contract</field>
+        <field name="arch" type="xml">
+            <form string="Contrato de Mantenimiento">
+                <header>
+                    <button name="action_open_annual_generation_wizard" type="object"
+                            string="Generate Annual Maintenance" class="btn-primary"
+                            groups="cjg_finance.group_maintenance_period_generator"
+                            invisible="state != 'active'"/>
+                    <button class="oe_highlight" invisible="state != 'draft'" name="action_activate" string="Activar" type="object"/>
+                    <button confirm="¿Está seguro de suspender este contrato?" invisible="state != 'active'" name="action_suspend" string="Suspender" type="object"/>
+                    <button confirm="¿Está seguro de cancelar este contrato?" invisible="state == 'cancelled' or state == 'expired'" name="action_cancel" string="Cancelar" type="object"/>
+                    <button name="%(action_maintenance_exchange_rate_wizard)d" string="Actualizar Tasa" type="action" class="btn-secondary"/>
+                    <field name="state" statusbar_visible="draft,active,suspended" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-money" name="action_view_payments" type="object">
+                            <field name="payment_count" string="Pagos" widget="statinfo"/>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-file-text-o" invisible="not sale_credit_id" name="action_view_sale_credit_origin" type="object" string="Contrato Origen">
+                        </button>
+                        <button class="oe_stat_button" icon="fa-calendar" name="action_register_payment" type="object">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">
+                                    Registrar
+                                </span>
+                                <span class="o_stat_text">
+                                    Pago
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Número de Contrato..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="main_info" string="Información Principal">
+                            <field name="partner_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="partner_vat" readonly="1"/>
+                            <field context="{'default_partner_id': partner_id}" name="sale_credit_id" options="{'no_create': True}"/>
+                            <field name="legacy_contract_number"/>
+                        </group>
+                        <group name="payment_info" string="Configuración de Pago">
+                            <field name="maintenance_fee"/>
+                            <field name="currency_id" options="{'no_create': True}"/>
+                            <field name="use_manual_exchange_rate"/>
+                            <field name="manual_exchange_rate" invisible="not use_manual_exchange_rate" required="use_manual_exchange_rate"/>
+                            <field name="frequency"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="next_payment_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group name="amounts" string="Resumen Financiero">
+                            <field name="total_paid" readonly="1"/>
+                            <field class="oe_subtotal_footer_separator" name="balance" readonly="1"/>
+                        </group>
+                        <group name="management" string="Gestión">
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field  name="company_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="annual_periods" string="Annual Maintenance">
+                            <field name="period_ids" readonly="1">
+                                <tree decoration-success="state == 'paid'" decoration-muted="concept_code == '204'">
+                                    <field name="sequence"/>
+                                    <field name="due_date"/>
+                                    <field name="concept_code"/>
+                                    <field name="amount" sum="Balance"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="payment_id" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="payments" string="Pagos">
+                            <field mode="tree" name="payment_ids" nolabel="1">
+                                <tree decoration-muted="state == 'cancelled'" decoration-success="state == 'posted'" editable="bottom">
+                                    <field name="payment_date"/>
+                                    <field name="amount"/>
+                                    <field column_invisible="True" name="company_id"/>
+                                    <field name="payment_method_id"/>
+                                    <field name="communication"/>
+                                    <field name="state" widget="badge"/>
+                                    <button class="oe_highlight" icon="fa-check" invisible="state != 'draft'" name="action_post" string="Registrar" type="object"/>
+                                    <button icon="fa-times" invisible="state != 'draft'" name="action_cancel" string="Cancelar" type="object"/>
+                                </tree></field>
+                        </page>
+                        <page name="notes" string="Notas">
+                            <field name="notes" placeholder="Notas adicionales sobre el contrato..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field groups="base.group_user" name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form></field>
+    </record>
+    <!-- Calendar View -->
+    <record id="view_maintenance_contract_calendar" model="ir.ui.view">
+        <field name="name">maintenance.contract.calendar</field>
+        <field name="model">maintenance.contract</field>
+        <field name="arch" type="xml">
+            <calendar color="state" date_start="next_payment_date" mode="month" quick_create="0" string="Calendario de Mantenimiento">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="maintenance_fee"/>
+                <field name="state"/>
+            </calendar></field>
+    </record>
+    <!-- Kanban View -->
+    <record id="view_maintenance_contract_kanban" model="ir.ui.view">
+        <field name="name">maintenance.contract.kanban</field>
+        <field name="model">maintenance.contract</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="maintenance_fee"/>
+                <field name="state"/>
+                <field name="next_payment_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <span class="badge badge-pill" t-att-class="record.state.raw_value == 'active' ? 'badge-success' :                                                     record.state.raw_value == 'suspended' ? 'badge-warning' :                                                     'badge-secondary'">
+                                    <field name="state"/>
+                                </span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <field name="partner_id"/>
+                                <div>
+                                    Cuota:
+                                    <field name="maintenance_fee"/>
+                                    <field name="frequency"/>
+                                </div>
+                                <div t-if="record.next_payment_date.value">
+                                    Próximo:
+                                    <field name="next_payment_date"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban></field>
+    </record>
+    <!-- Search View -->
+    <record id="view_maintenance_contract_search" model="ir.ui.view">
+        <field name="name">maintenance.contract.search</field>
+        <field name="model">maintenance.contract</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Contratos de Mantenimiento">
+                <field filter_domain="['|', ('name', 'ilike', self), ('legacy_contract_number', 'ilike', self)]" name="name" string="Contrato"/>
+                <field name="partner_id"/>
+                <field name="partner_vat" string="RNC/Cédula"/>
+                <field name="user_id"/>
+                <filter domain="[('state', '=', 'active')]" name="filter_active" string="Activos"/>
+                <filter domain="[('state', '=', 'suspended')]" name="filter_suspended" string="Suspendidos"/>
+                <filter domain="[('state', '=', 'draft')]" name="filter_draft" string="Borradores"/>
+                <separator/>
+                <filter domain="[('frequency', '=', 'monthly')]" name="filter_monthly" string="Mensual"/>
+                <filter domain="[('frequency', '=', 'yearly')]" name="filter_yearly" string="Anual"/>
+                <separator/>
+                <filter domain="[('next_payment_date', '&lt;=', context_today().strftime('%Y-%m-%d')), ('state', '=', 'active')]" name="filter_payment_due" string="Pago Pendiente"/>
+                <filter domain="[('balance', '&gt;', 0)]" name="filter_has_balance" string="Con Saldo Pendiente"/>
+                <separator/>
+                <filter domain="[('user_id', '=', uid)]" name="filter_my_contracts" string="Mis Contratos"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter context="{'group_by': 'partner_id'}" name="group_partner" string="Cliente"/>
+                    <filter context="{'group_by': 'state'}" name="group_state" string="Estado"/>
+                    <filter context="{'group_by': 'frequency'}" name="group_frequency" string="Frecuencia"/>
+                    <filter context="{'group_by': 'user_id'}" name="group_user" string="Responsable"/>
+                    <filter context="{'group_by': 'next_payment_date:month'}" name="group_month" string="Mes Próximo Pago"/>
+                </group>
+            </search></field>
+    </record>
+    <!-- ========== MAINTENANCE PAYMENT VIEWS ========== -->
+    <!-- Tree View -->
+    <record id="view_maintenance_payment_tree" model="ir.ui.view">
+        <field name="name">maintenance.contract.payment.tree</field>
+        <field name="model">maintenance.contract.payment</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state == 'cancelled'" decoration-success="state == 'posted'" editable="bottom" string="Pagos de Mantenimiento">
+                <field name="payment_date"/>
+                <field name="contract_id"/>
+                <field name="partner_id"/>
+                <field name="amount" sum="Total"/>
+                <field column_invisible="True" name="company_id"/>
+                <field name="payment_method_id"/>
+                <field name="communication"/>
+                <field name="state" widget="badge"/>
+                <button class="oe_highlight" icon="fa-check" invisible="state != 'draft'" name="action_post" string="Registrar" type="object"/>
+                <button icon="fa-times" invisible="state != 'draft'" name="action_cancel" string="Cancelar" type="object"/>
+            </tree></field>
+    </record>
+    <!-- Form View -->
+    <record id="view_maintenance_payment_form" model="ir.ui.view">
+        <field name="name">maintenance.contract.payment.form</field>
+        <field name="model">maintenance.contract.payment</field>
+        <field name="arch" type="xml">
+            <form string="Pago de Mantenimiento">
+                <header>
+                    <button class="oe_highlight" invisible="state != 'draft'" name="action_post" string="Registrar Pago" type="object"/>
+                    <button confirm="¿Está seguro de cancelar este pago?" invisible="state != 'draft'" name="action_cancel" string="Cancelar" type="object"/>
+                    <field name="state" statusbar_visible="draft,posted" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="payment_info" string="Información del Pago">
+                            <field name="contract_id" options="{'no_create': True}" required="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="payment_date"/>
+                            <field name="amount"/>
+                            <field invisible="1" name="currency_id"/>
+                        </group>
+                        <group name="method_info" string="Método y Referencias">
+                            <field invisible="1" name="company_id"/>
+                            <field name="payment_method_id"/>
+                            <field name="communication" placeholder="Referencia o memo..."/>
+                            <field name="legacy_plan"/>
+                        </group>
+                    </group>
+                    <group invisible="account_move_id == False" name="accounting" string="Información Contable">
+                        <field name="account_move_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Notas adicionales..."/>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="user_id" readonly="1"/>
+                            <field  name="company_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form></field>
+    </record>
+    <!-- Search View -->
+    <record id="view_maintenance_payment_search" model="ir.ui.view">
+        <field name="name">maintenance.contract.payment.search</field>
+        <field name="model">maintenance.contract.payment</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Pagos">
+                <field name="contract_id"/>
+                <field name="partner_id"/>
+                <field name="payment_date"/>
+                <filter domain="[('state', '=', 'draft')]" name="filter_draft" string="Borradores"/>
+                <filter domain="[('state', '=', 'posted')]" name="filter_posted" string="Registrados"/>
+                <filter domain="[('state', '=', 'cancelled')]" name="filter_cancelled" string="Cancelados"/>
+                <separator/>
+                <filter domain="[('payment_date', '=', context_today().strftime('%Y-%m-%d'))]" name="filter_today" string="Hoy"/>
+                <filter domain="[('payment_date', '&gt;=', context_today().strftime('%Y-%m-01')),                                   ('payment_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]" name="filter_this_month" string="Este Mes"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter context="{'group_by': 'contract_id'}" name="group_contract" string="Contrato"/>
+                    <filter context="{'group_by': 'partner_id'}" name="group_partner" string="Cliente"/>
+                    <filter context="{'group_by': 'state'}" name="group_state" string="Estado"/>
+                    <filter context="{'group_by': 'payment_date'}" name="group_date" string="Fecha"/>
+                </group>
+            </search></field>
+    </record>
+    <!-- ========== ACTIONS ========== -->
+    <!-- Maintenance Contract Action -->
+    <record id="action_maintenance_contract" model="ir.actions.act_window">
+        <field name="name">Contratos de Mantenimiento</field>
+        <field name="res_model">maintenance.contract</field>
+        <field name="view_mode">tree,form,calendar,kanban</field>
+        <field name="context">{
+            'search_default_filter_active': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un Contrato de Mantenimiento
+            </p>
+            <p>
+                Los contratos de mantenimiento permiten gestionar las cuotas periódicas
+                de mantenimiento de parcelas y servicios funerarios.
+            </p></field>
+    </record>
+    <!-- ========== MENUS ========== -->
+    <!-- Main Menu for Maintenance -->
+    <menuitem id="menu_maintenance_root" name="Mantenimiento" parent="cjg_finance.credito_menu" sequence="20"/>
+    <!-- Contracts Menu -->
+    <menuitem action="action_maintenance_contract" id="menu_maintenance_contracts" name="Contratos" parent="menu_maintenance_root" sequence="10"/>
+    <!-- Payments Menu -->
+    <menuitem action="action_maintenance_contract_payment" id="menu_maintenance_payments" name="Pagos" parent="menu_maintenance_root" sequence="20"/>
+    </data>
+</odoo>

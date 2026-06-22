@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_payment_form_testarossa_parity" model="ir.ui.view">
+            <field name="name">sale.credit.payment.form.testarossa.parity</field>
+            <field name="model">sale.credit.payment</field>
+            <field name="inherit_id" ref="cjg_finance.sale_credit_payment_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Datos Testarossa" groups="base.group_no_one">
+                        <group string="Identificación Legacy">
+                            <field name="legacy_mov_id" readonly="1"/>
+                            <field name="installment_number" readonly="1"/>
+                            <field name="is_initial_payment" readonly="1"/>
+                        </group>
+                        <group string="Desglose de Pago">
+                            <field name="amount_tax_paid"/>
+                            <field name="amount_maintenance"/>
+                            <field name="amount_penalty"/>
+                        </group>
+                        <group string="Personal de Cobro">
+                            <field name="collection_officer_nit" readonly="1"/>
+                            <field name="motorizado_nit" readonly="1"/>
+                        </group>
+                        <group string="Factura Fiscal">
+                            <field name="invoice_serie" readonly="1"/>
+                            <field name="invoice_number" readonly="1"/>
+                            <field name="invoice_date" readonly="1"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

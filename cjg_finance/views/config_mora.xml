@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="credit_overdue_configuration_view_form" model="ir.ui.view">
+            <field name="name">credit.overdue.configuration.view.form</field>
+            <field name="model">credit.overdue.configuration</field>
+            <field name="arch" type="xml">
+                <form>             
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="0"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" widget="many2one_clickable" force_save="1" readonly="1"/>
+                                <field name="user_id" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="client" widget="many2one_clickable" invisible="not credit_id" readonly="1"/>
+                                <field name="credit_id" invisible="1"/>
+                                <field name="intervalo"/>
+                                <field name="overdue_period"/>
+                                <field name="tipo_mora"/>
+                                <field name="importe" invisible="tipo_mora != 'amount'"/>
+                                <field name="porcentaje" invisible="tipo_mora != 'percent'"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="credit_overdue_configuration_view_tree" model="ir.ui.view">
+            <field name="name">credit.overdue.configuration.view.tree</field>
+            <field name="model">credit.overdue.configuration</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="user_id" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="client" widget="many2one_clickable"/>
+                    <field name="credit_id"/>
+                    <field name="intervalo"/>
+                    <field name="tipo_mora"/>
+                    <field name="importe"/>
+                    <field name="porcentaje"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+        <record id="credit_overdue_configuration_action" model="ir.actions.act_window">
+            <field name="name">Configuración de Moras de Créditos</field>
+            <field name="res_model">credit.overdue.configuration</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+         <menuitem id="customer_credit_statements_menu" name="Configurar moras de credito" parent="cjg_finance.credito_configuracion" groups="account.group_account_invoice" action="credit_overdue_configuration_action" sequence="20"/>
+
+        
+    </data>
+</odoo>

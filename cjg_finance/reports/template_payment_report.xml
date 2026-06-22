@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="external_layout_bold_custom">
+            <div t-attf-class="header o_company_#{res_company.id}_layout" t-att-style="report_header_style">
+                <div class="o_clean_header">
+                    <div class="row">
+                        <div class="col-6">
+                            <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" alt="Logo" style="max-height: 45px;"/>
+                        </div>
+                        <div class="col-5 offset-1 text-end" name="company_address">
+                            <ul class="list-unstyled">
+                                <li t-if="res_company.is_company_details_empty"><t t-esc="res_company.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'/></li>
+                                <li t-else=""><t t-esc="res_company.company_details"/></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div t-attf-class="article o_report_layout_bold o_company_#{res_company.id}_layout {{  'o_report_layout_background' if res_company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % res_company.layout_background_image.decode('utf-8') if res_company.layout_background_image and res_company.layout_background == 'Custom' else ('/base/static/img/bg_background_template.jpg' if res_company.layout_background == 'Geometric' else '') }});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-call="web.address_layout"/>
+                <t t-out="0"/>
+            </div>
+
+            <div t-attf-class="footer o_clean_footer o_company_#{res_company.id}_layout">
+                <div class="row">
+                    <div class="col-4">
+                        <span t-field="res_company.report_footer"/>
+                    </div>
+                    <div class="col-4">
+                        <span t-if="res_company.is_company_details_empty" t-field="res_company.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'/>
+                        <span t-else="" t-field="res_company.company_details"/>
+                    </div>
+                    <div class="col-3">
+                        <div class="mt0 mb0 h5" t-field="res_company.report_header"/>
+                    </div>
+                    <div class="col-1">
+                        <ul t-if="report_type == 'pdf'" class="list-inline pagenumber float-end text-center">
+                            <li class="list-inline-item"><strong><span class="page"/></strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+       <template id="report_sale_credit" >
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="d">
+                    <t t-set="res_company" t-value="d.company_id or d.env.company"/>
+                    <t t-call="cjg_finance.external_layout_bold_custom">
+                        <div class="page" style="font-family: sans-serif; padding-top: 20px;">
+                            <h1 style="margin-top: 10px; text-align: center; color: black; font-size: 25px;">ESTADO DE CUENTA</h1>
+                            <div style="margin-top: 20px; overflow: hidden;  ">
+                                <div >
+                                    <div style="overflow: hidden;">
+                                        <div  style="float: left; width: 50%;">
+                                            <span style="font-weight:bold;">Proyecto - Unidad:</span>
+                                            <span t-field="d.credit_id" />
+                                        </div>
+                                        <div style="float: left; margin-left: 100px;">
+                                            <span style="font-weight:bold;">Cliente:</span>
+                                            <span class="m-0" t-field="d.partner_id" />
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 10px;">
+                                        <span style="font-weight:bold;">Precio Final De Compra:</span>
+                                        <t t-set="total_amount_fixed" t-value="0.0"/>
+                                        <t t-foreach='d.credit_payment_lines' t-as="line">
+                                            <t t-set="total_amount_fixed" t-value="total_amount_fixed + line.amount_fixed"/>
+                                        </t>
+                                        <span t-esc="total_amount_fixed" t-options='{"widget": "monetary", "display_currency": d.currency_id}'/>
+                                    </div>
+                                </div>
+
+                
+                            </div>     
+                
+                            <div class="section" style="margin-top: 10px; text-align: center;">
+                                <h1 style="font-size: 20px;">PAGOS COMPLETADOS</h1>
+                                <table  class="table table-bordered" style="border: solid 2px;">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                No.pago
+                                            </th>
+                                            <th>
+                                                Monto acordado
+                                            </th>
+
+                                            <th>
+                                                Fecha acordada
+                                            </th>
+                                            <th>
+                                                Monto pagado
+                                            </th>
+
+                                            <th>
+                                                Fecha de pago
+                                            </th>
+                                            <th>
+                                                Monto pendiente
+                                            </th>
+                                            <th>
+                                                Estado
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach='d.credit_payment_lines' t-as="line">
+                                            <t t-if="line.state == 'paid'">
+                                                <tr>
+                                                    <td>
+                                                        <span  t-field="line.credit_line_id"/>
+                                                    </td>
+                                            
+                                                    <td>
+                                                        <span t-field="line.currency_id.symbol"/>
+                                                        <span t-field="line.amount_fixed" />
+                                                    </td>
+
+                                                    <td>
+                                                        <span t-field="line.expected_date_payment"/>
+                                                    </td>   
+
+                                                    <td>
+                                                        <span t-field="line.currency_id.symbol"/>
+                                                        <span t-field="line.amount_paid" />
+                                                    </td>
+
+                                                    <td>
+                                                        <span t-field="line.credit_line_id.date_payment"/>
+                                                    </td>
+
+                                                    <td>
+                                                        <span t-field="line.currency_id.symbol"/>
+                                                        <span t-field="line.remanente" />
+                                                    </td>
+
+                                                    <td>
+                                                        <span t-field="line.state"/>
+                                                    </td>
+                                                </tr> 
+                                            </t>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                                <!-- <div style="margin-top: 10px; font-size: 18px;">
+                                    <span style="font-weight:bold; ">Total Monto Pagado:</span>
+                                    <t t-set="total_paid" t-value="sum(line.amount_paid for line in d.credit_payment_lines if line.state == 'paid')"/>
+                                    <span t-esc="total_paid" t-options='{"widget": "monetary", "display_currency": d.currency_id}'/>
+                                </div> -->
+<!-- 
+                                <div style="margin-top: 10px; font-size: 18px;">
+                                    <span style="font-weight:bold;">Total Monto Pagado (Pagos Completados):</span>
+                                    <t t-set="total_paid_completed" t-value="sum(line.amount_paid for line in d.credit_payment_lines if line.state == 'paid')"/>
+                                    <span t-esc="total_paid_completed" t-options='{"widget": "monetary", "display_currency": d.currency_id}'/>
+                                </div> -->
+
+                                <!-- Nuevo bloque para mostrar el total general pagado -->
+                                <div style="margin-top: 20px; font-size: 20px;">
+                                    <span style="font-weight:bold;">Total General Pagado:</span>
+                                    <t t-set="total_paid_general" t-value="sum(line.amount_paid for line in d.credit_payment_lines)"/>
+                                    <span t-esc="total_paid_general" t-options='{"widget": "monetary", "display_currency": d.currency_id}'/>
+                                </div>
+                                <hr style="border-top: 1px solid #000; margin-top: 20px; margin-bottom: 20px; width: 100%;"/>
+
+                            </div>
+                            <div style="text-align: center; margin-top: 20px; "  >
+                                <h1 style="font-size: 20px;">PAGOS PENDIENTES</h1>
+                                <table class="table table-bordered " style="border: solid 2px;">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                No.pago
+                                            </th>
+                                            <th>
+                                                Monto acordado
+                                            </th>
+                                            <th>
+                                                Fecha acordada
+                                            </th>
+                                            <th>
+                                                Monto pagado
+                                            </th>
+                                            <th>
+                                                Fecha de pago
+                                            </th>
+                                            <th>
+                                                Monto pendiente
+                                            </th>
+                                            <th>
+                                                Estado
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach='d.credit_payment_lines' t-as="line">
+                                            <t t-if="line.state != 'paid'">
+                                                <tr>
+                                                    <td>
+                                                        <span  t-field="line.credit_line_id"/>
+                                                    </td>
+                                            
+                                                    <td>
+                                                        <span t-field="line.currency_id.symbol"/>
+                                                        <span t-field="line.amount_fixed" />
+                                                    </td>
+
+                                                    <td>
+                                                        <span t-field="line.expected_date_payment"/>
+                                                    </td>   
+
+                                                    <td>
+                                                        <span t-field="line.currency_id.symbol"/>
+                                                        <span t-field="line.amount_paid" />
+                                                    </td>
+
+                                                    <td>
+                                                        <span t-field="line.credit_line_id.date_payment"/>
+                                                    </td>
+
+                                                    <td>
+                                                        <span t-field="line.currency_id.symbol"/>
+                                                        <span t-field="line.remanente" />
+                                                    </td>
+                                                    <td>
+                                                        <span t-if="line.expected_date_payment and line.expected_date_payment &lt; env['cjg.finance.qweb.helper'].now_date_obj() and line.state != 'paid'">Atrasado</span>
+                                                        <span t-else="">Pendiente</span>
+                                                    </td>
+                                                </tr> 
+                                            </t>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                <div style="margin-top: 10px; font-size: 18px;">
+                                    <span style="font-weight:bold;">Total Monto Atrasado:</span>
+                                    <t t-set="total_atrasado" t-value="sum(line.remanente for line in d.credit_payment_lines if line.expected_date_payment and line.expected_date_payment &lt; env['cjg.finance.qweb.helper'].now_date_obj() and line.state != 'paid')"/>                                    <span t-esc="total_atrasado" t-options='{"widget": "monetary", "display_currency": d.currency_id}'/>
+                                </div>
+                                <div style="margin-top: 10px; font-size: 18px;">
+                                    <span style="font-weight:bold;">Total Monto Pendiente:</span>
+                                    <t t-set="total_pending" t-value="sum(line.remanente for line in d.credit_payment_lines if line.state != 'paid')"/>
+                                    <span t-esc="total_pending" t-options='{"widget": "monetary", "display_currency": d.currency_id}'/>
+                                </div>
+                                <hr style="border-top: 1px solid #000; margin-top: 20px; margin-bottom: 20px; width: 100%;"/>
+
+                            </div> 
+                       </div> 
+                    </t>
+                </t>
+            </t>
+       </template>
+    </data>
+</odoo>

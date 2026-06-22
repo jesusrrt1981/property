@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Reporte PDF de Contrato de Mantenimiento -->
+    <record id="action_report_maintenance_contract" model="ir.actions.report">
+        <field name="name">Contrato de Mantenimiento</field>
+        <field name="model">maintenance.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cjg_finance.report_maintenance_contract_document</field>
+        <field name="report_file">cjg_finance.report_maintenance_contract_document</field>
+        <field name="binding_model_id" ref="model_maintenance_contract" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_maintenance_contract_document">
+        <t t-call="web.html_container">
+            <main />
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h2>CONTRATO DE MANTENIMIENTO</h2>
+                                <h4 t-field="o.name" />
+                            </div>
+                        </div>
+                        <!-- Información del Cliente -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Cliente:</strong>
+                                <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": True}' />
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td>
+                                            <strong>RNC/Cédula:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.partner_vat" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Fecha Inicio:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.date_start" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Fecha Fin:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.date_end" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Estado:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.state" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Detalles del Contrato -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h4>Detalles del Servicio</h4>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td width="30%">
+                                            <strong>Cuota de Mantenimiento:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.maintenance_fee" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Frecuencia de Pago:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-if="o.frequency == 'monthly'">Mensual</span>
+                                            <span t-if="o.frequency == 'quarterly'">Trimestral</span>
+                                            <span t-if="o.frequency == 'yearly'">Anual</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Próximo Pago:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.next_payment_date" />
+                                        </td>
+                                    </tr>
+                                    <tr t-if="o.sale_credit_id">
+                                        <td>
+                                            <strong>Crédito Asociado:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.sale_credit_id.name" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Historial de Pagos -->
+                        <div t-if="o.payment_ids" class="row mb-3">
+                            <div class="col-12">
+                                <h4>Historial de Pagos</h4>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr class="table-active">
+                                            <th>Fecha</th>
+                                            <th>Monto</th>
+                                            <th>Método</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="o.payment_ids" t-as="payment">
+                                            <td>
+                                                <span t-field="payment.payment_date" />
+                                            </td>
+                                            <td>
+                                                <span t-field="payment.amount" t-options='{"widget": "monetary", "display_currency": payment.currency_id}' />
+                                            </td>
+                                            <td>
+                                                <span t-field="payment.payment_method_id.name" />
+                                            </td>
+                                            <td>
+                                                <span t-if="payment.state == 'draft'" class="badge badge-secondary">Borrador</span>
+                                                <span t-if="payment.state == 'posted'" class="badge badge-success">Registrado</span>
+                                                <span t-if="payment.state == 'cancelled'" class="badge badge-danger">Cancelado</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-active">
+                                            <td colspan="3" class="text-right">
+                                                <strong>Total Pagado:</strong>
+                                            </td>
+                                            <td>
+                                                <strong>
+                                                    <span t-field="o.total_paid" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr class="table-warning">
+                                            <td colspan="3" class="text-right">
+                                                <strong>Saldo Pendiente:</strong>
+                                            </td>
+                                            <td>
+                                                <strong>
+                                                    <span t-field="o.balance" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Notas -->
+                        <div t-if="o.notes" class="row">
+                            <div class="col-12">
+                                <h4>Notas</h4>
+                                <p t-field="o.notes" />
+                            </div>
+                        </div>
+                        <!-- Footer con firmas -->
+                        <div class="row mt-5">
+                            <div class="col-6 text-center">
+                                <div class="mt-5 pt-3" style="border-top: 1px solid black;">
+                                    <strong>Firma del Cliente</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div class="mt-5 pt-3" style="border-top: 1px solid black;">
+                                    <strong>Firma Autorizada</strong>
+                                    <br />
+                                    <span t-field="o.company_id.name" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    </data>
+</odoo>

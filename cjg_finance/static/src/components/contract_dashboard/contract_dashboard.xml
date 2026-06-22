@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <!-- Template Principal del Dashboard -->
+    <t t-name="cjg_finance.ContractDashboard">
+        <div class="contract-dashboard-container">
+            <!-- Loading Spinner -->
+            <t t-if="state.loading">
+                <div class="loading-overlay">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </t>
+            <!-- Pantalla de Selección de Cliente (cuando no hay partner) -->
+            <div t-if="!state.partner" class="client-selection-screen">
+                <div class="search-container">
+                    <div class="text-center mb-4">
+                        <i class="fa fa-users fa-4x text-primary mb-3" />
+                        <h2>Seleccionar Cliente</h2>
+                        <p class="text-muted">Busque un cliente para ver sus contratos</p>
+                    </div>
+                    <div class="search-box">
+                        <div class="input-group">
+                            <input t-model="state.searchTerm" t-on-input="onSearchInput" t-on-keydown="searchPartners" type="text" class="form-control form-control-lg" placeholder="Buscar por nombre, cédula, correo o número de contrato..." />
+                            <button t-on-click="searchPartners" class="btn btn-primary">
+                                <i class="fa fa-search me-2" />
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                    <div t-if="state.searchResults.length" class="search-results mt-4">
+                        <div class="list-group">
+                            <t t-foreach="state.searchResults" t-as="result" t-key="result.id">
+                                <button t-on-click="() => this.selectPartnerFromSearch(result)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">
+                                            <t t-esc="result.name" />
+                                        </h5>
+                                        <div class="small text-muted">
+                                            <i t-if="result.vat" class="fa fa-id-card me-1" />
+                                            <t t-esc="result.vat" />
+                                            <span t-if="result.email" class="mx-2">|</span>
+                                            <i t-if="result.email" class="fa fa-envelope me-1" />
+                                            <t t-esc="result.email" />
+                                        </div>
+                                    </div>
+                                    <i class="fa fa-chevron-right text-muted" />
+                                </button>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Contenido del Dashboard (cuando hay partner) -->
+            <div t-else="" class="dashboard-content-wrapper">
+                <!-- Tabs de Contratos Superiores -->
+                <div class="tabs-contratos">
+                    <t t-foreach="state.contracts" t-as="contract" t-key="contract.id">
+                        <div t-att-class="{ active: contract.id === state.activeContractId }" t-on-click="() => this.selectContract(contract.id)" class="tab-contrato">
+                            <span class="contract-number">
+                                <t t-esc="contract.legacy_contract_number || contract.name" />
+                            </span>
+                            <span t-att-class="getContractBadgeClass(contract.state)" class="badge">
+                                <t t-esc="getContractBadgeText(contract.state)" />
+                            </span>
+                        </div>
+                    </t>
+                    <!-- Tab Histórico (opcional) -->
+                    <div class="tab-contrato tab-historico">
+                        <span class="contract-number">HISTÓRICO</span>
+                    </div>
+                    <!-- Botón para cambiar cliente -->
+                    <div class="ms-auto p-2">
+                        <button t-on-click="() => this.state.partner = null" class="btn btn-sm btn-secondary">
+                            <i class="fa fa-search me-1" />
+                            Consultar cliente
+                        </button>
+                    </div>
+                </div>
+                <!-- Header con Acciones y Status Bar -->
+                <div class="header">
+                    <div class="header-actions">
+                        <button t-att-disabled="!state.activeContract or state.activeContract.state !== 'requested'" t-on-click="validateContract" class="btn btn-primary">
+                            <i class="fa fa-check me-2" />
+                            Validar
+                        </button>
+                        <button t-att-disabled="!state.activeContract" t-on-click="addPayment" class="btn btn-secondary">
+                            <i class="fa fa-plus me-2" />
+                            Agregar Pago
+                        </button>
+                        <button t-att-disabled="!state.activeContract" t-on-click="openContract" class="btn btn-outline-secondary">
+                            <i class="fa fa-external-link me-2" />
+                            Abrir
+                        </button>
+                    </div>
+                    <div t-if="state.activeContract" class="statusbar">
+                        <span t-att-class="{
+                                'status-inactive': state.activeContract.state === 'draft',
+                                'status-active': state.activeContract.state === 'approved',
+                                'status-inactive': state.activeContract.state === 'closed'
+                            }" class="status-badge">
+                            <t t-if="state.activeContract.state === 'draft'">Borrador</t>
+                            <t t-elif="state.activeContract.state === 'requested'">Solicitado</t>
+                            <t t-elif="state.activeContract.state === 'approved'">Activo</t>
+                            <t t-elif="state.activeContract.state === 'closed'">Finalizado</t>
+                            <t t-esc="state.activeContract.state" t-else="" />
+                        </span>
+                    </div>
+                </div>
+                <!-- Contenido Principal -->
+                <div t-if="state.activeContract" class="content">
+                    <!-- Cards de Estadísticas -->
+                    <div class="stats-grid">
+                        <div t-on-click="() => this.onStatCardClick('pagos')" class="stat-card blue">
+                            <div class="stat-icon">
+                                <i class="fa fa-money" />
+                            </div>
+                            <div t-esc="state.stats.pagos" class="stat-value" />
+                            <div class="stat-label">Pagos Realizados</div>
+                        </div>
+                        <div t-on-click="() => this.onStatCardClick('cuotas')" class="stat-card purple">
+                            <div class="stat-icon">
+                                <i class="fa fa-chart-pie" />
+                            </div>
+                            <div t-esc="state.stats.cuotas" class="stat-value" />
+                            <div class="stat-label">Cuotas Programadas</div>
+                        </div>
+                        <div t-on-click="() => this.onStatCardClick('documentos')" class="stat-card pink">
+                            <div class="stat-icon">
+                                <i class="fa fa-file-text" />
+                            </div>
+                            <div t-esc="state.stats.documentos" class="stat-value" />
+                            <div class="stat-label">Documentos Adjuntos</div>
+                        </div>
+                    </div>
+                    <!-- Título del Contrato -->
+                    <h1 class="contract-title">
+                        <t t-esc="state.activeContract.legacy_contract_number || state.activeContract.name" />
+                    </h1>
+                    <p class="contract-subtitle">
+                        Creado el
+                        <t t-esc="formatDate(state.activeContract.create_date)" />
+                    </p>
+                    <!-- Grid de Información -->
+                    <div class="info-grid">
+                        <!-- Card de Cliente -->
+                        <div class="info-card">
+                            <div class="info-title">
+                                <i class="fa fa-user me-2" />
+                                Cliente
+                            </div>
+                            <div class="field">
+                                <div class="field-label">Cliente</div>
+                                <div class="field-value">
+                                    <span class="avatar">
+                                        <t t-esc="state.activeContract.partner_id[1].substring(0, 2).toUpperCase()" />
+                                    </span>
+                                    <t t-esc="state.activeContract.partner_id[1]" />
+                                </div>
+                            </div>
+                            <div t-if="state.activeContract.vat" class="field">
+                                <div class="field-label">Identificación</div>
+                                <div class="field-value">
+                                    <t t-esc="state.activeContract.vat" />
+                                </div>
+                            </div>
+                            <div t-if="state.activeContract.asesor_id" class="field">
+                                <div class="field-label">Asesor que vendió</div>
+                                <div class="field-value">
+                                    <t t-esc="state.activeContract.asesor_id[1]" />
+                                </div>
+                            </div>
+                            <div t-if="state.activeContract.user_id" class="field">
+                                <div class="field-label">Oficial P/N</div>
+                                <div class="field-value">
+                                    <span class="avatar bg-success">
+                                        <t t-esc="state.activeContract.user_id[1].substring(0, 2).toUpperCase()" />
+                                    </span>
+                                    <t t-esc="state.activeContract.user_id[1]" />
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card de Financiamiento -->
+                        <div class="info-card">
+                            <div class="info-title">
+                                <i class="fa fa-credit-card me-2" />
+                                Financiamiento
+                            </div>
+                            <div class="field-row">
+                                <div class="field">
+                                    <div class="field-label">Producto</div>
+                                    <div class="field-value">
+                                        <t t-if="state.activeContract.product_id">
+                                            <t t-esc="state.activeContract.product_id[1]" />
+                                        </t>
+                                        <t t-else="">-</t>
+                                    </div>
+                                </div>
+                                <div t-if="state.activeContract.company_id" class="field">
+                                    <div class="field-label">Empresa</div>
+                                    <div class="field-value">
+                                        <t t-esc="state.activeContract.company_id[1]" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field-row">
+                                <div class="field">
+                                    <div class="field-label">Plazo</div>
+                                    <div class="field-value">
+                                        <t t-esc="state.activeContract.installment_id ? state.activeContract.installment_id[1] : 0" />
+                                        cuotas
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Valor de Cuota Destacado -->
+                            <div class="valor-cuota">
+                                <div class="valor-cuota-label">Valor cuota</div>
+                                <div class="valor-cuota-value">
+                                    <t t-esc="formatCurrency(state.activeContract.amount_per_rate)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tabs de Secciones -->
+                    <div class="tabs-secciones">
+                        <div t-att-class="{ active: state.activeTab === 'cuotas' }" t-on-click="() => this.changeTab('cuotas')" class="tab-seccion">
+                            <i class="fa fa-list-ul me-2" />
+                            Cuotas
+                        </div>
+                        <div t-att-class="{ active: state.activeTab === 'historial' }" t-on-click="() => this.changeTab('historial')" class="tab-seccion">
+                            <i class="fa fa-history me-2" />
+                            Historial
+                        </div>
+                        <div t-att-class="{ active: state.activeTab === 'documentos' }" t-on-click="() => this.changeTab('documentos')" class="tab-seccion">
+                            <i class="fa fa-folder me-2" />
+                            Documentos
+                        </div>
+                    </div>
+                    <!-- Contenido de las Tabs -->
+                    <div class="tab-content">
+                        <t t-if="state.activeTab === 'cuotas'">
+                            <t t-call="cjg_finance.ContractCuotasTab" />
+                        </t>
+                        <t t-elif="state.activeTab === 'historial'">
+                            <t t-call="cjg_finance.ContractHistorialTab" />
+                        </t>
+                        <t t-else="">
+                            <t t-call="cjg_finance.ContractDocumentosTab" />
+                        </t>
+                    </div>
+                </div>
+                <!-- Mensaje cuando no hay contrato seleccionado -->
+                <div t-else="" class="empty-state">
+                    <i class="fa fa-inbox fa-4x text-muted mb-3" />
+                    <h3>No hay contratos para mostrar</h3>
+                    <p class="text-muted">Este cliente no tiene contratos registrados.</p>
+                </div>
+                <!-- Footer con Chat -->
+                <div t-if="state.activeContract" class="footer">
+                    <span class="chat-icon">
+                        <i class="fa fa-comments" />
+                    </span>
+                    <input t-model="state.chatMessage" t-on-keydown="sendChatMessage" type="text" class="chat-input" placeholder="Enviar un mensaje..." />
+                    <button t-att-disabled="!state.chatMessage.trim()" t-on-click="sendChatMessage" class="btn btn-primary">
+                        <i class="fa fa-paper-plane me-2" />
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+    <!-- Tab de Cuotas -->
+    <t t-name="cjg_finance.ContractCuotasTab">
+        <div class="table-container">
+            <table class="table-cuotas">
+                <thead>
+                    <tr>
+                        <th>Cuota</th>
+                        <th>Fecha</th>
+                        <th class="right">Capital</th>
+                        <th class="right">Intereses</th>
+                        <th class="right">Total</th>
+                        <th class="right">Pagado</th>
+                        <th class="right">Pendiente</th>
+                        <th class="center">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-if="state.creditLines.length">
+                        <t t-foreach="state.creditLines" t-as="line" t-key="line.id">
+                            <tr t-att-class="getLineStateClass(line.state)">
+                                <td>
+                                    <strong>
+                                        <t t-esc="line.name" />
+                                    </strong>
+                                </td>
+                                <td>
+                                    <t t-esc="formatDate(line.expected_date_payment)" />
+                                </td>
+                                <td class="right">
+                                    <t t-esc="formatCurrency(line.amount_capital)" />
+                                </td>
+                                <td class="right">
+                                    <t t-esc="formatCurrency(line.amount_interest)" />
+                                </td>
+                                <td class="right">
+                                    <strong>
+                                        <t t-esc="formatCurrency(line.amount_fixed)" />
+                                    </strong>
+                                </td>
+                                <td class="right text-success">
+                                    <t t-esc="formatCurrency(line.amount_paid)" />
+                                </td>
+                                <td class="right text-danger">
+                                    <t t-esc="formatCurrency(line.amount_residual)" />
+                                </td>
+                                <td class="center">
+                                    <span t-att-class="getPaidBadgeClass(line.state === 'paid')" class="badge">
+                                        <i t-att-class="{
+                                                'fa-check': line.state === 'paid',
+                                                'fa-clock': line.state === 'due',
+                                                'fa-exclamation': line.state === 'overdue'
+                                            }" class="fa me-1" />
+                                        <t t-if="line.state === 'paid'">Pagada</t>
+                                        <t t-elif="line.state === 'partial'">Parcial</t>
+                                        <t t-elif="line.state === 'overdue'">Vencida</t>
+                                        <t t-else="">Pendiente</t>
+                                    </span>
+                                </td>
+                            </tr>
+                        </t>
+                        <!-- Fila de Resumen -->
+                        <tr class="summary-row summary-green">
+                            <td colspan="8" class="summary-text">
+                                <i class="fa fa-chart-line me-2" />
+                                <strong>TOTALES:</strong>
+                                Capital:
+                                <t t-esc="formatCurrency(state.activeContract.amount_financed)" />
+                                |
+                                Residual:
+                                <t t-esc="formatCurrency(state.activeContract.amount_residual)" />
+                            </td>
+                        </tr>
+                    </t>
+                    <t t-else="">
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="fa fa-info-circle me-2" />
+                                No hay cuotas registradas para este contrato
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </t>
+    <!-- Tab de Historial de Pagos -->
+    <t t-name="cjg_finance.ContractHistorialTab">
+        <div class="table-container">
+            <table class="table-historial">
+                <thead>
+                    <tr>
+                        <th>Recibo</th>
+                        <th>Fecha</th>
+                        <th class="right">Monto</th>
+                        <th class="center">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-if="state.payments.length">
+                        <t t-foreach="state.payments" t-as="payment" t-key="payment.id">
+                            <tr>
+                                <td>
+                                    <strong>
+                                        <t t-esc="payment.name" />
+                                    </strong>
+                                </td>
+                                <td>
+                                    <t t-esc="formatDate(payment.payment_date)" />
+                                </td>
+                                <td class="right">
+                                    <t t-esc="formatCurrency(payment.amount_total)" />
+                                </td>
+                                <td class="center">
+                                    <span t-att-class="{
+                                            'badge-success': payment.state === 'paid',
+                                            'badge-warning': payment.state === 'validated',
+                                            'badge-secondary': payment.state === 'draft'
+                                        }" class="badge">
+                                        <t t-if="payment.state === 'paid'">Pagado</t>
+                                        <t t-elif="payment.state === 'validated'">Validado</t>
+                                        <t t-else="">Borrador</t>
+                                    </span>
+                                </td>
+                            </tr>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="fa fa-info-circle me-2" />
+                                No hay pagos registrados para este contrato
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </t>
+    <!-- Tab de Documentos -->
+    <t t-name="cjg_finance.ContractDocumentosTab">
+        <div class="documents-grid">
+            <t t-if="state.documents.length">
+                <t t-foreach="state.documents" t-as="doc" t-key="doc.id">
+                    <div class="document-card">
+                        <div class="document-icon">
+                            <i t-att-class="{
+                                   'fa-file-pdf text-danger': doc.mimetype === 'application/pdf',
+                                   'fa-file-image text-primary': doc.mimetype.startsWith('image/'),
+                                   'fa-file-word text-info': doc.mimetype.includes('word'),
+                                   'fa-file-excel text-success': doc.mimetype.includes('spreadsheet') or doc.mimetype.includes('excel'),
+                                   'fa-file text-secondary': true
+                               }" class="fa fa-3x" />
+                        </div>
+                        <div class="document-info">
+                            <div class="document-name">
+                                <t t-esc="doc.name" />
+                            </div>
+                            <div class="document-meta text-muted">
+                                <t t-esc="formatDate(doc.create_date)" />
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+            <t t-else="">
+                <div class="empty-documents">
+                    <i class="fa fa-folder-open fa-4x text-muted mb-3" />
+                    <p class="text-muted">No hay documentos adjuntos</p>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

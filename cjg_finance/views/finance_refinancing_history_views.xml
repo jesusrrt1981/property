@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- ============================================ -->
+    <!-- Tree View: Refinancing History -->
+    <!-- ============================================ -->
+    <record id="finance_refinancing_history_view_tree" model="ir.ui.view">
+        <field name="name">finance.refinancing.history.tree</field>
+        <field name="model">finance.refinancing.history</field>
+        <field name="arch" type="xml">
+            <tree string="Histór de Refinanciamientos" create="false" delete="false">
+                <field name="refinance_date" />
+                <field name="credit_id" />
+                <field name="partner_id" />
+                <field name="old_balance" sum="Total Saldo Anterior" />
+                <field name="capital_down_payment" sum="Total Abonos" />
+                <field name="penalty_applied" sum="Total Penalizaciones" />
+                <field name="new_balance" sum="Total Saldo Nuevo" />
+                <field name="old_installments_pending" />
+                <field name="new_installments" />
+                <field name="user_id" />
+                <field name="currency_id" invisible="1" />
+            </tree>
+        </field>
+    </record>
+    <!-- ============================================ -->
+    <!-- Form View: Refinancing History -->
+    <!-- ============================================ -->
+    <record id="finance_refinancing_history_view_form" model="ir.ui.view">
+        <field name="name">finance.refinancing.history.form</field>
+        <field name="model">finance.refinancing.history</field>
+        <field name="arch" type="xml">
+            <form string="Detalle de Refinanciamiento" create="false" delete="false">
+                <sheet>
+                    <div name="button_box" class="oe_button_box" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Información General">
+                            <field name="credit_id" readonly="1" />
+                            <field name="partner_id" readonly="1" />
+                            <field name="refinance_date" readonly="1" />
+                            <field name="user_id" readonly="1" />
+                            <field name="currency_id" invisible="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="lines" string="Detalle de Cuotas">
+                             <field name="line_ids" readonly="1">
+                                <tree string="Detalle" decoration-muted="payment_ref == False">
+                                    <field name="number" />
+                                    <field name="date_maturity" />
+                                    <field name="description" />
+                                    <field name="amount_quota" sum="Total Cuota" />
+                                    <field name="payment_ref" />
+                                    <field name="payment_date" />
+                                    <field name="paid_capital" sum="Total Capital" />
+                                    <field name="paid_interest" sum="Total Interés" />
+                                    <field name="paid_total" sum="Total Pagado" />
+                                    <field name="balance" />
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="comparison" string="Comparación">
+                            <group>
+                                <group string="Estado Anterior">
+                                    <field name="old_balance" readonly="1" />
+                                    <field name="old_installments_pending" readonly="1" />
+                                    <field name="old_installment_value" readonly="1" />
+                                    <field name="old_interest_rate" readonly="1" />
+                                </group>
+                                <group string="Estado Nuevo">
+                                    <field name="new_balance" readonly="1" />
+                                    <field name="new_installments" readonly="1" />
+                                    <field name="new_installment_value" readonly="1" />
+                                    <field name="new_interest_rate" readonly="1" />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="financial_details" string="Detalles Financieros">
+                            <group>
+                                <group string="Parametros del Refinanciamiento">
+                                    <field name="capital_down_payment" readonly="1" />
+                                    <field name="penalty_applied" readonly="1" />
+                                    <field name="new_interest_generated" readonly="1" />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="notes" string="Notas">
+                            <field name="notes" placeholder="Observaciones sobre este refinanciamiento..." readonly="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- ============================================ -->
+    <!-- Search View: Refinancing History -->
+    <!-- ============================================ -->
+    <record id="finance_refinancing_history_view_search" model="ir.ui.view">
+        <field name="name">finance.refinancing.history.search</field>
+        <field name="model">finance.refinancing.history</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Refinanciamientos">
+                <field name="credit_id" string="Crédito" />
+                <field name="partner_id" string="Cliente" />
+                <field name="user_id" string="Usuario" />
+                <field name="refinance_date" string="Fecha" />
+                <filter name="this_month" string="Este Mes" domain="[('refinance_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), ('refinance_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]" />
+                <filter name="last_month" string="Mes Pasado" domain="[('refinance_date', '&gt;=', (context_today() - relativedelta(months=1, day=1)).strftime('%Y-%m-%d')), ('refinance_date', '&lt;=', (context_today() - relativedelta(months=1, day=31)).strftime('%Y-%m-%d'))]" />
+                <group string="Agrupar Por" expand="0">
+                    <filter name="group_by_partner" string="Cliente" context="{'group_by': 'partner_id'}" />
+                    <filter name="group_by_user" string="Usuario" context="{'group_by': 'user_id'}" />
+                    <filter name="group_by_date" string="Fecha" context="{'group_by': 'refinance_date:month'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+    <!-- ============================================ -->
+    <!-- Action: Refinancing History -->
+    <!-- ============================================ -->
+    <record id="finance_refinancing_history_action" model="ir.actions.act_window">
+        <field name="name">Histórico de Refinanciamientos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">finance.refinancing.history</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_this_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No hay histórico de refinanciamientos</p>
+            <p>El histórico se genera automáticamente cuando se refinancia un crédito.</p>
+        </field>
+    </record>
+    <!-- ============================================ -->
+    <!-- Menu Item: Refinancing History -->
+    <!-- ============================================ -->
+    <menuitem id="menu_finance_refinancing_history" name="Histórico Refinanciamientos" parent="cjg_finance.credito_menu" action="finance_refinancing_history_action" sequence="50" />
+    </data>
+</odoo>

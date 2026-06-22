@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cjg_finance.PartnerContractTabs">
+        <t t-if="state.loading">
+            <div class="p-3 text-center">
+                <i class="fa fa-spinner fa-spin"/>
+                <span class="ml-2">Cargando...</span>
+            </div>
+        </t>
+        <t t-else="">
+            <div class="cjg-contract">
+                <div class="tabs-contratos">
+                    <div class="tab-contrato" t-foreach="state.credits" t-as="credit" t-key="credit &amp;&amp; credit.id || credit_index"
+                         t-att-class="credit_index === state.selectedTab ? 'tab-contrato active' : 'tab-contrato'"
+                         t-on-click.prevent="() =&gt; this.onTabChange(credit_index)">
+                        <t t-esc="credit &amp;&amp; credit.name"/>
+                        <span class="badge" t-att-class="(credit.state === 'closed') ? 'badge badge-saldado' : 'badge badge-activo'">
+                            <t t-esc="(credit.state === 'closed') ? 'SALDADO' : 'ACTIVO'"/>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="header" t-if="state.credits.length">
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary">Validar</button>
+                        <button class="btn btn-secondary">Agregar</button>
+                    </div>
+                    <div class="statusbar">
+                        <span class="status-badge" t-att-class="(state.credits[state.selectedTab].state === 'draft') ? 'status-badge status-active' : 'status-badge status-inactive'">Borrador</span>
+                        <span class="status-badge" t-att-class="(state.credits[state.selectedTab].state in ['approved','requested','verified','in_payment']) ? 'status-badge status-active' : 'status-badge status-inactive'">Activo</span>
+                        <span class="status-badge" t-att-class="(state.credits[state.selectedTab].state === 'closed') ? 'status-badge status-active' : 'status-badge status-inactive'">Finalizado</span>
+                    </div>
+                </div>
+
+                <div class="content" t-if="state.credits.length">
+                    <t t-set="credit" t-value="state.credits[state.selectedTab]"/>
+
+                    <div class="stats-grid">
+                        <div class="stat-card blue">
+                            <div class="stat-icon"></div>
+                            <div class="stat-value"><t t-esc="credit.counts.pagos || 0"/></div>
+                            <div class="stat-label">Pagos</div>
+                        </div>
+                        <div class="stat-card purple">
+                            <div class="stat-icon"></div>
+                            <div class="stat-value"><t t-esc="credit.counts.cuotas || 0"/></div>
+                            <div class="stat-label">Cuotas</div>
+                        </div>
+                        <div class="stat-card pink">
+                            <div class="stat-icon"></div>
+                            <div class="stat-value"><t t-esc="credit.counts.documentos || 0"/></div>
+                            <div class="stat-label">Documentos</div>
+                        </div>
+                    </div>
+
+                    <h1><t t-esc="credit.name"/></h1>
+                    <p class="subtitle"><t t-esc="credit.date_contract || ''"/></p>
+
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-title"> Cliente</div>
+                            <div class="field">
+                                <div class="field-label">Cliente</div>
+                                <div class="field-value">
+                                    <span class="avatar"><t t-esc="(credit.partner_id &amp;&amp; credit.partner_id[1] &amp;&amp; credit.partner_id[1][0]) || '?'"/></span>
+                                    <t t-esc="credit.partner_id &amp;&amp; credit.partner_id[1]"/>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label">Oficial</div>
+                                <div class="field-value"><t t-esc="credit.user_id &amp;&amp; credit.user_id[1]"/></div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label">Gerente</div>
+                                <div class="field-value"><t t-esc="credit.manager_id &amp;&amp; credit.manager_id[1]"/></div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label">Motorista</div>
+                                <div class="field-value"><t t-esc="credit.motorista_id &amp;&amp; credit.motorista_id[1]"/></div>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-title"> Financiamiento</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                                <div class="field">
+                                    <div class="field-label">Producto</div>
+                                    <div class="field-value"><t t-esc="credit.product_id &amp;&amp; credit.product_id[1]"/></div>
+                                </div>
+                                <div class="field">
+                                    <div class="field-label">Empresa</div>
+                                    <div class="field-value"><t t-esc="credit.company_id &amp;&amp; credit.company_id[1]"/></div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label">Próxima cuota</div>
+                                <span class="tag"><t t-esc="credit.nextPending &amp;&amp; credit.nextPending.expected_date_payment || ''"/></span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                                <div class="field">
+                                    <div class="field-label">Cuotas</div>
+                                    <div class="field-value"><t t-esc="credit.counts.cuotas || 0"/></div>
+                                </div>
+                                <div class="field">
+                                    <div class="field-label">Monto por cuota</div>
+                                    <div class="field-value"><t t-esc="credit.amount_per_rate || 0"/></div>
+                                </div>
+                            </div>
+                            <div class="valor-cuota">
+                                <div class="valor-cuota-label">Valor cuota</div>
+                                <div class="valor-cuota-value"><t t-esc="credit.amount_per_rate || 0"/></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tabs-secciones">
+                        <div class="tab-seccion" t-att-class="state.selectedSection === 'cuotas' ? 'tab-seccion active' : 'tab-seccion'" t-on-click.prevent="() =&gt; this.onSectionChange('cuotas')"> Cuotas</div>
+                        <div class="tab-seccion" t-att-class="state.selectedSection === 'historial' ? 'tab-seccion active' : 'tab-seccion'" t-on-click.prevent="() =&gt; this.onSectionChange('historial')"> Historial</div>
+                        <div class="tab-seccion" t-att-class="state.selectedSection === 'documentos' ? 'tab-seccion active' : 'tab-seccion'" t-on-click.prevent="() =&gt; this.onSectionChange('documentos')"> Documentos</div>
+                    </div>
+
+                    <div t-if="state.selectedSection === 'cuotas'">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Plan</th>
+                                        <th class="right">Pendiente</th>
+                                        <th class="right">Total</th>
+                                        <th class="center">Pagado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="credit.lines" t-as="l" t-key="l.id" t-att-class="l.state in ['paid','paid_overdue','paid_reload'] ? 'success' : ''">
+                                        <td><t t-esc="l.count"/></td>
+                                        <td class="right"><t t-esc="l.amount_residual"/></td>
+                                        <td class="right"><t t-esc="l.amount_fixed"/></td>
+                                        <td class="center">
+                                            <div class="toggle">
+                                                <div class="toggle-circle" t-att-style="l.state in ['paid','paid_overdue','paid_reload'] ? 'left: 20px;' : 'left: 2px;'"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="summary-green">
+                                        <td colspan="4" style="padding: 16px; font-weight: 700; color: #166534;">
+                                            <t t-esc="'Capital: '"/> <t t-esc="credit.amount_financed || 0"/> <t t-esc="' | Intereses: '"/> <t t-esc="credit.amount_interest_value || 0"/> <t t-esc="' | Total: '"/> <t t-esc="(credit.amount_financed || 0) + (credit.amount_interest_value || 0)"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="summary-gray">
+                                        <td colspan="4" style="padding: 16px; font-weight: 700; color: #111827;">
+                                            <t t-esc="'Total Vendido: '"/> <t t-esc="credit.total_sold || 0"/> <t t-esc="' | Pagado: '"/> <t t-esc="credit.credit_amount || 0"/> <t t-esc="' | Adeudado: '"/> <t t-esc="credit.credit_Adeudado || 0"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div t-if="state.selectedSection === 'historial'">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Acción</th>
+                                        <th>Contrato</th>
+                                        <th>Descripción Cliente</th>
+                                        <th>Oficial</th>
+                                        <th>Próximo Contacto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="credit.followups" t-as="r" t-key="r.id">
+                                        <td><t t-esc="r.create_date"/></td>
+                                        <td><t t-esc="r.action_type"/></td>
+                                        <td><t t-esc="r.credit_id &amp;&amp; r.credit_id[1]"/></td>
+                                        <td><t t-esc="r.internal_notes"/></td>
+                                        <td><t t-esc="r.user_id &amp;&amp; r.user_id[1]"/></td>
+                                        <td><t t-esc="r.next_contact_date"/></td>
+                                    </tr>
+                                    <tr t-if="(credit.followups || []).length === 0">
+                                        <td colspan="6" class="text-center" style="padding: 16px; color: #6b7280;">Sin historial</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div t-if="state.selectedSection === 'documentos'">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="credit.attachments" t-as="a" t-key="a.id">
+                                        <td><t t-esc="a.file_name_show || a.file_attached_name || 'Documento'"/></td>
+                                        <td><t t-esc="a.description || ''"/></td>
+                                    </tr>
+                                    <tr t-if="(credit.attachments || []).length === 0">
+                                        <td colspan="2" class="text-center" style="padding: 16px; color: #6b7280;">Sin documentos</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </t>
+</templates>

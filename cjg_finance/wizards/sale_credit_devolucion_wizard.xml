@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_credit_devolucion_wizard_view_form" model="ir.ui.view">
+            <field name="name">sale.credit.devolucion.wizard.form</field>
+            <field name="model">sale.credit.devolucion.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Devolución de Contrato (Opción 3)">
+                    <field name="step" invisible="1"/>
+                    <group string="Información del Contrato">
+                        <group>
+                            <field name="credit_id" readonly="1"/>
+                            <field name="capital_paid" widget="monetary" readonly="1"/>
+                            <field name="interest_paid" widget="monetary" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="devolucion_amount" widget="monetary" readonly="1"/>
+                            <field name="retained_amount" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Datos de Devolución">
+                        <field name="devolucion_method"/>
+                        <field name="devolucion_reference"
+                               invisible="step == 'confirm'" required="step == 'register'"/>
+                        <field name="devolucion_date"
+                               invisible="step == 'confirm'" required="step == 'register'"/>
+                        <field name="devolucion_notes"/>
+                    </group>
+                    <footer>
+                        <button string="Iniciar Proceso de Devolución" type="object"
+                                name="action_confirm_devolucion" class="btn-primary"
+                                invisible="step == 'register'"/>
+                        <button string="Registrar Emisión" type="object"
+                                name="action_register_devolucion" class="btn-primary"
+                                invisible="step == 'confirm'"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_credit_devolucion_wizard_action" model="ir.actions.act_window">
+            <field name="name">Devolución de Contrato</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.credit.devolucion.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

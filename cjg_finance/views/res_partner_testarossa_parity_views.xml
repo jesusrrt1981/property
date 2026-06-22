@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_partner_form_testarossa_parity" model="ir.ui.view">
+            <field name="name">res.partner.form.testarossa.parity</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Datos Testarossa" groups="base.group_no_one">
+                        <group string="Identificación">
+                            <field name="document_type"/>
+                            <field name="civil_status"/>
+                            <field name="partner_classification"/>
+                            <field name="partner_class"/>
+                        </group>
+                        <group string="Datos Personales">
+                            <field name="birth_place"/>
+                            <field name="num_children"/>
+                            <field name="file_number"/>
+                        </group>
+                        <group string="Empleo">
+                            <field name="employer_name"/>
+                            <field name="employer_nit"/>
+                        </group>
+                        <group string="Fiscal">
+                            <field name="comprobante_type"/>
+                            <field name="comprobante_type_real"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

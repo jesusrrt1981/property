@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Client Action para el Dashboard de Contratos -->
+        <record id="action_contract_dashboard_client" model="ir.actions.client">
+            <field name="name">Dashboard de Contratos</field>
+            <field name="tag">contract_dashboard</field>
+            <field name="params" eval="{}" />
+        </record>
+        <!-- Menú Principal: Dashboard de Contratos -->
+        <menuitem id="menu_contract_dashboard" name="Dashboard de Contratos" parent="credito_menu" action="action_contract_dashboard_client" sequence="25" />
+        <!-- Acción de Servidor para abrir desde res.partner -->
+        <record id="action_open_contract_dashboard_from_partner" model="ir.actions.server">
+            <field name="name">Ver Dashboard de Contratos</field>
+            <field model="ir.model" name="model_id" search="[('model', '=', 'res.partner')]" />
+            <field model="ir.model" name="binding_model_id" search="[('model', '=', 'res.partner')]" />
+            <field name="state">code</field>
+            <field name="code">action = {
+    'type': 'ir.actions.client',
+    'tag': 'contract_dashboard',
+    'target': 'fullscreen',
+    'params': {
+        'partnerId': record.id
+    }
+}</field>
+        </record>
+        <!-- Botón en formulario de res.partner -->
+        <record id="view_partner_form_contract_dashboard_button" model="ir.ui.view">
+            <field name="name">res.partner.form.contract.dashboard.button</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="inside">
+                    <field name="is_company" invisible="1"/>
+                </xpath>
+                <xpath position="inside" expr="//div[@name='button_box']">
+                    <button name="%(action_open_contract_dashboard_from_partner)d" type="action" class="oe_stat_button" icon="fa-dashboard" invisible="not is_company">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Dashboard</span>
+                            <span class="o_stat_text">Contratos</span>
+                        </div>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+        <!-- Acción para abrir desde sale.credit -->
+        <record id="action_open_contract_dashboard_from_credit" model="ir.actions.server">
+            <field name="name">Ver en Dashboard</field>
+            <field name="model_id" ref="cjg_finance.model_sale_credit" />
+            <field name="binding_model_id" ref="cjg_finance.model_sale_credit" />
+            <field name="binding_view_types">form</field>
+            <field name="state">code</field>
+            <field name="code">action = {
+    'type': 'ir.actions.client',
+    'tag': 'contract_dashboard',
+    'target': 'fullscreen',
+    'params': {
+        'partnerId': record.partner_id.id
+    }
+}</field>
+        </record>
+    </data>
+</odoo>

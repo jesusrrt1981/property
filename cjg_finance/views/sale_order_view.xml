@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="cjg_finance_sale_order_form" model="ir.ui.view">
+            <field name="name">astratech.credit.sale.order.view.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options="{&quot;always_reload&quot;: True, 'no_quick_create': True, 'no_open': True}"/>
+                </xpath>
+                <!-- <xpath expr="//field[@name='partner_invoice_id']" position="replace">
+                    <field name="partner_invoice_id" groups="sale.group_delivery_invoice_address" context="{'default_type':'invoice'}" options="{&quot;always_reload&quot;: True, 'no_quick_create': True, 'no_open': True}" readonly="state != 'draft'"/>
+                </xpath> -->
+                <!-- <xpath expr="//field[@name='partner_shipping_id']" position="replace">
+                    <field name="partner_shipping_id" groups="sale.group_delivery_invoice_address" context="{'default_type':'delivery'}" options="{&quot;always_reload&quot;: True, 'no_quick_create': True, 'no_open': True}" readonly="state != 'draft'"/>
+                </xpath> -->
+                <field name="payment_term_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="validity_date" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">False</attribute>
+                    <attribute name="force_save">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="force_save">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="force_save">True</attribute>
+                </xpath>
+                <field name="team_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="require_signature" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="require_payment" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="client_order_ref" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="user_id" position="after">
+                    <!-- <field name="credit_count"/> -->
+                </field>
+                <group name="sale_info" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </group>
+                <header position="inside">
+                    <field name="invoice_ids" invisible="1"/>
+                    <!-- <button type="object" name="action_print_sale_thermal_invoice" string="FACTURA TÉRMICA" invisible="not invoice_ids"/> -->
+                </header>
+            </field>
+        </record>
+        <!-- <record id="cjg_finance_sale_order_form2" model="ir.ui.view">
+            <field name="name">astratech.credit.sale.order.view.form2</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                    <button name="action_show_requested_credit" type="object" class="oe_stat_button" icon="fa-money" invisible="not sale_advanced">
+                        
+                        <div class="o_form_field o_stat_info" modifiers="{}">
+                        <span class="o_stat_value" modifiers="{}">
+                            <field name="credit_amount" options="{'currency_field': 'currency_id'}" widget="monetary" string="Credit"/>
+                        </span>
+
+                    <span class="o_stat_text" modifiers="{}">
+						Credito
+					</span>
+                        </div>
+                    </button>
+                </xpath>
+                <field name="payment_term_id" position="after">
+                    <field name="sale_advanced" readonly="state not in ['draft', 'sent']"/>
+                    <field name="journal_id" options="{'no_open': True, 'no_create': True}" readonly="state != 'draft'"/>
+                </field>
+                <field name="journal_id" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="force_save">True</attribute>
+                </field>
+                <header position="after">
+                    <field name="credit_state" invisible="1"/>
+                    <div class="alert alert-danger" role="alert" style="margin-bottom:0px; margin:5px;" invisible="credit_state not in ['draft', 'requested']">
+                         Pending credit approval...
+                    </div>
+                </header>
+            </field>
+        </record> -->
+        <!--    
+    Colocar en un TREE
+        <xpath expr="//field[@name='state']" position="after">
+                    <field name="credit_state" decoration-info="credit_state in ['draft','requested']" decoration-success="credit_state == 'approved'" decoration-muted="credit_state == 'done'" decoration-danger="credit_state == 'refused'" widget="badge" optional="show"/>
+                     <field name="credit_count" optional="hide"/>
+                </xpath> 
+                
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="credit_state"/>
+                    <field name="credit_count" optional="hide"/>
+                </xpath>
+                -->
+    </data>
+</odoo>

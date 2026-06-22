@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="0">
+
+    <!-- ============================================================== -->
+    <!-- GRUPO: Documentación                                            -->
+    <!-- Representa a María Santana en el workflow de                    -->
+    <!-- reactivación/mejora/reembolso.                                  -->
+    <!--                                                                 -->
+    <!-- Responsabilidades:                                              -->
+    <!--   - Recibe solicitudes por escrito del cliente                  -->
+    <!--   - Autoriza cambios de estatus:                                -->
+    <!--       Anulado       → Anulado Devolución                        -->
+    <!--       Desistido     → Desistido Devolución                      -->
+    <!--   - Autoriza reembolsos                                         -->
+    <!--   - Coordina con Contabilidad para emisión de                   -->
+    <!--     cheques / transferencias                                    -->
+    <!--                                                                 -->
+    <!-- NO modificar el contrato en sí (montos, fechas, productos).     -->
+    <!-- ============================================================== -->
+
+    <!-- Categoría para agrupar los grupos de Documentación -->
+    <record id="module_category_documentation" model="ir.module.category">
+        <field name="name">Documentación</field>
+        <field name="description">Usuarios del departamento de Documentación (ej. María Santana) que gestionan cambios de estatus y autorizaciones de reembolsos.</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Grupo principal: Usuario de Documentación -->
+    <record id="group_documentation_user" model="res.groups">
+        <field name="name">Usuario de Documentación</field>
+        <field name="category_id" ref="module_category_documentation"/>
+        <field name="comment">
+            Usuarios con acceso a autorizar cambios de estatus de contratos
+            (Anulado → Anulado Devolución, Desistido → Desistido Devolución),
+            procesar reembolsos, y coordinar con Contabilidad.
+
+            Permisos:
+              - Leer todos los contratos (auditoría cross-company)
+              - Cambiar estado de Anulado/Desistido a *Devolución
+              - Crear y aplicar cargos de reembolso
+              - NO modificar el contrato en sí (montos, fechas, productos)
+        </field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Grupo manager: Documentación Manager (puede aprobar ajustes) -->
+    <record id="group_documentation_manager" model="res.groups">
+        <field name="name">Manager de Documentación</field>
+        <field name="category_id" ref="module_category_documentation"/>
+        <field name="comment">
+            Manager del departamento de Documentación. Puede:
+              - Aprobar penalidades ajustadas (20% o 15%)
+              - Revertir cambios de estatus
+              - Auditoría de operaciones de documentación
+        </field>
+        <field name="implied_ids" eval="[(4, ref('group_documentation_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- ============================================================== -->
+    <!-- RECORD RULES — Documentación (cjg_finance)                      -->
+    <!--                                                                 -->
+    <!-- Nota: el domain_force [(1, '=', 1)] es DELIBERADO.              -->
+    <!-- Documentación ve TODO cross-company / cross-equipo              -->
+    <!-- para fines de auditoría. Solo lectura + transiciones            -->
+    <!-- de estatus controladas por el wizard de devolución.             -->
+    <!--                                                                 -->
+    <!-- Las reglas sobre collection.* viven en                          -->
+    <!-- cjg_finance_collection/security/ir_rule_documentation.xml       -->
+    <!-- para evitar dependencia circular.                              -->
+    <!-- ============================================================== -->
+
+    <record id="rule_sale_credit_documentation_all" model="ir.rule">
+        <field name="name">Documentación: ve todos los contratos</field>
+        <field name="model_id" ref="model_sale_credit"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_documentation_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</data></odoo>

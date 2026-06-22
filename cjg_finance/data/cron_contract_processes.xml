@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+    <!-- Cron: Anulación Automática de Contratos (ejecutar diariamente, con guardia de último día del mes) -->
+    <record id="cron_auto_cancel_contracts" model="ir.cron">
+        <field name="name">Anulación Automática de Contratos</field>
+        <field name="model_id" ref="model_sale_credit"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_auto_cancel_contracts()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <!-- Cron: Desistimiento Automático de Contratos (ejecutar diariamente) -->
+    <record id="cron_auto_withdraw_contracts" model="ir.cron">
+        <field name="name">Desistimiento Automático de Contratos</field>
+        <field name="model_id" ref="model_sale_credit"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_auto_withdraw_contracts()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+        <field name="doall" eval="False"/>
+    </record>
+</data></odoo>

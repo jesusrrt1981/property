@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- Tree View -->
+    <record id="view_sale_credit_charge_tree" model="ir.ui.view">
+        <field name="name">sale.credit.charge.tree</field>
+        <field name="model">sale.credit.charge</field>
+        <field name="arch" type="xml">
+            <tree string="Cargos y Abonos" decoration-danger="charge_type=='charge'" decoration-success="charge_type=='credit'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="credit_id"/>
+                <field name="partner_id"/>
+                <field name="charge_type" widget="badge" decoration-danger="charge_type=='charge'" decoration-success="charge_type=='credit'"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge" decoration-info="state=='draft'" decoration-success="state=='posted'" decoration-muted="state=='cancelled'"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_sale_credit_charge_form" model="ir.ui.view">
+        <field name="name">sale.credit.charge.form</field>
+        <field name="model">sale.credit.charge</field>
+        <field name="arch" type="xml">
+            <form string="Cargo/Abono">
+                <header>
+                    <button name="action_post" string="Aplicar" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state == 'cancelled'"/>
+                    <button name="action_draft" string="Volver a Borrador" type="object" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="credit_id" options="{'no_create': True}"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="charge_type" widget="radio" options="{'horizontal': true}"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="reason" placeholder="Describa el motivo del cargo/abono..."/>
+                    </group>
+                    <group invisible="1">
+                        <field name="testarossa_id"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_sale_credit_charge_search" model="ir.ui.view">
+        <field name="name">sale.credit.charge.search</field>
+        <field name="model">sale.credit.charge</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Cargos/Abonos">
+                <field name="name"/>
+                <field name="credit_id"/>
+                <field name="partner_id"/>
+                <field name="reason"/>
+                <filter name="filter_charges" string="Cargos" domain="[('charge_type', '=', 'charge')]"/>
+                <filter name="filter_credits" string="Abonos" domain="[('charge_type', '=', 'credit')]"/>
+                <separator/>
+                <filter name="filter_draft" string="Borrador" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_posted" string="Aplicados" domain="[('state', '=', 'posted')]"/>
+                <filter name="filter_cancelled" string="Cancelados" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter name="filter_this_month" string="Este Mes" domain="[('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')), ('date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_credit" string="Contrato" context="{'group_by': 'credit_id'}"/>
+                    <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_type" string="Tipo" context="{'group_by': 'charge_type'}"/>
+                    <filter name="group_state" string="Estado" context="{'group_by': 'state'}"/>
+                    <filter name="group_date" string="Fecha" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_sale_credit_charge" model="ir.actions.act_window">
+        <field name="name">Cargos y Abonos</field>
+        <field name="res_model">sale.credit.charge</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_posted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un Cargo o Abono
+            </p>
+            <p>
+                Los cargos son montos adicionales que se agregan al contrato (moras, penalidades, etc.).<br/>
+                Los abonos son descuentos o condonaciones que se restan del contrato.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_sale_credit_charge"
+              name="Cargos/Abonos"
+              parent="pagos_menu"
+              action="action_sale_credit_charge"
+              sequence="50"/>
+    </data>
+</odoo>

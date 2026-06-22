@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="credit_overdue_view_form" model="ir.ui.view">
+            <field name="name">credit.overdue.view.form</field>
+            <field name="model">credit.overdue</field>
+            <field name="arch" type="xml">
+                <form delete="0" edit="0" create="0">   
+                    <header>
+                       <button name="action_exoneracion" string="Exonerar mora" type="object" class="oe_highlight" invisible="is_exonerated or invoice_id"/>
+                            
+                        <!-- <button name="waive_overdue" string="Exonerar mora" type="object" class="oe_highlight"  invisible="is_exonerated or invoice_id"/> -->
+                        <button name="create_invoice" string="Facturar mora" type="object" class="oe_highlight" invisible="is_exonerated or invoice_id"/>
+
+                        <!-- <button special="cancel" string="Cancelar" class="oe_link" invisible="invoice_id"/> -->
+                    </header>               
+                    <sheet>
+                        <widget name="web_ribbon" title="Mora Exonerada" bg_color="bg-success" invisible="not is_exonerated or invoice_id"/>
+                        <widget name="web_ribbon" title="Mora Exonerada Por Porcentaje" bg_color="bg-success" invisible="not exonerated_percent or invoice_id"/>
+                        <widget name="web_ribbon" title="Mora Exonerada Por Monto Fijo" bg_color="bg-success" invisible="not exonerated_amount or invoice_id"/>
+                        
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_overdue_invoice" class="oe_stat_button" type="object" icon="fa-pencil-square-o" invisible="not invoice_id">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Invoice</span>
+                                    <field name="invoice_id" invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="is_exonerated" invisible="1"/>
+                                    <field name="exonerated_percent" invisible="1"/>
+                                    <field name="exonerated_amount" invisible="1"/>
+
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="related_credit_name" invisible="1"/>
+                                <field name="partner_id" widget="many2one_clickable" force_save="1"/>
+                                <field name="credit_id"/>
+                                <field name="credit_line_id"/>
+                                <field name="overdue_type"/>
+                                <field name="payment_state"/>
+                                <field name="expected_date_payment"/>
+                            </group>
+                            <group>
+                                <field name="amount_total"/>
+                                <field name="amount_residual"/>
+                                <field name="compute_state" invisible="1"/>
+                                <field name="user_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <!-- <field name="create_date" string="Fecha Creación"/> -->
+                            </group>
+                        </group>
+                    </sheet>
+                <!-- <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div> -->
+             
+                </form>
+            </field>
+        </record>
+        <record id="credit_overdue_view_tree" model="ir.ui.view">
+            <field name="name">credit.overdue.view.tree</field>
+            <field name="model">credit.overdue</field>
+            <field name="arch" type="xml">
+                <tree delete="0" edit="0" create="0">
+                    <field name="name"/>
+                    <field name="user_id" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="partner_id" widget="many2one_clickable"/>
+                    <field name="credit_id"/>
+                    <field name="credit_line_id" optional="hide"/>
+                    <field name="overdue_type" optional="hide"/>
+                    <field name="amount_total" sum="Total"/>
+                    <field name="amount_residual" sum="Total"/>
+                    <field name="credit_overdue" sum="Total Moras"/> 
+                    <field name="state"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="payment_state" optional="hide"/>
+                    <field name="invoice_id" optional="hide"/>
+                    <field name="expected_date_payment" optional="hide"/> 
+                </tree>
+            </field>
+        </record>
+        <record id="credit_overduet_view_search" model="ir.ui.view">
+            <field name="name">credit.overdue.view.search</field>
+            <field name="model">credit.overdue</field>
+            <field name="arch" type="xml">
+                <search string="Credit Overdue">
+                    <field name="name" string="Name" filter_domain="['|', '|', ('name', 'ilike', self), ('credit_id', 'ilike', self),('partner_id', 'ilike', self)]"/>
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <field name="overdue_type"/>
+                    <field name="state"/>
+                    <separator/>
+                    <!-- <filter name="state_draft" string="Draft" domain="[('state', '=', 'draft')]"/> -->
+                    <!-- <filter name="state_pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                    <filter name="state_invoiced" string="Invoiced" domain="[('state', '=', 'invoiced')]"/>
+                    <filter name="state_paid" string="Paid" domain="[('state', '=', 'paid')]"/> -->
+                    <separator/>
+                    <filter name="user" string="User" domain="[]" context="{'group_by': 'user_id'}"/>
+                    <filter name="partner_id" string="Partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter name="credit" string="Credit" domain="[]" context="{'group_by': 'credit_id'}"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+        <record id="credit_overdue_history_view_form" model="ir.ui.view">
+            <field name="name">credit.overdue.history.view.form</field>
+            <field name="model">credit.overdue.history</field>
+            <field name="arch" type="xml">
+                <form delete="0" edit="0" create="0">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_credit_overdues" class="oe_stat_button" type="object" icon="fa-bars" invisible="overdue_count == 0">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Overdues</span>
+                                    <field name="overdue_count" nolabel="1"/>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <!-- <group>
+                                <field name="creation_date"/>
+                            </group> -->
+                            <group>
+                                <field name="user_id"/>
+                                <field name="overdue_date"/>
+                                <field name="overdue_amount"/>
+                                <field name="previous_overdue_amount"/>
+                                <field name="new_overdue_amount"/>
+                                <field name="company_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="credit_overdue_history_view_tree" model="ir.ui.view">
+            <field name="name">credit.overdue.history.view.tree</field>
+            <field name="model">credit.overdue.history</field>
+            <field name="arch" type="xml">
+                <tree delete="0" edit="0" create="0">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="overdue_date"/>
+                    <field name="overdue_amount"/>
+                    <field name="previous_overdue_amount"/>
+                    <field name="new_overdue_amount"/>
+                    <field name="state"/>
+                    <field name="company_id"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>

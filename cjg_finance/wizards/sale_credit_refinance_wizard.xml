@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- ============================================ -->
+    <!-- Form View: Refinancing Wizard -->
+    <!-- ============================================ -->
+    <record id="sale_credit_refinance_wizard_form" model="ir.ui.view">
+        <field name="name">sale.credit.refinance.wizard.form</field>
+        <field name="model">sale.credit.refinance.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Refinanciar Crédito">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <span>Refinanciamiento de Crédito</span>
+                        </h1>
+                        <h2>
+                            <field name="credit_id" readonly="1" options="{'no_open': True}" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group name="current_state" string="Estado Actual">
+                            <field name="current_balance" widget="monetary" />
+                            <field name="current_installments_pending" />
+                            <field name="current_installment_value" widget="monetary" />
+                            <field name="current_interest_rate" />
+                            <field name="currency_id" invisible="1" />
+                        </group>
+                    </group>
+                    <group>
+                        <group name="refinance_params" string="Parametros del Refinanciamiento">
+                            <field name="capital_down_payment" widget="monetary" />
+                            <field name="new_term" />
+                            <field name="new_category_id" placeholder="Dejar vacío para mantener tasa actual" />
+                        </group>
+                        <group name="new_plan" string="Nuevo Plan (Calculado Automaticamente)">
+                            <field name="new_capital" widget="monetary" readonly="1" />
+                            <field name="penalty" widget="monetary" readonly="1" />
+                            <field name="new_interest" widget="monetary" readonly="1" />
+                            <separator string="═══════════════════" />
+                            <field name="total_to_finance" widget="monetary" readonly="1" class="oe_subtotal_footer_separator" />
+                            <field name="new_installment_value" widget="monetary" readonly="1" class="oe_subtotal_footer_separator" />
+                        </group>
+                    </group>
+                    <group name="notes" string="Notas">
+                        <field name="notes" placeholder="Observaciones sobre este refinanciamiento..." nolabel="1" />
+                    </group>
+                    <notebook>
+                        <page name="comparison" string="Comparación Detallada">
+                            <group>
+                                <group string="Antes del Refinanciamiento" class="o_group_col_8">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th>Concepto</th>
+                                            <th class="text-end">Valor</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Saldo Actual</td>
+                                            <td class="text-end">
+                                                <field name="current_balance" readonly="1" nolabel="1" widget="monetary" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Cuotas Pendientes</td>
+                                            <td class="text-end">
+                                                <field name="current_installments_pending" readonly="1" nolabel="1" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Valor Cuota</td>
+                                            <td class="text-end">
+                                                <field name="current_installment_value" readonly="1" nolabel="1" widget="monetary" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tasa de Interés</td>
+                                            <td class="text-end">
+                                                <field name="current_interest_rate" readonly="1" nolabel="1" />
+                                                %
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </group>
+                                <group string="Después del Refinanciamiento" class="o_group_col_8">
+                                    <table class="table table-bordered table-success">
+                                        <tr class="table-success">
+                                            <th>Concepto</th>
+                                            <th class="text-end">Nuevo Valor</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Capital (después de abono)</td>
+                                            <td class="text-end">
+                                                <field name="new_capital" readonly="1" nolabel="1" widget="monetary" />
+                                            </td>
+                                        </tr>
+                                        <tr class="table-warning">
+                                            <td>+ Penalización</td>
+                                            <td class="text-end">
+                                                <field name="penalty" readonly="1" nolabel="1" widget="monetary" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>+ Intereses Nuevos</td>
+                                            <td class="text-end">
+                                                <field name="new_interest" readonly="1" nolabel="1" widget="monetary" />
+                                            </td>
+                                        </tr>
+                                        <tr class="table-info">
+                                            <td>
+                                                <strong>= Total a Financiar</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>
+                                                    <field name="total_to_finance" readonly="1" nolabel="1" widget="monetary" />
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Nuevo Plazo</td>
+                                            <td class="text-end">
+                                                <field name="new_term" readonly="1" nolabel="1" />
+                                                meses
+                                            </td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <td>
+                                                <strong>Nuevo Valor Cuota</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>
+                                                    <field name="new_installment_value" readonly="1" nolabel="1" widget="monetary" />
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="info" string="Informacion">
+                            <div class="alert alert-info" role="alert">
+                                <h4 class="fw-bold mb-2">Como funciona el refinanciamiento</h4>
+                                <p>El refinanciamiento le permite ajustar su plan de pagos mediante:</p>
+                                <ul>
+                                    <li>
+                                        <strong>Abono a Capital:</strong>
+                                        Reduce el saldo pendiente
+                                    </li>
+                                    <li>
+                                        <strong>Nuevo Plazo:</strong>
+                                        Ajusta el número de cuotas
+                                    </li>
+                                    <li>
+                                        <strong>Nueva Tasa:</strong>
+                                        Opcional, cambia la categoría/tasa de interés
+                                    </li>
+                                </ul>
+                                <hr />
+                                <p class="mb-0">
+                                    <strong>Nota:</strong>
+                                    Se aplicará una penalización del
+                                    <code>2%</code>
+                                    sobre el saldo actual (configurable en Configuración → Créditos).
+                                    Los cálculos se actualizan automáticamente al cambiar los parámetros.
+                                </p>
+                            </div>
+                            <div class="alert alert-warning" role="alert">
+                                <h4 class="fw-bold mb-2">Validaciones Automaticas</h4>
+                                <p>El sistema validará automáticamente:</p>
+                                <ul>
+                                    <li>Que no haya RCVs (Recibos de Cobro Virtual) pendientes</li>
+                                    <li>Que el abono a capital sea al menos el mínimo configurado</li>
+                                    <li>Que el nuevo plazo cumpla con las políticas del negocio</li>
+                                    <li>Que no haya saldos vencidos (según configuración)</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_apply_refinance" string="Refinanciar Crédito" type="object" class="btn-primary" data-hotkey="q" />
+                    <button string="Cancelar" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!-- ============================================ -->
+    <!-- Action: Open Refinancing Wizard -->
+    <!-- ============================================ -->
+    <record id="action_sale_credit_refinance_wizard" model="ir.actions.act_window">
+        <field name="name">Refinanciar Crédito</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.credit.refinance.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_sale_credit" />
+        <field name="binding_view_types">form</field>
+    </record>
+    </data>
+</odoo>

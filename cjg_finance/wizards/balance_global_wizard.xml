@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_balance_global_wizard_form" model="ir.ui.view">
+            <field name="name">cjg.finance.balance.global.wizard.form</field>
+            <field name="model">cjg.finance.balance.global.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Plantilla Global de Balance (XLSX)">
+                    <group>
+                        <group string="Período">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group string="Categoría">
+                            <field name="categoria" widget="radio"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_export_xlsx"
+                                string="Generar XLSX"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-file-excel-o"/>
+                        <button string="Cancelar"
+                                class="btn-default"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_balance_global_wizard" model="ir.actions.act_window">
+            <field name="name">Balance — Plantilla Global</field>
+            <field name="res_model">cjg.finance.balance.global.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

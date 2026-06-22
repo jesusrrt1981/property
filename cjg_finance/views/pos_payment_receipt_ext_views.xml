@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+    <!-- 
+     IMPORTANTE: Estas vistas están comentadas hasta que cjg_finance_pos se actualice.
+    
+    PASOS PARA ACTIVAR:
+    1. Actualizar cjg_finance_pos primero (Apps > CJG Finance POS > Upgrade)
+    2. Verificar que existe la vista: Settings > Technical > Views > buscar "cjg.pos.payment.receipt.form"
+    3. Si existe, descomentar estas vistas
+    4. Hacer commit y push
+    5. Actualizar cjg_finance (Apps > CJG Finance > Upgrade)
+    -->
+    
+    <!--
+    <record id="view_pos_payment_receipt_credit_form" model="ir.ui.view">
+        <field name="name">cjg.pos.payment.receipt.credit.form</field>
+        <field name="model">cjg.pos.payment.receipt</field>
+        <field name="inherit_id" ref="cjg_finance_pos.view_pos_payment_receipt_form"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//field[@name='document_type']" position="after">
+                <field name="sale_credit_id" invisible="1"/>
+                <field name="credit_line_id" invisible="document_type != 'credit'" required="document_type == 'credit'"/>
+            </xpath>
+            
+            <xpath expr="//sheet" position="inside">
+                <group string="Requerimiento de Cobro (RCV)" invisible="not partner_id">
+                    <group>
+                        <field name="credit_contract_id" 
+                               domain="[('partner_id', '=', partner_id), ('state', '=', 'approved')]"
+                               options="{'no_create': True}"
+                               placeholder="Seleccione un contrato para generar requerimiento de cobro..."/>
+                        <field name="sale_credit_payment_id" readonly="1" 
+                               invisible="not sale_credit_payment_id"
+                               string="Pago Generado"/>
+                    </group>
+                    <group invisible="not credit_contract_id">
+                        <label for="credit_installments_pending" string="Información del Contrato"/>
+                        <div>
+                            <field name="credit_installments_pending" class="oe_inline"/> cuotas pendientes
+                        </div>
+                        <field name="credit_suggested_amount" widget="monetary" 
+                               string="Monto Sugerido (Próxima Cuota)"/>
+                        <field name="credit_total_debt" widget="monetary" 
+                               string="Deuda Total"/>
+                    </group>
+                </group>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <record id="view_pos_payment_receipt_credit_tree" model="ir.ui.view">
+        <field name="name">cjg.pos.payment.receipt.credit.tree</field>
+        <field name="model">cjg.pos.payment.receipt</field>
+        <field name="inherit_id" ref="cjg_finance_pos.view_pos_payment_receipt_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sale_credit_id" optional="hide"/>
+                <field name="credit_line_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+    -->
+    
+    </data>
+</odoo>
